@@ -1,356 +1,427 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
-<head>
+<html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>My Account — Lbara.tn</title>
+<title>Lbara - My Account Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
     theme: {
       extend: {
         colors: {
-          "primary": "#003060",
-          "secondary": "#005F4B",
-          "accent": "#B8860B",
-          "surface": "#FFFFFF",
-          "on-surface": "#1A202C",
-          "on-primary": "#FFFFFF",
-          "surface-container": "#e8eeff",
-          "surface-container-low": "#f1f3ff",
-          "surface-container-high": "#e3e8f9",
+          "secondary-container": "#fdc34d",
           "surface-container-lowest": "#ffffff",
-          "outline-variant": "#c3c6d0",
-          "on-surface-variant": "#43474f",
+          "on-tertiary-container": "#5ba68f",
+          "primary-fixed": "#d5e3ff",
           "tertiary-fixed": "#a5f2d7",
+          "on-secondary-fixed-variant": "#5d4200",
+          "surface-container": "#e8eeff",
           "on-tertiary-fixed-variant": "#00513f",
+          "surface-container-highest": "#dde2f3",
+          "outline-variant": "#c3c6d0",
+          "primary-fixed-dim": "#a7c8ff",
+          "error": "#ba1a1a",
+          "on-primary-fixed-variant": "#224778",
+          "surface-bright": "#f9f9ff",
+          "surface-container-low": "#f1f3ff",
+          "primary": "#001b3b",
+          "on-primary": "#ffffff",
+          "primary-container": "#003060",
+          "surface-dim": "#d4daea",
+          "on-secondary-container": "#715000",
+          "on-tertiary-fixed": "#002118",
+          "on-primary-fixed": "#001b3c",
+          "on-background": "#161c27",
+          "tertiary-fixed-dim": "#89d5bc",
+          "on-tertiary": "#ffffff",
+          "on-secondary": "#ffffff",
+          "on-primary-container": "#7799cf",
+          "on-surface-variant": "#43474f",
+          "secondary-fixed-dim": "#f7bd48",
+          "on-error": "#ffffff",
+          "on-secondary-fixed": "#271900",
+          "tertiary-container": "#00382b",
+          "surface-variant": "#dde2f3",
+          "surface-tint": "#3c5f92",
           "error-container": "#ffdad6",
           "on-error-container": "#93000a",
-          "secondary-container": "#fdc34d",
-          "on-secondary-container": "#715000",
           "secondary-fixed": "#ffdea6",
-          "on-secondary-fixed-variant": "#5d4200",
-          "primary-fixed": "#d5e3ff",
-          "error": "#ba1a1a",
+          "surface": "#f9f9ff",
+          "outline": "#737780",
+          "inverse-primary": "#a7c8ff",
+          "tertiary": "#002118",
+          "on-surface": "#161c27",
+          "secondary": "#7b5800",
+          "surface-container-high": "#e3e8f9",
+          "inverse-surface": "#2a303d",
+          "background": "#f9f9ff",
+          "inverse-on-surface": "#ecf0ff"
         },
         fontFamily: {
-          "headline": ["Quicksand", "sans-serif"],
-          "body": ["Nunito", "sans-serif"],
+          "headline": ["Plus Jakarta Sans"],
+          "body": ["Be Vietnam Pro"],
+          "label": ["Plus Jakarta Sans"]
         },
-        borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px"},
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
       },
     },
   }
 </script>
-<style type="text/tailwindcss">
-  @layer base {
-    body { @apply bg-white text-on-surface font-body; }
-  }
+<style>
   .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
-  .cartoon-button {
-    @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none;
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background-color: #f9f9ff;
+    color: #161c27;
   }
+  .headline-font { font-family: 'Plus Jakarta Sans', sans-serif; }
 </style>
 </head>
-<body class="bg-surface-container-low text-on-surface">
+<body class="bg-surface text-on-surface">
 
-<!-- Sidebar -->
-<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full py-8 px-4 bg-white border-r border-outline-variant/20 w-64 z-50">
+<!-- Sidebar Navigation -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full py-8 px-4 bg-slate-50 dark:bg-slate-900 h-screen w-64 border-r-0 z-50">
   <div class="mb-10 px-4">
-    <a href="/index.html" class="text-2xl font-black text-primary tracking-tight font-headline">Lbara.tn</a>
+    <a href="/index.html" class="text-2xl font-black text-blue-900 dark:text-blue-100 tracking-tight headline-font">Lbara</a>
   </div>
-  <nav class="flex-1 space-y-1">
-    <button onclick="showSection('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 text-primary font-bold border-r-4 border-primary bg-surface-container transition-all">
+  <nav class="flex-1 space-y-2">
+    <button onclick="showSection('dashboard')" id="nav-dashboard"
+      class="w-full flex items-center gap-3 px-4 py-3 text-blue-900 font-bold border-r-4 border-blue-900 bg-white/50 translate-x-1 transition-transform duration-150">
       <span class="material-symbols-outlined">dashboard</span>
-      <span class="font-headline">Dashboard</span>
+      <span class="font-label">Dashboard</span>
     </button>
-    <button onclick="showSection('security')" id="nav-security" class="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:text-primary hover:bg-surface-container transition-colors border-r-4 border-transparent">
+    <button onclick="showSection('orders')" id="nav-orders"
+      class="w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200">
+      <span class="material-symbols-outlined">inventory_2</span>
+      <span class="font-label">My Orders</span>
+    </button>
+    <button onclick="showSection('security')" id="nav-security"
+      class="w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200">
       <span class="material-symbols-outlined">lock</span>
-      <span class="font-headline">Security</span>
+      <span class="font-label">Security</span>
     </button>
-    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:text-primary hover:bg-surface-container transition-colors" href="/shop.html">
-      <span class="material-symbols-outlined">add_shopping_cart</span>
-      <span class="font-headline">Browse Shop</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:text-primary hover:bg-surface-container transition-colors" href="/contact.html">
+    <a href="/contact.html"
+      class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200">
       <span class="material-symbols-outlined">support_agent</span>
-      <span class="font-headline">Support</span>
+      <span class="font-label">Support</span>
     </a>
   </nav>
-  <!-- User info + logout -->
-  <div class="mt-auto px-4 py-6 bg-surface-container-low rounded-2xl">
+  <div class="mt-auto px-4 py-6 bg-surface-container-low rounded-xl">
     <div class="flex items-center gap-3 mb-4">
-      <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold font-headline text-lg" id="sidebar-avatar">?</div>
+      <div id="sidebar-avatar" class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold headline-font text-lg">?</div>
       <div>
-        <p class="font-headline font-bold text-sm text-primary" id="sidebar-name">Loading...</p>
+        <p class="headline-font font-bold text-sm text-primary" id="sidebar-name">Loading...</p>
         <p class="text-xs text-on-surface-variant" id="sidebar-email"></p>
       </div>
     </div>
-    <button onclick="handleLogout()" class="w-full py-2 bg-primary text-white font-bold rounded-full text-sm hover:opacity-90 transition-opacity font-headline cartoon-button">
+    <button onclick="handleLogout()" class="w-full py-2 bg-secondary-container text-on-secondary-container font-bold rounded-full text-sm hover:opacity-90 transition-opacity">
       Sign Out
     </button>
   </div>
 </aside>
 
-<!-- Top bar -->
-<header class="flex justify-between items-center w-full px-6 py-4 md:pl-72 sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-outline-variant/10">
-  <h2 class="font-headline font-bold text-lg text-primary">My Account</h2>
-  <div class="flex items-center gap-3">
-    <a href="/shop.html" class="cartoon-button bg-primary text-white font-bold px-5 py-2 rounded-full text-sm font-headline">
-      Browse Shop
-    </a>
-    <button onclick="handleLogout()" class="md:hidden p-2 text-on-surface-variant hover:text-primary transition-colors">
-      <span class="material-symbols-outlined">logout</span>
+<!-- Top AppBar -->
+<header class="flex justify-between items-center w-full px-6 py-4 md:pl-72 sticky top-0 z-40 bg-white/70 backdrop-blur-xl shadow-sm">
+  <div class="flex items-center gap-4 flex-1">
+    <div class="relative w-full max-w-md hidden md:block">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+      <input class="w-full pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all text-sm" placeholder="Search services..." type="text"/>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <button class="p-2 text-slate-600 hover:text-blue-900 transition-all">
+      <span class="material-symbols-outlined">notifications</span>
     </button>
+    <button class="p-2 text-slate-600 hover:text-blue-900 transition-all">
+      <span class="material-symbols-outlined">help</span>
+    </button>
+    <div class="h-8 w-[1px] bg-outline-variant mx-2 opacity-30"></div>
+    <div id="header-avatar" class="w-8 h-8 rounded-full border-2 border-primary-fixed bg-primary-container flex items-center justify-center text-white font-bold text-sm headline-font">?</div>
   </div>
 </header>
 
-<!-- Main -->
-<main class="md:pl-64 min-h-screen pb-24 md:pb-0">
-  <div class="max-w-6xl mx-auto p-6 md:p-10">
+<!-- Main Content -->
+<main class="md:pl-64 min-h-screen">
+  <div class="max-w-7xl mx-auto p-6 md:p-10">
 
-    <!-- ── DASHBOARD VIEW ─────────────────────────────────── -->
-    <div id="view-dashboard">
-
-      <!-- Welcome header -->
-      <header class="mb-10">
-        <h1 class="text-4xl md:text-5xl font-extrabold font-headline text-on-surface tracking-tight mb-2" id="welcome-title">Hello 👋</h1>
-        <p class="text-on-surface-variant text-lg" id="welcome-sub">Loading your account...</p>
+    <!-- ═══════════════════════════════════════════════════════
+         DASHBOARD SECTION
+    ═══════════════════════════════════════════════════════ -->
+    <div id="section-dashboard">
+      <header class="mb-12">
+        <h1 class="text-4xl md:text-5xl font-extrabold headline-font text-on-surface tracking-tight mb-2" id="welcome-title">Hello</h1>
+        <p class="text-on-surface-variant text-lg">Your digital world is up to date and active.</p>
       </header>
 
-      <!-- Stats row -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-        <div class="bg-primary text-white p-6 rounded-2xl">
-          <p class="text-xs font-bold uppercase tracking-widest opacity-70 font-headline mb-1">Total Orders</p>
-          <p class="text-3xl font-black font-headline" id="stat-total">—</p>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <!-- Left column -->
+        <div class="md:col-span-4 flex flex-col gap-8">
+          <!-- Stats card -->
+          <section class="bg-primary-container text-on-primary p-8 rounded-[2rem] relative overflow-hidden flex flex-col justify-between h-64 shadow-[0_20px_40px_rgba(0,48,96,0.15)]">
+            <div class="relative z-10">
+              <p class="headline-font font-semibold opacity-70 text-sm uppercase tracking-widest">Total Orders</p>
+              <h2 class="text-4xl font-black mt-2" id="stat-total">—</h2>
+            </div>
+            <div class="relative z-10 flex justify-between items-end">
+              <div>
+                <p class="text-xs opacity-70 font-semibold">Fulfilled: <span id="stat-fulfilled" class="font-black">—</span></p>
+                <p class="text-xs opacity-70 font-semibold">Spent: <span id="stat-spent" class="font-black">—</span> TND</p>
+              </div>
+              <a href="/shop.html" class="bg-surface-container-lowest text-primary px-6 py-2 rounded-full font-bold text-sm hover:scale-105 transition-transform headline-font">
+                Shop Now
+              </a>
+            </div>
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-tertiary-fixed opacity-10 rounded-full blur-3xl"></div>
+            <div class="absolute -left-10 -bottom-10 w-60 h-60 bg-secondary-container opacity-5 rounded-full blur-3xl"></div>
+          </section>
+
+          <!-- Quick Actions -->
+          <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
+            <h3 class="headline-font font-bold text-xl mb-6">Quick Actions</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <a href="/shop.html" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
+                <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">add_shopping_cart</span>
+                <span class="text-xs font-bold headline-font">Buy New</span>
+              </a>
+              <button onclick="showSection('orders')" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
+                <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">receipt_long</span>
+                <span class="text-xs font-bold headline-font">My Orders</span>
+              </button>
+              <button onclick="showSection('security')" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
+                <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">lock</span>
+                <span class="text-xs font-bold headline-font">Security</span>
+              </button>
+              <a href="/contact.html" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
+                <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">support_agent</span>
+                <span class="text-xs font-bold headline-font">Support</span>
+              </a>
+            </div>
+          </section>
         </div>
-        <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
-          <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Fulfilled</p>
-          <p class="text-3xl font-black font-headline text-secondary" id="stat-fulfilled">—</p>
-        </div>
-        <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
-          <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Processing</p>
-          <p class="text-3xl font-black font-headline text-accent" id="stat-processing">—</p>
-        </div>
-        <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
-          <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Total Spent</p>
-          <p class="text-xl font-black font-headline text-primary" id="stat-spent">—</p>
+
+        <!-- Right column: recent orders -->
+        <div class="md:col-span-8">
+          <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
+            <div class="flex justify-between items-center mb-8">
+              <h3 class="headline-font font-bold text-2xl">Recent Orders</h3>
+              <button onclick="showSection('orders')" class="text-primary font-bold text-sm underline underline-offset-4">View All</button>
+            </div>
+            <div id="dashboard-orders-loading" class="text-center py-8 text-on-surface-variant">
+              <span class="material-symbols-outlined text-4xl block mb-2">hourglass_empty</span>
+              <p class="headline-font font-bold text-sm">Loading...</p>
+            </div>
+            <div id="dashboard-orders-empty" class="hidden text-center py-8 text-on-surface-variant">
+              <span class="material-symbols-outlined text-4xl block mb-2">shopping_bag</span>
+              <p class="headline-font font-bold">No orders yet</p>
+            </div>
+            <div id="dashboard-orders-list" class="hidden space-y-6"></div>
+          </section>
         </div>
       </div>
 
-      <!-- Quick Actions -->
-      <section class="mb-10">
-        <h3 class="font-headline font-bold text-xl mb-4">Quick Actions</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <a href="/shop.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
-            <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">add_shopping_cart</span>
-            <span class="text-xs font-bold font-headline">Buy New</span>
-          </a>
-          <a href="/contact.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
-            <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">support_agent</span>
-            <span class="text-xs font-bold font-headline">Support</span>
-          </a>
-          <button onclick="showSection('security')" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
-            <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">lock</span>
-            <span class="text-xs font-bold font-headline">Security</span>
-          </button>
-          <a href="/faq.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
-            <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">help</span>
-            <span class="text-xs font-bold font-headline">FAQ</span>
-          </a>
+      <!-- Footer -->
+      <footer class="mt-20 py-10 flex flex-col md:flex-row justify-between items-center gap-6 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+        <span class="headline-font font-black text-2xl tracking-tighter">Lbara.tn</span>
+        <div class="flex gap-8 text-xs font-bold uppercase tracking-widest headline-font">
+          <a class="hover:text-primary" href="#">Privacy</a>
+          <a class="hover:text-primary" href="#">Terms</a>
+          <a class="hover:text-primary" href="#">Help</a>
         </div>
+      </footer>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         MY ORDERS SECTION
+    ═══════════════════════════════════════════════════════ -->
+    <div id="section-orders" class="hidden">
+      <header class="mb-12">
+        <h1 class="text-4xl md:text-5xl font-extrabold headline-font text-on-surface tracking-tight mb-2">My Orders</h1>
+        <p class="text-on-surface-variant text-lg">All your purchases in one place.</p>
+      </header>
+      <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
+        <div id="orders-loading" class="text-center py-12 text-on-surface-variant">
+          <span class="material-symbols-outlined text-5xl block mb-3">hourglass_empty</span>
+          <p class="headline-font font-bold">Loading orders...</p>
+        </div>
+        <div id="orders-empty" class="hidden text-center py-12 text-on-surface-variant">
+          <span class="material-symbols-outlined text-5xl block mb-3">shopping_bag</span>
+          <p class="headline-font font-bold text-lg mb-2">No orders yet</p>
+          <a href="/shop.html" class="inline-block mt-2 px-6 py-3 bg-primary-container text-on-primary rounded-full font-bold headline-font hover:opacity-90 transition-opacity">Browse Shop</a>
+        </div>
+        <div id="orders-full-list" class="hidden space-y-6"></div>
       </section>
+    </div>
 
-      <!-- Orders list -->
-    <section class="bg-white rounded-2xl border border-outline-variant/20 p-8">
-      <div class="flex justify-between items-center mb-8">
-        <h3 class="font-headline font-bold text-2xl">Order History</h3>
-      </div>
-
-      <!-- Loading state -->
-      <div id="orders-loading" class="text-center py-12 text-on-surface-variant">
-        <span class="material-symbols-outlined text-5xl mb-3 block">hourglass_empty</span>
-        <p class="font-headline font-bold">Loading orders...</p>
-      </div>
-
-      <!-- Empty state -->
-      <div id="orders-empty" class="hidden text-center py-12 text-on-surface-variant">
-        <span class="material-symbols-outlined text-5xl mb-3 block">shopping_bag</span>
-        <p class="font-headline font-bold text-lg mb-2">No orders yet</p>
-        <p class="text-sm mb-6">Start browsing our digital services.</p>
-        <a href="/shop.html" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-full font-headline inline-block">Browse Shop</a>
-      </div>
-
-      <!-- Orders table -->
-      <div id="orders-list" class="hidden space-y-4"></div>
-    </section>
-
-    </div><!-- ── END DASHBOARD VIEW ── -->
-
-    <!-- ── SECURITY VIEW ──────────────────────────────────── -->
-    <div id="view-security" class="hidden">
-      <header class="mb-10">
-        <h1 class="text-4xl font-extrabold font-headline text-on-surface tracking-tight mb-2">Security</h1>
+    <!-- ═══════════════════════════════════════════════════════
+         SECURITY SECTION
+    ═══════════════════════════════════════════════════════ -->
+    <div id="section-security" class="hidden">
+      <header class="mb-12">
+        <h1 class="text-4xl md:text-5xl font-extrabold headline-font text-on-surface tracking-tight mb-2">Security</h1>
         <p class="text-on-surface-variant text-lg">Manage your password and account security.</p>
       </header>
-      <section class="bg-white rounded-2xl border border-outline-variant/20 p-8">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
-            <span class="material-symbols-outlined text-primary">lock</span>
+      <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 bg-primary-fixed flex items-center justify-center rounded-2xl">
+            <span class="material-symbols-outlined text-primary">lock_reset</span>
           </div>
-          <h3 class="font-headline font-bold text-2xl">Change Password</h3>
+          <div>
+            <h3 class="headline-font font-bold text-xl">Change Password</h3>
+            <p class="text-sm text-on-surface-variant">A 6-digit code will be sent to your email.</p>
+          </div>
         </div>
-        <!-- Step 1 -->
-        <div id="security-step1">
-          <p class="text-on-surface-variant text-sm mb-6">We'll send a 6-digit verification code to your email address.</p>
-          <button id="send-code-btn" onclick="sendCode()" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-full font-headline text-sm flex items-center gap-2">
+
+        <!-- Step 1: Send code -->
+        <div id="sec-step1">
+          <button id="send-code-btn" onclick="sendCode()"
+            class="px-6 py-3 bg-primary-container text-on-primary rounded-full font-bold headline-font text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
             <span class="material-symbols-outlined text-sm">mail</span>
             Send Verification Code
           </button>
-          <p id="send-code-msg" class="hidden mt-4 text-sm font-bold font-headline"></p>
+          <p id="send-code-msg" class="hidden mt-4 text-sm font-semibold"></p>
         </div>
-        <!-- Step 2 -->
-        <div id="security-step2" class="hidden mt-6 border-t border-outline-variant/10 pt-6">
-          <p class="text-on-surface-variant text-sm mb-6">Enter the 6-digit code from your email and your new password.</p>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <!-- Step 2: Verify + new password -->
+        <div id="sec-step2" class="hidden mt-8 pt-8 border-t border-outline-variant/20">
+          <p class="text-sm text-on-surface-variant mb-6">Enter the code from your email and choose a new password.</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">Verification Code</label>
+              <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Verification Code</label>
               <input id="otp-input" type="text" maxlength="6" inputmode="numeric" placeholder="123456"
-                class="w-full border-2 border-primary rounded-xl px-4 py-3 font-bold text-primary text-center text-xl tracking-widest placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
+                class="w-full bg-surface-container border-none rounded-xl px-4 py-3 font-bold text-on-surface text-center text-xl tracking-widest focus:ring-2 focus:ring-blue-500/20 transition-all"/>
             </div>
             <div>
-              <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">New Password</label>
+              <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">New Password</label>
               <div class="relative">
                 <input id="new-password-input" type="password" placeholder="Min. 8 characters"
-                  class="w-full border-2 border-primary rounded-xl px-4 py-3 pr-12 font-bold text-primary placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
-                <button type="button" onclick="togglePwd('new-password-input','eye-new')" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
+                  class="w-full bg-surface-container border-none rounded-xl px-4 py-3 pr-12 font-medium text-on-surface focus:ring-2 focus:ring-blue-500/20 transition-all"/>
+                <button type="button" onclick="togglePwd('new-password-input','eye-new')"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors">
                   <span id="eye-new" class="material-symbols-outlined text-xl">visibility</span>
                 </button>
               </div>
             </div>
             <div>
-              <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">Confirm Password</label>
+              <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Confirm Password</label>
               <div class="relative">
                 <input id="confirm-password-input" type="password" placeholder="Repeat password"
-                  class="w-full border-2 border-primary rounded-xl px-4 py-3 pr-12 font-bold text-primary placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
-                <button type="button" onclick="togglePwd('confirm-password-input','eye-confirm')" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
+                  class="w-full bg-surface-container border-none rounded-xl px-4 py-3 pr-12 font-medium text-on-surface focus:ring-2 focus:ring-blue-500/20 transition-all"/>
+                <button type="button" onclick="togglePwd('confirm-password-input','eye-confirm')"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors">
                   <span id="eye-confirm" class="material-symbols-outlined text-xl">visibility</span>
                 </button>
               </div>
             </div>
           </div>
           <div class="flex items-center gap-4 mt-6">
-            <button onclick="changePassword()" id="change-pwd-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-full font-headline text-sm flex items-center gap-2">
+            <button onclick="changePassword()" id="change-pwd-btn"
+              class="px-6 py-3 bg-primary-container text-on-primary rounded-full font-bold headline-font text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
               <span class="material-symbols-outlined text-sm">check</span>
               Confirm Change
             </button>
-            <button onclick="cancelChange()" class="text-sm font-bold text-on-surface-variant hover:text-primary transition-colors font-headline">Cancel</button>
+            <button onclick="cancelSecurityChange()" class="text-sm font-semibold text-on-surface-variant hover:text-on-surface transition-colors">
+              Cancel
+            </button>
           </div>
-          <p id="change-pwd-msg" class="hidden mt-4 text-sm font-bold font-headline"></p>
+          <p id="change-pwd-msg" class="hidden mt-4 text-sm font-semibold"></p>
         </div>
       </section>
-    </div><!-- ── END SECURITY VIEW ── -->
+    </div>
 
   </div>
 </main>
 
-<!-- Mobile bottom nav -->
+<!-- Mobile Bottom Nav -->
 <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl flex justify-around items-center py-4 px-6 z-50 border-t border-outline-variant/10">
-  <button class="flex flex-col items-center gap-1 text-primary">
+  <button onclick="showSection('dashboard')" class="flex flex-col items-center gap-1 text-primary">
     <span class="material-symbols-outlined">dashboard</span>
-    <span class="text-[10px] font-bold font-headline">Home</span>
+    <span class="text-[10px] font-bold headline-font">Home</span>
   </button>
-  <a href="/shop.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
-    <span class="material-symbols-outlined">store</span>
-    <span class="text-[10px] font-bold font-headline">Shop</span>
-  </a>
-  <a href="/contact.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
-    <span class="material-symbols-outlined">support_agent</span>
-    <span class="text-[10px] font-bold font-headline">Support</span>
-  </a>
+  <button onclick="showSection('orders')" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">inventory_2</span>
+    <span class="text-[10px] font-bold headline-font">Orders</span>
+  </button>
   <button onclick="showSection('security')" class="flex flex-col items-center gap-1 text-on-surface-variant">
     <span class="material-symbols-outlined">lock</span>
-    <span class="text-[10px] font-bold font-headline">Security</span>
+    <span class="text-[10px] font-bold headline-font">Security</span>
   </button>
   <button onclick="handleLogout()" class="flex flex-col items-center gap-1 text-on-surface-variant">
     <span class="material-symbols-outlined">logout</span>
-    <span class="text-[10px] font-bold font-headline">Sign Out</span>
+    <span class="text-[10px] font-bold headline-font">Sign Out</span>
   </button>
 </nav>
 
 <script src="/js/api.js"></script>
 <script>
-const STATUS_STYLES = {
-  fulfilled:       { label: 'Fulfilled',   bg: 'bg-tertiary-fixed',      text: 'text-on-tertiary-fixed-variant' },
-  paid:            { label: 'Paid',        bg: 'bg-primary-fixed',       text: 'text-primary' },
-  processing:      { label: 'Processing',  bg: 'bg-secondary-container', text: 'text-on-secondary-container' },
-  pending_payment: { label: 'Pending',     bg: 'bg-secondary-fixed',     text: 'text-on-secondary-fixed-variant' },
-  payment_failed:  { label: 'Failed',      bg: 'bg-error-container',     text: 'text-on-error-container' },
-  cancelled:       { label: 'Cancelled',   bg: 'bg-error-container',     text: 'text-on-error-container' },
-  refunded:        { label: 'Refunded',    bg: 'bg-surface-container',   text: 'text-on-surface-variant' },
-};
+// ── Section switching ──────────────────────────────────────
+const SECTIONS = ['dashboard', 'orders', 'security'];
 
-function statusBadge(status) {
-  const s = STATUS_STYLES[status] || { label: status, bg: 'bg-surface-container', text: 'text-on-surface-variant' };
-  return `<span class="text-[10px] font-black font-headline uppercase px-2 py-1 rounded-full ${s.bg} ${s.text}">${s.label}</span>`;
+function showSection(name) {
+  SECTIONS.forEach(s => {
+    document.getElementById('section-' + s).style.display = (s === name) ? '' : 'none';
+  });
+
+  // Update sidebar active state
+  SECTIONS.forEach(s => {
+    const btn = document.getElementById('nav-' + s);
+    if (!btn) return;
+    if (s === name) {
+      btn.className = 'w-full flex items-center gap-3 px-4 py-3 text-blue-900 font-bold border-r-4 border-blue-900 bg-white/50 translate-x-1 transition-transform duration-150';
+    } else {
+      btn.className = 'w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200';
+    }
+  });
 }
 
-function formatDate(iso) {
+// ── Helpers ───────────────────────────────────────────────
+const STATUS_LABELS = {
+  fulfilled: { label: 'Fulfilled', bg: 'bg-tertiary-fixed', text: 'text-on-tertiary-fixed' },
+  paid: { label: 'Paid', bg: 'bg-primary-fixed', text: 'text-primary' },
+  processing: { label: 'Processing', bg: 'bg-secondary-container', text: 'text-on-secondary-container' },
+  pending_payment: { label: 'Pending', bg: 'bg-secondary-fixed', text: 'text-on-secondary-fixed-variant' },
+  payment_failed: { label: 'Failed', bg: 'bg-error-container', text: 'text-on-error-container' },
+  cancelled: { label: 'Cancelled', bg: 'bg-error-container', text: 'text-on-error-container' },
+};
+
+function badge(status) {
+  const s = STATUS_LABELS[status] || { label: status, bg: 'bg-surface-container', text: 'text-on-surface-variant' };
+  return `<span class="text-[10px] font-black headline-font uppercase px-2 py-0.5 rounded-full ${s.bg} ${s.text}">${s.label}</span>`;
+}
+
+function fmtDate(iso) {
   return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-function renderOrders(orders) {
-  if (!orders.length) {
-    document.getElementById('orders-empty').classList.remove('hidden');
-    return;
-  }
-  const list = document.getElementById('orders-list');
-  list.classList.remove('hidden');
-  list.innerHTML = orders.map(o => `
-    <div class="flex items-center justify-between py-4 border-b border-outline-variant/10 last:border-0">
+function orderRow(o) {
+  return `
+    <div class="flex items-center justify-between py-2">
       <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center flex-shrink-0">
+        <div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center">
           <span class="material-symbols-outlined text-primary">shopping_bag</span>
         </div>
         <div>
-          <p class="font-headline font-bold text-on-surface">${o.product_name || 'Order'}</p>
-          <p class="text-xs text-on-surface-variant">${o.order_ref} &bull; ${formatDate(o.created_at)}</p>
+          <p class="headline-font font-bold text-on-surface">${o.product_name || 'Order'}</p>
+          <p class="text-xs text-on-surface-variant">${o.order_ref} &bull; ${fmtDate(o.created_at)}</p>
         </div>
       </div>
-      <div class="text-right flex flex-col items-end gap-1">
-        <p class="font-bold font-headline text-on-surface">${parseFloat(o.amount_tnd).toFixed(3)} TND</p>
-        ${statusBadge(o.status)}
+      <div class="text-right">
+        <p class="font-bold headline-font text-on-surface">- ${parseFloat(o.amount_tnd).toFixed(3)} TND</p>
+        ${badge(o.status)}
       </div>
-    </div>
-  `).join('');
+    </div>`;
 }
 
-function showSection(section) {
-  const isDashboard = section === 'dashboard';
-  document.getElementById('view-dashboard').classList.toggle('hidden', !isDashboard);
-  document.getElementById('view-security').classList.toggle('hidden', isDashboard);
-
-  const dashBtn = document.getElementById('nav-dashboard');
-  const secBtn = document.getElementById('nav-security');
-
-  dashBtn.className = `w-full flex items-center gap-3 px-4 py-3 font-bold border-r-4 transition-all ${isDashboard ? 'text-primary border-primary bg-surface-container' : 'text-on-surface-variant border-transparent hover:text-primary hover:bg-surface-container'}`;
-  secBtn.className = `w-full flex items-center gap-3 px-4 py-3 font-bold border-r-4 transition-all ${!isDashboard ? 'text-primary border-primary bg-surface-container' : 'text-on-surface-variant border-transparent hover:text-primary hover:bg-surface-container'}`;
-}
-
+// ── Password change ───────────────────────────────────────
 function togglePwd(inputId, iconId) {
   const input = document.getElementById(inputId);
   const icon = document.getElementById(iconId);
-  if (input.type === 'password') {
-    input.type = 'text';
-    icon.textContent = 'visibility_off';
-  } else {
-    input.type = 'password';
-    icon.textContent = 'visibility';
-  }
+  input.type = input.type === 'password' ? 'text' : 'password';
+  icon.textContent = input.type === 'password' ? 'visibility' : 'visibility_off';
 }
 
 async function sendCode() {
@@ -358,20 +429,17 @@ async function sendCode() {
   const msg = document.getElementById('send-code-msg');
   btn.disabled = true;
   btn.textContent = 'Sending...';
-  msg.className = 'hidden mt-4 text-sm font-bold font-headline';
   try {
     await api.requestPasswordChange();
-    msg.textContent = '✓ Code sent! Check your inbox (also spam folder).';
-    msg.className = 'mt-4 text-sm font-bold font-headline text-secondary';
-    document.getElementById('security-step2').classList.remove('hidden');
-    btn.textContent = 'Resend Code';
-    btn.disabled = false;
+    msg.textContent = '✓ Code sent! Check your inbox.';
+    msg.className = 'mt-4 text-sm font-semibold text-green-700';
+    document.getElementById('sec-step2').classList.remove('hidden');
   } catch (err) {
     msg.textContent = err.message || 'Failed to send code.';
-    msg.className = 'mt-4 text-sm font-bold font-headline text-error';
-    btn.innerHTML = '<span class="material-symbols-outlined text-sm">mail</span> Send Verification Code';
-    btn.disabled = false;
+    msg.className = 'mt-4 text-sm font-semibold text-red-600';
   }
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-symbols-outlined text-sm">mail</span> Resend Code';
 }
 
 async function changePassword() {
@@ -383,35 +451,32 @@ async function changePassword() {
 
   if (newPwd !== confirmPwd) {
     msg.textContent = 'Passwords do not match.';
-    msg.className = 'mt-4 text-sm font-bold font-headline text-error';
+    msg.className = 'mt-4 text-sm font-semibold text-red-600';
     return;
   }
   btn.disabled = true;
   btn.textContent = 'Verifying...';
-  msg.className = 'hidden mt-4 text-sm font-bold font-headline';
   try {
     await api.confirmPasswordChange({ otp, new_password: newPwd });
     msg.textContent = '✓ Password changed successfully!';
-    msg.className = 'mt-4 text-sm font-bold font-headline text-secondary';
+    msg.className = 'mt-4 text-sm font-semibold text-green-700';
     document.getElementById('otp-input').value = '';
     document.getElementById('new-password-input').value = '';
     document.getElementById('confirm-password-input').value = '';
-    btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Confirm Change';
-    btn.disabled = false;
     setTimeout(() => {
-      document.getElementById('security-step2').classList.add('hidden');
+      document.getElementById('sec-step2').classList.add('hidden');
       msg.className = 'hidden';
     }, 3000);
   } catch (err) {
     msg.textContent = err.message || 'Failed to change password.';
-    msg.className = 'mt-4 text-sm font-bold font-headline text-error';
-    btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Confirm Change';
-    btn.disabled = false;
+    msg.className = 'mt-4 text-sm font-semibold text-red-600';
   }
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Confirm Change';
 }
 
-function cancelChange() {
-  document.getElementById('security-step2').classList.add('hidden');
+function cancelSecurityChange() {
+  document.getElementById('sec-step2').classList.add('hidden');
   document.getElementById('otp-input').value = '';
   document.getElementById('new-password-input').value = '';
   document.getElementById('confirm-password-input').value = '';
@@ -423,8 +488,8 @@ async function handleLogout() {
   window.location.href = '/login.html';
 }
 
+// ── Init ─────────────────────────────────────────────────
 async function init() {
-  // Guard: redirect to login if not authenticated
   let user;
   try {
     const res = await api.me();
@@ -434,42 +499,52 @@ async function init() {
     return;
   }
 
-  // Populate user info
   const name = user.full_name || user.email.split('@')[0];
   const initial = name[0].toUpperCase();
-  document.getElementById('welcome-title').textContent = `Hello, ${name} 👋`;
-  document.getElementById('welcome-sub').textContent = user.email;
+  document.getElementById('welcome-title').textContent = `Hello, ${name}`;
   document.getElementById('sidebar-name').textContent = name;
   document.getElementById('sidebar-email').textContent = user.email;
   document.getElementById('sidebar-avatar').textContent = initial;
+  document.getElementById('header-avatar').textContent = initial;
 
-  // Load orders
-  document.getElementById('orders-loading').classList.remove('hidden');
   try {
     const res = await api.myOrders();
     const orders = res.orders || [];
-    document.getElementById('orders-loading').classList.add('hidden');
 
-    // Stats
     const fulfilled = orders.filter(o => o.status === 'fulfilled').length;
-    const processing = orders.filter(o => ['paid', 'processing'].includes(o.status)).length;
-    const spent = orders
-      .filter(o => ['paid', 'processing', 'fulfilled'].includes(o.status))
-      .reduce((sum, o) => sum + parseFloat(o.amount_tnd), 0);
+    const spent = orders.filter(o => ['paid','processing','fulfilled'].includes(o.status))
+      .reduce((s, o) => s + parseFloat(o.amount_tnd), 0);
 
     document.getElementById('stat-total').textContent = orders.length;
     document.getElementById('stat-fulfilled').textContent = fulfilled;
-    document.getElementById('stat-processing').textContent = processing;
-    document.getElementById('stat-spent').textContent = spent.toFixed(3) + ' TND';
+    document.getElementById('stat-spent').textContent = spent.toFixed(3);
 
-    renderOrders(orders);
+    // Dashboard recent (max 3)
+    document.getElementById('dashboard-orders-loading').classList.add('hidden');
+    const recent = orders.slice(0, 3);
+    if (recent.length === 0) {
+      document.getElementById('dashboard-orders-empty').classList.remove('hidden');
+    } else {
+      const dl = document.getElementById('dashboard-orders-list');
+      dl.classList.remove('hidden');
+      dl.innerHTML = recent.map(orderRow).join('');
+    }
+
+    // Full orders list
+    document.getElementById('orders-loading').classList.add('hidden');
+    if (orders.length === 0) {
+      document.getElementById('orders-empty').classList.remove('hidden');
+    } else {
+      const fl = document.getElementById('orders-full-list');
+      fl.classList.remove('hidden');
+      fl.innerHTML = orders.map(orderRow).join('');
+    }
   } catch {
-    document.getElementById('orders-loading').innerHTML =
-      '<p class="text-center text-error font-headline font-bold py-8">Failed to load orders.</p>';
+    document.getElementById('dashboard-orders-loading').innerHTML =
+      '<p class="text-sm text-red-500 font-semibold text-center py-4">Failed to load orders.</p>';
   }
 }
 
 init();
 </script>
-</body>
-</html>
+</body></html>
