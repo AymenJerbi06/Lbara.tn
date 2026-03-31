@@ -113,6 +113,10 @@ CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_active ON products(active);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
 
+-- ─── Password Reset Columns (safe to run on existing DB) ──
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token VARCHAR(128);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires TIMESTAMPTZ;
+
 -- ─── Seed Products ────────────────────────────────────────
 INSERT INTO products (slug, name, provider, category, description, price_tnd, badge, account_type, duration_label, delivery_hours)
 VALUES
