@@ -165,8 +165,6 @@
       </div>
     </section>
 
-    </div><!-- end view-dashboard -->
-
     <!-- Security View -->
     <div id="view-security" class="hidden">
     <header class="mb-10">
@@ -233,6 +231,9 @@
     </section>
     </div><!-- end view-security -->
 
+    <!-- Dashboard View -->
+    <div id="view-dashboard">
+
     <!-- Orders list -->
     <section class="bg-white rounded-2xl border border-outline-variant/20 p-8">
       <div class="flex justify-between items-center mb-8">
@@ -256,6 +257,8 @@
       <!-- Orders table -->
       <div id="orders-list" class="hidden space-y-4"></div>
     </section>
+
+    </div><!-- end view-dashboard -->
 
   </div>
 </main>
@@ -333,7 +336,7 @@ function renderOrders(orders) {
 
 function showSection(section) {
   const isDashboard = section === 'dashboard';
-  document.getElementById('view-dashboard').classList.toggle('hidden', !isDashboard);
+  document.querySelectorAll('#view-dashboard').forEach(el => el.classList.toggle('hidden', !isDashboard));
   document.getElementById('view-security').classList.toggle('hidden', isDashboard);
 
   const dashBtn = document.getElementById('nav-dashboard');
