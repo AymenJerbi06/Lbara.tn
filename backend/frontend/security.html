@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lbara - Security Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "secondary-container": "#fdc34d",
+          "surface-container-lowest": "#ffffff",
+          "on-tertiary-container": "#5ba68f",
+          "primary-fixed": "#d5e3ff",
+          "tertiary-fixed": "#a5f2d7",
+          "on-secondary-fixed-variant": "#5d4200",
+          "surface-container": "#e8eeff",
+          "on-tertiary-fixed-variant": "#00513f",
+          "surface-container-highest": "#dde2f3",
+          "outline-variant": "#c3c6d0",
+          "primary-fixed-dim": "#a7c8ff",
+          "error": "#ba1a1a",
+          "on-primary-fixed-variant": "#224778",
+          "surface-bright": "#f9f9ff",
+          "surface-container-low": "#f1f3ff",
+          "primary": "#001b3b",
+          "on-primary": "#ffffff",
+          "primary-container": "#003060",
+          "surface-dim": "#d4daea",
+          "on-secondary-container": "#715000",
+          "on-tertiary-fixed": "#002118",
+          "on-primary-fixed": "#001b3c",
+          "on-background": "#161c27",
+          "tertiary-fixed-dim": "#89d5bc",
+          "on-tertiary": "#ffffff",
+          "on-secondary": "#ffffff",
+          "on-primary-container": "#7799cf",
+          "on-surface-variant": "#43474f",
+          "secondary-fixed-dim": "#f7bd48",
+          "on-error": "#ffffff",
+          "on-secondary-fixed": "#271900",
+          "tertiary-container": "#00382b",
+          "surface-variant": "#dde2f3",
+          "surface-tint": "#3c5f92",
+          "error-container": "#ffdad6",
+          "on-error-container": "#93000a",
+          "secondary-fixed": "#ffdea6",
+          "surface": "#f9f9ff",
+          "outline": "#737780",
+          "inverse-primary": "#a7c8ff",
+          "tertiary": "#002118",
+          "on-surface": "#161c27",
+          "secondary": "#7b5800",
+          "surface-container-high": "#e3e8f9",
+          "inverse-surface": "#2a303d",
+          "background": "#f9f9ff",
+          "inverse-on-surface": "#ecf0ff"
+        },
+        fontFamily: {
+          "headline": ["Plus Jakarta Sans"],
+          "body": ["Be Vietnam Pro"],
+          "label": ["Plus Jakarta Sans"]
+        },
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background-color: #f9f9ff;
+    color: #161c27;
+  }
+  .headline-font { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .stepper-line::before {
+    content: '';
+    position: absolute;
+    left: 1.25rem;
+    top: 2rem;
+    bottom: 0;
+    width: 2px;
+    background-color: #dde2f3;
+    z-index: 0;
+  }
+  .stepper-item:last-child .stepper-line::before {
+    display: none;
+  }
+</style>
+</head>
+<body class="bg-surface text-on-surface">
+
+<!-- Sidebar -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full py-8 px-4 bg-slate-50 dark:bg-slate-900 h-screen w-64 border-r-0 z-50">
+  <div class="mb-10 px-4">
+    <a href="/index.html" class="text-2xl font-black text-blue-900 dark:text-blue-100 tracking-tight headline-font">Lbara</a>
+  </div>
+  <nav class="flex-1 space-y-2">
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200" href="/my-account.html">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-label">Dashboard</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200" href="/my-account.html">
+      <span class="material-symbols-outlined">inventory_2</span>
+      <span class="font-label">My Orders</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-blue-900 font-bold border-r-4 border-blue-900 bg-white/50 translate-x-1 transition-transform duration-150" href="/security.html">
+      <span class="material-symbols-outlined">lock</span>
+      <span class="font-label">Security</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200" href="/contact.html">
+      <span class="material-symbols-outlined">support_agent</span>
+      <span class="font-label">Support</span>
+    </a>
+  </nav>
+  <div class="mt-auto px-4 py-6 bg-surface-container-low rounded-xl">
+    <div class="flex items-center gap-3 mb-4">
+      <div id="sidebar-avatar" class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold headline-font text-lg">?</div>
+      <div>
+        <p class="headline-font font-bold text-sm text-primary" id="sidebar-name">Loading...</p>
+        <p class="text-xs text-on-surface-variant" id="sidebar-email"></p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="w-full py-2 bg-secondary-container text-on-secondary-container font-bold rounded-full text-sm hover:opacity-90 transition-opacity">
+      Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- Top AppBar -->
+<header class="flex justify-between items-center w-full px-6 py-4 md:pl-72 sticky top-0 z-40 bg-white/70 backdrop-blur-xl shadow-sm">
+  <div class="flex items-center gap-4 flex-1">
+    <div class="relative w-full max-w-md hidden md:block">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+      <input class="w-full pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all text-sm" placeholder="Search settings..." type="text"/>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <button class="p-2 text-slate-600 hover:text-blue-900 transition-all">
+      <span class="material-symbols-outlined">notifications</span>
+    </button>
+    <button class="p-2 text-slate-600 hover:text-blue-900 transition-all">
+      <span class="material-symbols-outlined">help</span>
+    </button>
+    <div class="h-8 w-[1px] bg-outline-variant mx-2 opacity-30"></div>
+    <div id="header-avatar" class="w-8 h-8 rounded-full border-2 border-primary-fixed bg-primary-container flex items-center justify-center text-white font-bold text-sm headline-font">?</div>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="md:pl-64 min-h-screen">
+  <div class="max-w-4xl mx-auto p-6 md:p-10">
+    <header class="mb-12">
+      <div class="flex items-center gap-2 text-on-surface-variant mb-2">
+        <a class="text-sm font-bold headline-font hover:text-primary transition-colors" href="/my-account.html">Dashboard</a>
+        <span class="material-symbols-outlined text-sm">chevron_right</span>
+        <span class="text-sm font-bold headline-font text-primary">Security Review</span>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-extrabold headline-font text-on-surface tracking-tight">Security Review</h1>
+      <p class="text-on-surface-variant text-lg mt-2">Manage your account identity and protection settings.</p>
+    </header>
+
+    <div class="space-y-12">
+
+      <!-- Step 1: Display Name -->
+      <section class="stepper-item relative flex gap-6">
+        <div class="stepper-line relative flex-shrink-0">
+          <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold headline-font z-10 relative">1</div>
+        </div>
+        <div class="flex-1 pb-12">
+          <div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)] border border-outline-variant/10">
+            <div class="flex items-center gap-3 mb-6">
+              <span class="material-symbols-outlined text-primary">badge</span>
+              <h2 class="headline-font font-bold text-xl">Update Your Display Name</h2>
+            </div>
+            <p class="text-on-surface-variant mb-6">This is the name that will be visible on your account.</p>
+            <div class="max-w-md">
+              <div class="flex flex-col gap-4">
+                <div>
+                  <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="display_name">New Display Name</label>
+                  <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="display_name" placeholder="e.g. Alex J." type="text"/>
+                </div>
+                <button onclick="saveName()" id="save-name-btn" class="w-fit bg-primary text-on-primary px-8 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2">
+                  Save Name
+                  <span class="material-symbols-outlined text-sm">check</span>
+                </button>
+                <p id="save-name-msg" class="hidden text-sm font-semibold"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2: Change Password -->
+      <section class="stepper-item relative flex gap-6">
+        <div class="stepper-line relative flex-shrink-0">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest text-primary flex items-center justify-center font-bold headline-font z-10 relative">2</div>
+        </div>
+        <div class="flex-1">
+          <div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)] border border-outline-variant/10">
+            <div class="flex items-center gap-3 mb-6">
+              <span class="material-symbols-outlined text-primary">lock</span>
+              <h2 class="headline-font font-bold text-xl">Change Password</h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+              <!-- Left: new password fields -->
+              <div class="space-y-6">
+                <div class="flex items-center gap-2 text-primary">
+                  <span class="w-6 h-6 rounded-full bg-primary-fixed flex items-center justify-center text-[10px] font-bold">A</span>
+                  <span class="text-sm font-bold headline-font">Create New Password</span>
+                </div>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="new_password">New Password</label>
+                    <div class="relative">
+                      <input class="w-full px-4 py-3 pr-12 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm" id="new_password" placeholder="••••••••" type="password"/>
+                      <button type="button" onclick="togglePwd('new_password','eye1')" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors">
+                        <span id="eye1" class="material-symbols-outlined text-xl">visibility</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="confirm_password">Confirm New Password</label>
+                    <div class="relative">
+                      <input class="w-full px-4 py-3 pr-12 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm" id="confirm_password" placeholder="••••••••" type="password"/>
+                      <button type="button" onclick="togglePwd('confirm_password','eye2')" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors">
+                        <span id="eye2" class="material-symbols-outlined text-xl">visibility</span>
+                      </button>
+                    </div>
+                  </div>
+                  <p class="text-[10px] text-on-surface-variant font-medium px-1">Use 8 or more characters with a mix of letters, numbers &amp; symbols.</p>
+                </div>
+              </div>
+
+              <!-- Right: email verification -->
+              <div class="space-y-6">
+                <div class="flex items-center gap-2 text-primary">
+                  <span class="w-6 h-6 rounded-full bg-primary-fixed flex items-center justify-center text-[10px] font-bold">B</span>
+                  <span class="text-sm font-bold headline-font">Email Verification</span>
+                </div>
+                <div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/20">
+                  <p class="text-xs text-on-surface-variant mb-4">For your security, a 6-digit code will be sent to your registered email.</p>
+                  <button onclick="sendCode()" id="send-code-btn" class="w-full py-2 bg-white border border-outline-variant text-primary font-bold text-xs rounded-lg hover:bg-surface-container-highest transition-colors mb-4">
+                    Request Verification Code
+                  </button>
+                  <p id="send-code-msg" class="hidden text-xs font-semibold mb-3"></p>
+                  <div class="space-y-2">
+                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-1 px-1" for="verify_code">Enter 6-Digit Code</label>
+                    <input class="w-full px-4 py-2 bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 transition-all text-sm text-center tracking-[0.5em] font-bold" id="verify_code" maxlength="6" placeholder="000000" type="text"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-10 pt-8 border-t border-outline-variant/10 flex items-center justify-between">
+              <p id="change-pwd-msg" class="hidden text-sm font-semibold"></p>
+              <button onclick="changePassword()" id="change-pwd-btn" class="ml-auto bg-primary text-on-primary px-10 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2 shadow-lg shadow-primary/10">
+                Update Password
+                <span class="material-symbols-outlined text-sm">shield_lock</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="mt-20 py-10 flex flex-col md:flex-row justify-between items-center gap-6 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+      <span class="headline-font font-black text-2xl tracking-tighter">Lbara.tn</span>
+      <div class="flex gap-8 text-xs font-bold uppercase tracking-widest headline-font">
+        <a class="hover:text-primary" href="#">Privacy</a>
+        <a class="hover:text-primary" href="#">Terms</a>
+        <a class="hover:text-primary" href="#">Help</a>
+      </div>
+    </footer>
+  </div>
+</main>
+
+<!-- Mobile Bottom Nav -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl flex justify-around items-center py-4 px-6 z-50 border-t border-outline-variant/10">
+  <a href="/my-account.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">dashboard</span>
+    <span class="text-[10px] font-bold headline-font">Home</span>
+  </a>
+  <a href="/my-account.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">inventory_2</span>
+    <span class="text-[10px] font-bold headline-font">Orders</span>
+  </a>
+  <a href="/security.html" class="flex flex-col items-center gap-1 text-primary">
+    <span class="material-symbols-outlined">lock</span>
+    <span class="text-[10px] font-bold headline-font">Security</span>
+  </a>
+  <button onclick="handleLogout()" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">logout</span>
+    <span class="text-[10px] font-bold headline-font">Sign Out</span>
+  </button>
+</nav>
+
+<script src="/js/api.js"></script>
+<script>
+function togglePwd(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
+  input.type = input.type === 'password' ? 'text' : 'password';
+  icon.textContent = input.type === 'password' ? 'visibility' : 'visibility_off';
+}
+
+async function sendCode() {
+  const btn = document.getElementById('send-code-btn');
+  const msg = document.getElementById('send-code-msg');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  try {
+    await api.requestPasswordChange();
+    msg.textContent = '✓ Code sent! Check your inbox.';
+    msg.className = 'text-xs font-semibold text-green-700 mb-3';
+    btn.textContent = 'Resend Code';
+  } catch (err) {
+    msg.textContent = err.message || 'Failed to send code.';
+    msg.className = 'text-xs font-semibold text-red-600 mb-3';
+    btn.textContent = 'Request Verification Code';
+  }
+  btn.disabled = false;
+}
+
+async function saveName() {
+  const name = document.getElementById('display_name').value.trim();
+  const btn = document.getElementById('save-name-btn');
+  const msg = document.getElementById('save-name-msg');
+  if (!name) return;
+  btn.disabled = true;
+  try {
+    await apiFetch('/auth/update-profile', { method: 'POST', body: { full_name: name } });
+    msg.textContent = '✓ Name updated!';
+    msg.className = 'text-sm font-semibold text-green-700';
+    document.getElementById('sidebar-name').textContent = name;
+  } catch (err) {
+    msg.textContent = err.message || 'Failed to update name.';
+    msg.className = 'text-sm font-semibold text-red-600';
+  }
+  btn.disabled = false;
+}
+
+async function changePassword() {
+  const newPwd = document.getElementById('new_password').value;
+  const confirmPwd = document.getElementById('confirm_password').value;
+  const otp = document.getElementById('verify_code').value.trim();
+  const btn = document.getElementById('change-pwd-btn');
+  const msg = document.getElementById('change-pwd-msg');
+
+  msg.className = 'hidden text-sm font-semibold';
+
+  if (newPwd !== confirmPwd) {
+    msg.textContent = 'Passwords do not match.';
+    msg.className = 'text-sm font-semibold text-red-600';
+    return;
+  }
+  if (!otp) {
+    msg.textContent = 'Please request and enter the verification code first.';
+    msg.className = 'text-sm font-semibold text-red-600';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Verifying...';
+  try {
+    await api.confirmPasswordChange({ otp, new_password: newPwd });
+    msg.textContent = '✓ Password updated successfully!';
+    msg.className = 'text-sm font-semibold text-green-700';
+    document.getElementById('new_password').value = '';
+    document.getElementById('confirm_password').value = '';
+    document.getElementById('verify_code').value = '';
+  } catch (err) {
+    msg.textContent = err.message || 'Failed to update password.';
+    msg.className = 'text-sm font-semibold text-red-600';
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Update Password <span class="material-symbols-outlined text-sm">shield_lock</span>';
+}
+
+async function handleLogout() {
+  try { await api.logout(); } catch {}
+  window.location.href = '/login.html';
+}
+
+async function init() {
+  let user;
+  try {
+    const res = await api.me();
+    user = res.user;
+  } catch {
+    window.location.href = '/login.html';
+    return;
+  }
+  const name = user.full_name || user.email.split('@')[0];
+  const initial = name[0].toUpperCase();
+  document.getElementById('sidebar-name').textContent = name;
+  document.getElementById('sidebar-email').textContent = user.email;
+  document.getElementById('sidebar-avatar').textContent = initial;
+  document.getElementById('header-avatar').textContent = initial;
+  document.getElementById('display_name').value = user.full_name || '';
+}
+
+init();
+</script>
+</body></html>
