@@ -107,7 +107,7 @@
       <span class="material-symbols-outlined">dashboard</span>
       <span class="font-label">Dashboard</span>
     </a>
-    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200" href="/my-account.html">
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200" href="/order-history.html">
       <span class="material-symbols-outlined">inventory_2</span>
       <span class="font-label">My Orders</span>
     </a>
@@ -289,7 +289,7 @@
     <span class="material-symbols-outlined">dashboard</span>
     <span class="text-[10px] font-bold headline-font">Home</span>
   </a>
-  <a href="/my-account.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+  <a href="/order-history.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
     <span class="material-symbols-outlined">inventory_2</span>
     <span class="text-[10px] font-bold headline-font">Orders</span>
   </a>
@@ -334,18 +334,27 @@ async function saveName() {
   const name = document.getElementById('display_name').value.trim();
   const btn = document.getElementById('save-name-btn');
   const msg = document.getElementById('save-name-msg');
-  if (!name) return;
+  if (!name) {
+    msg.textContent = 'Name cannot be empty.';
+    msg.className = 'text-sm font-semibold text-red-600';
+    return;
+  }
   btn.disabled = true;
+  btn.textContent = 'Saving...';
   try {
-    await apiFetch('/auth/update-profile', { method: 'POST', body: { full_name: name } });
+    const res = await api.updateProfile({ full_name: name });
+    const updated = res.user.full_name || name;
     msg.textContent = '✓ Name updated!';
     msg.className = 'text-sm font-semibold text-green-700';
-    document.getElementById('sidebar-name').textContent = name;
+    document.getElementById('sidebar-name').textContent = updated;
+    document.getElementById('sidebar-avatar').textContent = updated[0].toUpperCase();
+    document.getElementById('header-avatar').textContent = updated[0].toUpperCase();
   } catch (err) {
     msg.textContent = err.message || 'Failed to update name.';
     msg.className = 'text-sm font-semibold text-red-600';
   }
   btn.disabled = false;
+  btn.innerHTML = 'Save Name <span class="material-symbols-outlined text-sm">check</span>';
 }
 
 async function changePassword() {
