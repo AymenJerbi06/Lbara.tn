@@ -109,7 +109,12 @@
 <label class="text-sm font-black text-primary uppercase tracking-widest">Password</label>
 <a class="text-xs font-bold text-accent hover:underline" href="#">Forgot Password?</a>
 </div>
-<input id="login-password" class="w-full cartoon-input" placeholder="••••••••" type="password"/>
+<div class="relative">
+<input id="login-password" class="w-full cartoon-input pr-12" placeholder="••••••••" type="password"/>
+<button type="button" onclick="(function(){var i=document.getElementById('login-password'),e=document.getElementById('eye-login');if(i.type==='password'){i.type='text';e.textContent='visibility_off';}else{i.type='password';e.textContent='visibility';}})()" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
+  <span id="eye-login" class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
 </div>
 <div class="flex items-center gap-3 px-1">
 <input class="w-5 h-5 border-2 border-primary rounded text-primary focus:ring-0" id="remember" type="checkbox"/>

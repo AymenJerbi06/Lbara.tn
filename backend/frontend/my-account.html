@@ -158,6 +158,66 @@
       </div>
     </section>
 
+    <!-- Security Section -->
+    <section class="bg-white rounded-2xl border border-outline-variant/20 p-8 mb-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary">lock</span>
+        </div>
+        <h3 class="font-headline font-bold text-2xl">Security</h3>
+      </div>
+
+      <!-- Step 1: Request code -->
+      <div id="security-step1">
+        <p class="text-on-surface-variant text-sm mb-6">To change your password, we'll send a 6-digit verification code to your email address.</p>
+        <button id="send-code-btn" onclick="sendCode()" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-full font-headline text-sm flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">mail</span>
+          Send Verification Code
+        </button>
+        <p id="send-code-msg" class="hidden mt-4 text-sm font-bold font-headline"></p>
+      </div>
+
+      <!-- Step 2: Enter code + new password -->
+      <div id="security-step2" class="hidden mt-6 border-t border-outline-variant/10 pt-6">
+        <p class="text-on-surface-variant text-sm mb-6">Enter the 6-digit code from your email and your new password.</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">Verification Code</label>
+            <input id="otp-input" type="text" maxlength="6" inputmode="numeric" placeholder="123456"
+              class="w-full border-2 border-primary rounded-xl px-4 py-3 font-bold text-primary text-center text-xl tracking-widest placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
+          </div>
+          <div>
+            <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">New Password</label>
+            <div class="relative">
+              <input id="new-password-input" type="password" placeholder="Min. 8 characters"
+                class="w-full border-2 border-primary rounded-xl px-4 py-3 pr-12 font-bold text-primary placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
+              <button type="button" onclick="togglePwd('new-password-input','eye-new')" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
+                <span id="eye-new" class="material-symbols-outlined text-xl">visibility</span>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">Confirm Password</label>
+            <div class="relative">
+              <input id="confirm-password-input" type="password" placeholder="Repeat password"
+                class="w-full border-2 border-primary rounded-xl px-4 py-3 pr-12 font-bold text-primary placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
+              <button type="button" onclick="togglePwd('confirm-password-input','eye-confirm')" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
+                <span id="eye-confirm" class="material-symbols-outlined text-xl">visibility</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 mt-6">
+          <button onclick="changePassword()" id="change-pwd-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-full font-headline text-sm flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">check</span>
+            Confirm Change
+          </button>
+          <button onclick="cancelChange()" class="text-sm font-bold text-on-surface-variant hover:text-primary transition-colors font-headline">Cancel</button>
+        </div>
+        <p id="change-pwd-msg" class="hidden mt-4 text-sm font-bold font-headline"></p>
+      </div>
+    </section>
+
     <!-- Orders list -->
     <section class="bg-white rounded-2xl border border-outline-variant/20 p-8">
       <div class="flex justify-between items-center mb-8">
@@ -250,6 +310,83 @@ function renderOrders(orders) {
       </div>
     </div>
   `).join('');
+}
+
+function togglePwd(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.textContent = 'visibility_off';
+  } else {
+    input.type = 'password';
+    icon.textContent = 'visibility';
+  }
+}
+
+async function sendCode() {
+  const btn = document.getElementById('send-code-btn');
+  const msg = document.getElementById('send-code-msg');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  msg.className = 'hidden mt-4 text-sm font-bold font-headline';
+  try {
+    await api.requestPasswordChange();
+    msg.textContent = '✓ Code sent! Check your inbox (also spam folder).';
+    msg.className = 'mt-4 text-sm font-bold font-headline text-secondary';
+    document.getElementById('security-step2').classList.remove('hidden');
+    btn.textContent = 'Resend Code';
+    btn.disabled = false;
+  } catch (err) {
+    msg.textContent = err.message || 'Failed to send code.';
+    msg.className = 'mt-4 text-sm font-bold font-headline text-error';
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm">mail</span> Send Verification Code';
+    btn.disabled = false;
+  }
+}
+
+async function changePassword() {
+  const otp = document.getElementById('otp-input').value.trim();
+  const newPwd = document.getElementById('new-password-input').value;
+  const confirmPwd = document.getElementById('confirm-password-input').value;
+  const btn = document.getElementById('change-pwd-btn');
+  const msg = document.getElementById('change-pwd-msg');
+
+  if (newPwd !== confirmPwd) {
+    msg.textContent = 'Passwords do not match.';
+    msg.className = 'mt-4 text-sm font-bold font-headline text-error';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Verifying...';
+  msg.className = 'hidden mt-4 text-sm font-bold font-headline';
+  try {
+    await api.confirmPasswordChange({ otp, new_password: newPwd });
+    msg.textContent = '✓ Password changed successfully!';
+    msg.className = 'mt-4 text-sm font-bold font-headline text-secondary';
+    document.getElementById('otp-input').value = '';
+    document.getElementById('new-password-input').value = '';
+    document.getElementById('confirm-password-input').value = '';
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Confirm Change';
+    btn.disabled = false;
+    setTimeout(() => {
+      document.getElementById('security-step2').classList.add('hidden');
+      msg.className = 'hidden';
+    }, 3000);
+  } catch (err) {
+    msg.textContent = err.message || 'Failed to change password.';
+    msg.className = 'mt-4 text-sm font-bold font-headline text-error';
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Confirm Change';
+    btn.disabled = false;
+  }
+}
+
+function cancelChange() {
+  document.getElementById('security-step2').classList.add('hidden');
+  document.getElementById('otp-input').value = '';
+  document.getElementById('new-password-input').value = '';
+  document.getElementById('confirm-password-input').value = '';
+  document.getElementById('change-pwd-msg').className = 'hidden';
 }
 
 async function handleLogout() {

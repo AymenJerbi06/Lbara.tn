@@ -40,6 +40,10 @@ const api = {
 
   // Contact
   sendContact: (body) => apiFetch('/contact', { method: 'POST', body }),
+
+  // Password change
+  requestPasswordChange: () => apiFetch('/auth/request-password-change', { method: 'POST' }),
+  confirmPasswordChange: (body) => apiFetch('/auth/confirm-password-change', { method: 'POST', body }),
 };
 
 // ─── Auth State Helpers ───────────────────────────────────
