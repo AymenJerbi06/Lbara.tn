@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FAQ - Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#003060", "secondary": "#005F4B", "accent": "#B8860B",
+          "on-surface": "#1A202C",
+        },
+        fontFamily: { "headline": ["Quicksand", "sans-serif"], "body": ["Nunito", "sans-serif"] },
+        borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer base { body { @apply bg-white text-on-surface font-body; } }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .cartoon-card { @apply bg-white border-4 border-primary shadow-[8px_8px_0px_0px_#003060] transition-all; }
+  .cartoon-button { @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none; }
+  .vibrant-gradient { background: linear-gradient(135deg, #001F3F 0%, #000C1A 100%); }
+  .faq-item { @apply border-b-2 border-primary/10; }
+  .faq-answer { display: none; }
+  .faq-answer.open { display: block; }
+</style>
+</head>
+<body class="selection:bg-primary/30 selection:text-primary">
+
+<!-- Nav -->
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
+  <div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
+    <a class="text-3xl font-bold tracking-tight text-primary font-headline" href="/index.html">Lbara.tn</a>
+    <div class="hidden md:flex items-center gap-8 font-headline font-bold text-sm">
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/index.html">Home</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/shop.html">Shop</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/how-it-works.html">How It Works</a>
+      <a class="text-primary border-b-4 border-primary" href="/faq.html">FAQ</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/contact.html">Contact</a>
+    </div>
+    <button id="nav-account-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">Join Now</button>
+<button id="hamburger-btn" class="md:hidden flex flex-col gap-1.5 p-2" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+  <span class="block w-6 h-0.5 bg-primary"></span>
+  <span class="block w-6 h-0.5 bg-primary"></span>
+  <span class="block w-6 h-0.5 bg-primary"></span>
+</button>
+</div>
+</nav>
+<!-- Mobile menu (hidden by default) -->
+<div id="mobile-menu" class="hidden md:hidden fixed top-[73px] left-0 w-full bg-white border-b-4 border-primary z-40 shadow-lg">
+  <div class="flex flex-col px-6 py-4 gap-1 font-headline font-bold text-sm">
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/index.html">Home</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/shop.html">Shop</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/how-it-works.html">How It Works</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/faq.html">FAQ</a>
+    <a class="text-on-surface/70 hover:text-primary py-3" href="/contact.html">Contact</a>
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="vibrant-gradient pt-40 pb-24 text-center px-6">
+  <p class="text-accent font-black text-sm uppercase tracking-[0.3em] mb-4">Got Questions?</p>
+  <h1 class="font-headline text-5xl md:text-6xl font-black text-white uppercase tracking-tight leading-none mb-6">
+    Frequently Asked <span class="text-accent">Questions</span>
+  </h1>
+  <p class="text-white/60 font-bold text-lg max-w-xl mx-auto">
+    Everything you need to know about ordering digital services on Lbara.tn.
+  </p>
+</section>
+
+<!-- FAQ Sections -->
+<section class="py-24 px-6">
+  <div class="max-w-3xl mx-auto">
+
+    <!-- Category: Orders & Delivery -->
+    <div class="mb-12">
+      <h2 class="font-headline text-2xl font-black text-primary uppercase tracking-widest mb-6 flex items-center gap-3">
+        <span class="material-symbols-outlined text-accent" style="font-variation-settings:'FILL' 1;">local_shipping</span>
+        Orders &amp; Delivery
+      </h2>
+      <div class="cartoon-card rounded-2xl overflow-hidden divide-y-2 divide-primary/10">
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">How long does delivery take?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">Most orders are fulfilled within <strong class="text-primary">2 hours</strong> of payment confirmation during business hours. For orders placed late at night, delivery may take until the following morning. You will receive your credentials by email.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">What email do I use for delivery?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">During checkout, you will be asked for a <strong class="text-primary">delivery email</strong>. This is where we send your service credentials. It does not have to match your Lbara.tn account email.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">Can I track my order?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">Yes. After placing an order you will be redirected to a confirmation page showing your order status. Logged-in users can also view all past orders from their account.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">I paid but haven't received my credentials yet.</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">First, check your spam/junk folder. If you still haven't received anything after 4 hours, please <a class="text-accent font-bold underline" href="/contact.html">contact our support team</a> with your order reference number.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Category: Payment -->
+    <div class="mb-12">
+      <h2 class="font-headline text-2xl font-black text-primary uppercase tracking-widest mb-6 flex items-center gap-3">
+        <span class="material-symbols-outlined text-accent" style="font-variation-settings:'FILL' 1;">payments</span>
+        Payment
+      </h2>
+      <div class="cartoon-card rounded-2xl overflow-hidden divide-y-2 divide-primary/10">
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">What payment methods do you accept?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">We accept payments via <strong class="text-primary">Flouci</strong> and <strong class="text-primary">Paymee</strong> — Tunisia's leading payment platforms. Both support Tunisian bank cards (CIB, Mastercard, Visa).</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">Is it safe to pay on Lbara.tn?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">Yes. We never store your card details — all payments are processed securely through Flouci or Paymee. Your card information goes directly to the payment gateway.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">Do you offer promo codes?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">Yes! You can enter a promo code during checkout. Follow us on social media to stay updated on our latest offers and discounts.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">Can I get a refund?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">Refunds are evaluated on a case-by-case basis. If there is an issue with your order (e.g. non-working credentials), please contact us within 24 hours. We will do our best to resolve the issue or offer a replacement. Please see our full <a class="text-accent font-bold underline" href="#">Refund Policy</a> for details.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Category: Services -->
+    <div class="mb-12">
+      <h2 class="font-headline text-2xl font-black text-primary uppercase tracking-widest mb-6 flex items-center gap-3">
+        <span class="material-symbols-outlined text-accent" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+        Services
+      </h2>
+      <div class="cartoon-card rounded-2xl overflow-hidden divide-y-2 divide-primary/10">
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">Do I need a VPN to use these services?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">No. The accounts we provide are configured to work from Tunisia without a VPN. That is one of the key reasons Lbara.tn exists — to break down these barriers for Tunisian users.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">What is the difference between Private and Shared accounts?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed"><strong class="text-primary">Private</strong> accounts are exclusively yours — the login credentials are not shared with anyone else. <strong class="text-primary">Shared</strong> accounts are used by a small number of people simultaneously and are therefore offered at a lower price.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">What happens when my subscription expires?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">You can simply place a new order for the same service when your subscription period ends. We do not auto-renew — you are always in control.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">Can I change my delivery email after ordering?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">As long as your order has not been fulfilled yet, yes — please <a class="text-accent font-bold underline" href="/contact.html">contact us</a> as soon as possible with your order reference and the correct email address.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Category: Account -->
+    <div class="mb-12">
+      <h2 class="font-headline text-2xl font-black text-primary uppercase tracking-widest mb-6 flex items-center gap-3">
+        <span class="material-symbols-outlined text-accent" style="font-variation-settings:'FILL' 1;">manage_accounts</span>
+        Account
+      </h2>
+      <div class="cartoon-card rounded-2xl overflow-hidden divide-y-2 divide-primary/10">
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">Do I need an account to order?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">No — you can place an order as a guest. However, creating a free account lets you track all your orders in one place and speeds up future checkouts.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">How do I reset my password?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">On the <a class="text-accent font-bold underline" href="/login.html">Login page</a>, click <strong class="text-primary">"Forgot Password?"</strong> and follow the instructions. A reset link will be sent to your registered email.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Still have questions -->
+    <div class="cartoon-card rounded-3xl p-10 text-center">
+      <span class="material-symbols-outlined text-primary text-5xl mb-4 block" style="font-variation-settings:'FILL' 1;">contact_support</span>
+      <h3 class="font-headline text-2xl font-black text-primary mb-2">Still Have a Question?</h3>
+      <p class="text-on-surface/60 font-bold mb-8">Our support team is here to help — usually replies within 2 hours.</p>
+      <a href="/contact.html" class="cartoon-button bg-primary text-white font-black px-10 py-4 rounded-2xl text-lg inline-flex items-center gap-3">
+        <span class="material-symbols-outlined">mail</span>
+        Contact Us
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-primary w-full pt-20 pb-10 text-white">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-16 px-8 max-w-screen-2xl mx-auto">
+    <div class="md:col-span-1">
+      <span class="text-3xl font-bold text-accent mb-6 block font-headline">Lbara.tn</span>
+      <p class="text-sm text-white/60 leading-relaxed font-medium">The Kinetic Curator of Tunisian Services. Breaking the digital walls one subscription at a time.</p>
+      <div class="flex gap-4 mt-8">
+        <div class="w-10 h-10 rounded-xl bg-white/10 border-2 border-white/10 flex items-center justify-center hover:bg-accent transition-colors cursor-pointer"><span class="material-symbols-outlined text-xl">share</span></div>
+        <div class="w-10 h-10 rounded-xl bg-white/10 border-2 border-white/10 flex items-center justify-center hover:bg-accent transition-colors cursor-pointer"><span class="material-symbols-outlined text-xl">podcasts</span></div>
+      </div>
+    </div>
+    <div>
+      <h4 class="font-headline font-bold text-xl mb-8">Explore</h4>
+      <ul class="space-y-4">
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html">All Services</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html">Streaming Bundles</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html">AI Tools</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html">Gaming Keys</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-headline font-bold text-xl mb-8">Company</h4>
+      <ul class="space-y-4">
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Our Story</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Terms of Service</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Privacy Policy</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Refund Policy</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-headline font-bold text-xl mb-8">Contact</h4>
+      <ul class="space-y-6">
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/contact.html">Contact Support</a></li>
+        <li class="flex items-center gap-3 text-white/60 text-sm font-bold"><span class="material-symbols-outlined text-accent">mail</span>hello@lbara.tn</li>
+        <li class="flex items-center gap-3 text-white/60 text-sm font-bold"><span class="material-symbols-outlined text-accent">phone</span>+216 71 000 000</li>
+      </ul>
+    </div>
+  </div>
+  <div class="mt-20 border-t-2 border-white/5 pt-10 px-8 max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+    <p class="text-sm text-white/40 font-bold">© 2024 Lbara.tn - The Kinetic Curator of Tunisian Services.</p>
+    <div class="flex gap-6">
+      <span class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold text-white/60 border border-white/10 uppercase tracking-widest">Secure Payment</span>
+      <span class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold text-white/60 border border-white/10 uppercase tracking-widest">24/7 Support</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/api.js"></script>
+<script>
+  function toggleFaq(btn) {
+    const answer = btn.nextElementSibling;
+    const icon = btn.querySelector('.material-symbols-outlined');
+    const isOpen = answer.classList.contains('open');
+
+    // Close all
+    document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.faq-item button .material-symbols-outlined').forEach(i => {
+      i.style.transform = '';
+    });
+
+    if (!isOpen) {
+      answer.classList.add('open');
+      icon.style.transform = 'rotate(180deg)';
+    }
+  }
+</script>
+</body>
+</html>

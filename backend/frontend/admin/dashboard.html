@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard - Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: { "primary": "#003060", "secondary": "#005F4B", "accent": "#B8860B", "on-surface": "#1A202C" },
+        fontFamily: { "headline": ["Quicksand", "sans-serif"], "body": ["Nunito", "sans-serif"] },
+        borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer base { body { @apply bg-[#F0F4F8] text-on-surface font-body; } }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .cartoon-card { @apply bg-white border-2 border-primary/10 shadow-md rounded-2xl; }
+  .cartoon-button { @apply border-2 border-primary shadow-[3px_3px_0px_0px_#003060] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none; }
+  .status-pill { @apply inline-block px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider; }
+  .status-paid { @apply bg-secondary/10 text-secondary; }
+  .status-fulfilled { @apply bg-blue-100 text-blue-700; }
+  .status-pending_payment { @apply bg-yellow-100 text-yellow-700; }
+  .status-payment_failed { @apply bg-red-100 text-red-600; }
+  .status-cancelled { @apply bg-gray-100 text-gray-500; }
+  .status-flagged { @apply bg-orange-100 text-orange-600; }
+  .status-processing { @apply bg-purple-100 text-purple-600; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Sidebar -->
+<aside class="fixed inset-y-0 left-0 w-64 bg-primary text-white flex flex-col z-40">
+  <div class="p-6 border-b border-white/10">
+    <span class="text-2xl font-black text-accent font-headline">Lbara.tn</span>
+    <p class="text-xs text-white/50 font-bold mt-1">Admin Panel</p>
+  </div>
+  <nav class="flex-grow p-4 space-y-1">
+    <button onclick="showTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white bg-white/10 transition-colors">
+      <span class="material-symbols-outlined">dashboard</span> Dashboard
+    </button>
+    <button onclick="showTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white/70 hover:bg-white/10 transition-colors">
+      <span class="material-symbols-outlined">receipt_long</span> Orders
+    </button>
+    <button onclick="showTab('products')" id="tab-products" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white/70 hover:bg-white/10 transition-colors">
+      <span class="material-symbols-outlined">inventory_2</span> Products
+    </button>
+    <button onclick="showTab('messages')" id="tab-messages" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white/70 hover:bg-white/10 transition-colors">
+      <span class="material-symbols-outlined">forum</span> Messages
+    </button>
+  </nav>
+  <div class="p-4 border-t border-white/10">
+    <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white/70 hover:bg-red-500/20 transition-colors">
+      <span class="material-symbols-outlined">logout</span> Logout
+    </button>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<div class="ml-64 p-8">
+
+  <!-- ─── Dashboard Tab ─────────────────────────────────── -->
+  <div id="content-dashboard">
+    <h1 class="font-headline text-3xl font-black text-primary mb-8">Dashboard Overview</h1>
+    <div id="stats-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <!-- Populated by JS -->
+      <div class="cartoon-card p-6 animate-pulse"><div class="h-8 bg-primary/10 rounded-lg mb-2"></div><div class="h-12 bg-primary/5 rounded-lg"></div></div>
+      <div class="cartoon-card p-6 animate-pulse"><div class="h-8 bg-primary/10 rounded-lg mb-2"></div><div class="h-12 bg-primary/5 rounded-lg"></div></div>
+      <div class="cartoon-card p-6 animate-pulse"><div class="h-8 bg-primary/10 rounded-lg mb-2"></div><div class="h-12 bg-primary/5 rounded-lg"></div></div>
+      <div class="cartoon-card p-6 animate-pulse"><div class="h-8 bg-primary/10 rounded-lg mb-2"></div><div class="h-12 bg-primary/5 rounded-lg"></div></div>
+    </div>
+
+    <!-- Recent orders preview -->
+    <div class="cartoon-card p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-headline font-bold text-primary text-xl">Recent Paid Orders</h2>
+        <button onclick="showTab('orders')" class="text-sm font-bold text-accent hover:underline">View All →</button>
+      </div>
+      <div id="recent-orders-list" class="space-y-3">
+        <p class="text-primary/40 font-bold text-center py-8">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Orders Tab ────────────────────────────────────── -->
+  <div id="content-orders" class="hidden">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="font-headline text-3xl font-black text-primary">Orders</h1>
+      <div class="flex gap-3">
+        <select id="orders-filter" class="border-2 border-primary/20 rounded-xl px-4 py-2 font-bold text-sm text-primary focus:ring-0 focus:border-primary">
+          <option value="">All Statuses</option>
+          <option value="paid">Paid (pending fulfillment)</option>
+          <option value="fulfilled">Fulfilled</option>
+          <option value="pending_payment">Pending Payment</option>
+          <option value="payment_failed">Payment Failed</option>
+          <option value="flagged">Flagged</option>
+        </select>
+      </div>
+    </div>
+    <div id="orders-table" class="cartoon-card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-primary/5 text-primary font-black uppercase text-xs tracking-wider">
+            <th class="p-4 text-left">Ref</th>
+            <th class="p-4 text-left">Product</th>
+            <th class="p-4 text-left">Customer Email</th>
+            <th class="p-4 text-left">Amount</th>
+            <th class="p-4 text-left">Status</th>
+            <th class="p-4 text-left">Date</th>
+            <th class="p-4 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="orders-tbody">
+          <tr><td colspan="7" class="text-center p-8 text-primary/40 font-bold">Loading orders...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── Fulfill Modal ─────────────────────────────────── -->
+  <div id="fulfill-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+    <div class="bg-white border-4 border-primary rounded-3xl p-8 w-full max-w-lg shadow-2xl">
+      <h2 class="font-headline text-xl font-black text-primary mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-secondary">send</span>
+        Fulfill Order <span id="modal-order-ref" class="text-accent"></span>
+      </h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Credentials / Access Details</label>
+          <textarea id="fulfill-credentials" class="w-full border-2 border-primary/20 rounded-xl px-4 py-3 font-bold text-primary placeholder:text-primary/30 focus:border-primary focus:ring-0 h-32 resize-none" placeholder="Email: user@example.com&#10;Password: xxxxx&#10;Or: activation code"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Admin Notes (optional)</label>
+          <input id="fulfill-notes" class="w-full border-2 border-primary/20 rounded-xl px-4 py-3 font-bold text-primary placeholder:text-primary/30 focus:border-primary focus:ring-0" placeholder="Internal notes..."/>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeFulfillModal()" class="flex-1 border-2 border-primary/20 text-primary font-bold py-3 rounded-2xl hover:bg-primary/5">Cancel</button>
+        <button onclick="submitFulfillment()" class="flex-1 cartoon-button bg-secondary text-white font-bold py-3 rounded-2xl">
+          <span class="material-symbols-outlined text-sm mr-1">send</span>
+          Send to Customer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Products Tab ──────────────────────────────────── -->
+  <div id="content-products" class="hidden">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="font-headline text-3xl font-black text-primary">Products</h1>
+      <button onclick="document.getElementById('add-product-form').classList.toggle('hidden')" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-2xl flex items-center gap-2">
+        <span class="material-symbols-outlined">add</span> Add Product
+      </button>
+    </div>
+
+    <!-- Add Product Form -->
+    <div id="add-product-form" class="hidden cartoon-card p-6 mb-8">
+      <h3 class="font-headline font-bold text-primary text-lg mb-4">New Product</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <input id="prod-slug" class="border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="slug (e.g. netflix-1m)"/>
+        <input id="prod-name" class="border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="Name"/>
+        <input id="prod-provider" class="border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="Provider"/>
+        <select id="prod-category" class="border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary">
+          <option value="streaming">Streaming</option>
+          <option value="ai_tools">AI Tools</option>
+          <option value="gaming">Gaming</option>
+          <option value="productivity">Productivity</option>
+          <option value="education">Education</option>
+        </select>
+        <input id="prod-price" class="border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="Price TND" type="number" step="0.001"/>
+        <input id="prod-badge" class="border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="Badge (POPULAR / INSTANT / SALE)"/>
+        <input id="prod-image_url" class="col-span-2 border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="Image URL (https://...)"/>
+        <textarea id="prod-description" class="col-span-2 border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary resize-none h-20" placeholder="Description"></textarea>
+      </div>
+      <button onclick="createProduct()" class="mt-4 cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-xl">Save Product</button>
+    </div>
+
+    <div id="products-list" class="cartoon-card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-primary/5 text-primary font-black uppercase text-xs tracking-wider">
+            <th class="p-4 text-left">Name</th>
+            <th class="p-4 text-left">Provider</th>
+            <th class="p-4 text-left">Category</th>
+            <th class="p-4 text-left">Price (TND)</th>
+            <th class="p-4 text-left">Status</th>
+            <th class="p-4 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="products-tbody">
+          <tr><td colspan="6" class="text-center p-8 text-primary/40 font-bold">Loading products...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── Edit Product Modal ──────────────────────────── -->
+  <div id="edit-product-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
+    <div class="bg-white border-4 border-primary rounded-3xl p-8 w-full max-w-2xl shadow-2xl my-8">
+      <h2 class="font-headline text-xl font-black text-primary mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-accent">edit</span>
+        Edit Product
+      </h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-1">Image URL</label>
+          <div class="flex gap-3 items-start">
+            <input id="edit-image_url" class="flex-1 border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="https://example.com/image.jpg"/>
+            <img id="edit-image-preview" src="" alt="" class="hidden w-20 h-14 object-cover rounded-xl border-2 border-primary/20"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-1">Name</label>
+          <input id="edit-name" class="w-full border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-1">Provider</label>
+          <input id="edit-provider" class="w-full border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-1">Category</label>
+          <select id="edit-category" class="w-full border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary">
+            <option value="streaming">Streaming</option>
+            <option value="ai_tools">AI Tools</option>
+            <option value="gaming">Gaming</option>
+            <option value="productivity">Productivity</option>
+            <option value="education">Education</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-1">Price (TND)</label>
+          <input id="edit-price_tnd" type="number" step="0.001" class="w-full border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-1">Badge</label>
+          <input id="edit-badge" class="w-full border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="POPULAR / INSTANT / SALE / NEW"/>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-1">Account Type</label>
+          <select id="edit-account_type" class="w-full border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary">
+            <option value="private">Private</option>
+            <option value="shared">Shared</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-1">Duration Label</label>
+          <input id="edit-duration_label" class="w-full border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="1 Month"/>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-1">Delivery Hours</label>
+          <input id="edit-delivery_hours" type="number" class="w-full border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary"/>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-1">Description</label>
+          <textarea id="edit-description" class="w-full border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-bold text-primary focus:ring-0 focus:border-primary resize-none h-20"></textarea>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeEditModal()" class="flex-1 border-2 border-primary/20 text-primary font-bold py-3 rounded-2xl hover:bg-primary/5">Cancel</button>
+        <button onclick="saveEditProduct()" class="flex-1 cartoon-button bg-primary text-white font-bold py-3 rounded-2xl">
+          <span class="material-symbols-outlined text-sm mr-1">save</span>
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Messages Tab ──────────────────────────────────── -->
+  <div id="content-messages" class="hidden">
+    <h1 class="font-headline text-3xl font-black text-primary mb-8">Contact Messages</h1>
+    <div id="messages-list" class="space-y-4">
+      <p class="text-primary/40 font-bold text-center py-8">Loading messages...</p>
+    </div>
+  </div>
+
+</div>
+
+<script src="/js/api.js"></script>
+<script>
+// ─── Admin Dashboard Logic ────────────────────────────────
+
+let fulfillOrderId = null;
+
+// Tab switching
+function showTab(tab) {
+  ['dashboard','orders','products','messages'].forEach(t => {
+    document.getElementById(`content-${t}`).classList.toggle('hidden', t !== tab);
+    const btn = document.getElementById(`tab-${t}`);
+    if (t === tab) {
+      btn.classList.add('bg-white/10','text-white');
+      btn.classList.remove('text-white/70');
+    } else {
+      btn.classList.remove('bg-white/10','text-white');
+      btn.classList.add('text-white/70');
+    }
+  });
+  if (tab === 'dashboard') loadDashboard();
+  if (tab === 'orders') loadOrders();
+  if (tab === 'products') loadProducts();
+  if (tab === 'messages') loadMessages();
+}
+
+// Verify admin on load
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const { user } = await api.me();
+    if (!user.is_admin) { window.location.href = '/login.html'; return; }
+    loadDashboard();
+  } catch {
+    window.location.href = '/login.html';
+  }
+});
+
+async function handleLogout() {
+  await api.logout();
+  window.location.href = '/login.html';
+}
+
+// ─── Dashboard ────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const { stats } = await apiFetchAdmin('/admin/stats');
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="cartoon-card p-6">
+        <p class="text-xs font-black text-primary/50 uppercase tracking-widest mb-3">Total Orders</p>
+        <p class="text-4xl font-black text-primary">${stats.total_orders}</p>
+      </div>
+      <div class="cartoon-card p-6">
+        <p class="text-xs font-black text-primary/50 uppercase tracking-widest mb-3">Revenue (TND)</p>
+        <p class="text-4xl font-black text-secondary">${parseFloat(stats.total_revenue_tnd).toFixed(3)}</p>
+      </div>
+      <div class="cartoon-card p-6 border-accent/30">
+        <p class="text-xs font-black text-primary/50 uppercase tracking-widest mb-3">Pending Fulfillment</p>
+        <p class="text-4xl font-black text-accent">${stats.pending_fulfillment}</p>
+      </div>
+      <div class="cartoon-card p-6">
+        <p class="text-xs font-black text-primary/50 uppercase tracking-widest mb-3">Open Messages</p>
+        <p class="text-4xl font-black text-primary">${stats.open_messages}</p>
+      </div>
+    `;
+
+    const { orders } = await apiFetchAdmin('/admin/orders?status=paid&limit=5');
+    document.getElementById('recent-orders-list').innerHTML = orders.length
+      ? orders.map(renderOrderRow).join('')
+      : '<p class="text-primary/40 font-bold text-center py-4">No paid orders yet.</p>';
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// ─── Orders ───────────────────────────────────────────────
+async function loadOrders(status = '') {
+  const filterEl = document.getElementById('orders-filter');
+  if (filterEl) filterEl.onchange = (e) => loadOrders(e.target.value);
+
+  try {
+    const { orders } = await apiFetchAdmin(`/admin/orders${status ? '?status=' + status : ''}`);
+    document.getElementById('orders-tbody').innerHTML = orders.length
+      ? orders.map(o => `
+        <tr class="border-t border-primary/5 hover:bg-primary/2">
+          <td class="p-4 font-black text-primary text-xs">${o.order_ref}</td>
+          <td class="p-4 font-bold text-sm">${o.product_name}</td>
+          <td class="p-4 text-sm text-on-surface/60 font-bold">${o.delivery_email}</td>
+          <td class="p-4 font-black text-primary">${parseFloat(o.amount_tnd).toFixed(3)}</td>
+          <td class="p-4"><span class="status-pill status-${o.status}">${o.status.replace('_',' ')}</span></td>
+          <td class="p-4 text-xs text-on-surface/50 font-bold">${new Date(o.created_at).toLocaleDateString()}</td>
+          <td class="p-4">
+            ${o.status === 'paid' ? `<button onclick="openFulfillModal('${o.id}','${o.order_ref}')" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">Fulfill</button>` : ''}
+            ${o.status === 'flagged' ? `<button onclick="updateStatus('${o.id}','paid')" class="cartoon-button bg-primary text-white font-bold px-3 py-1 rounded-lg text-xs ml-1">Approve</button>` : ''}
+          </td>
+        </tr>`).join('')
+      : '<tr><td colspan="7" class="text-center p-8 text-primary/40 font-bold">No orders found.</td></tr>';
+  } catch(err) {
+    document.getElementById('orders-tbody').innerHTML = `<tr><td colspan="7" class="text-center p-4 text-red-500 font-bold">${err.message}</td></tr>`;
+  }
+}
+
+function renderOrderRow(o) {
+  return `<div class="flex items-center justify-between p-4 bg-primary/3 rounded-xl border border-primary/10">
+    <div>
+      <span class="font-black text-primary text-sm">${o.order_ref}</span>
+      <span class="ml-3 text-sm font-bold text-on-surface/60">${o.product_name}</span>
+      <span class="ml-3 text-xs font-bold text-on-surface/40">${o.delivery_email}</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="font-black text-primary">${parseFloat(o.amount_tnd).toFixed(3)} TND</span>
+      <button onclick="openFulfillModal('${o.id}','${o.order_ref}')" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">Fulfill</button>
+    </div>
+  </div>`;
+}
+
+function openFulfillModal(orderId, orderRef) {
+  fulfillOrderId = orderId;
+  document.getElementById('modal-order-ref').textContent = `#${orderRef}`;
+  document.getElementById('fulfill-credentials').value = '';
+  document.getElementById('fulfill-notes').value = '';
+  document.getElementById('fulfill-modal').classList.remove('hidden');
+}
+
+function closeFulfillModal() {
+  document.getElementById('fulfill-modal').classList.add('hidden');
+  fulfillOrderId = null;
+}
+
+async function submitFulfillment() {
+  const credentials = document.getElementById('fulfill-credentials').value.trim();
+  const notes = document.getElementById('fulfill-notes').value.trim();
+  if (!credentials) { showToast('Credentials are required.', 'error'); return; }
+  try {
+    await apiFetchAdmin(`/admin/orders/${fulfillOrderId}/fulfill`, {
+      method: 'PUT', body: { credentials, notes }
+    });
+    showToast('Order fulfilled! Email sent to customer.');
+    closeFulfillModal();
+    loadOrders();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function updateStatus(orderId, status) {
+  try {
+    await apiFetchAdmin(`/admin/orders/${orderId}/status`, { method: 'PUT', body: { status } });
+    showToast('Status updated.');
+    loadOrders();
+  } catch(err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ─── Products ─────────────────────────────────────────────
+async function loadProducts() {
+  try {
+    const { products } = await apiFetchAdmin('/admin/products');
+    document.getElementById('products-tbody').innerHTML = products.length
+      ? products.map(p => `
+        <tr class="border-t border-primary/5">
+          <td class="p-4 font-bold flex items-center gap-3">
+            ${p.image_url ? `<img src="${p.image_url}" class="w-10 h-10 rounded-lg object-cover border border-primary/10" alt=""/>` : `<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-lg">image</span></div>`}
+            ${p.name}
+          </td>
+          <td class="p-4 text-sm text-on-surface/60 font-bold">${p.provider}</td>
+          <td class="p-4 text-xs font-black uppercase">${p.category}</td>
+          <td class="p-4 font-black text-primary">${parseFloat(p.price_tnd).toFixed(3)}</td>
+          <td class="p-4"><span class="status-pill ${p.active ? 'status-fulfilled' : 'status-cancelled'}">${p.active ? 'Active' : 'Inactive'}</span></td>
+          <td class="p-4 flex items-center gap-2">
+            <button onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="cartoon-button bg-accent/10 text-accent border-accent/30 font-bold px-3 py-1 rounded-lg text-xs">Edit</button>
+            <button onclick="toggleProduct('${p.id}', ${!p.active})" class="cartoon-button ${p.active ? 'bg-red-50 text-red-600 border-red-200' : 'bg-secondary/10 text-secondary border-secondary/20'} font-bold px-3 py-1 rounded-lg text-xs">
+              ${p.active ? 'Deactivate' : 'Activate'}
+            </button>
+          </td>
+        </tr>`).join('')
+      : '<tr><td colspan="6" class="text-center p-8 text-primary/40 font-bold">No products.</td></tr>';
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+async function createProduct() {
+  const body = {
+    slug: document.getElementById('prod-slug').value.trim(),
+    name: document.getElementById('prod-name').value.trim(),
+    provider: document.getElementById('prod-provider').value.trim(),
+    category: document.getElementById('prod-category').value,
+    price_tnd: document.getElementById('prod-price').value,
+    badge: document.getElementById('prod-badge').value.trim() || null,
+    description: document.getElementById('prod-description').value.trim(),
+    image_url: document.getElementById('prod-image_url').value.trim() || null,
+  };
+  try {
+    await apiFetchAdmin('/admin/products', { method: 'POST', body });
+    showToast('Product created!');
+    document.getElementById('add-product-form').classList.add('hidden');
+    loadProducts();
+  } catch(err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function toggleProduct(id, active) {
+  try {
+    await apiFetchAdmin(`/admin/products/${id}`, { method: 'PUT', body: { active } });
+    showToast('Product updated.');
+    loadProducts();
+  } catch(err) {
+    showToast(err.message, 'error');
+  }
+}
+
+let editProductId = null;
+
+function openEditModal(p) {
+  editProductId = p.id;
+  document.getElementById('edit-name').value = p.name || '';
+  document.getElementById('edit-provider').value = p.provider || '';
+  document.getElementById('edit-category').value = p.category || 'streaming';
+  document.getElementById('edit-price_tnd').value = p.price_tnd || '';
+  document.getElementById('edit-badge').value = p.badge || '';
+  document.getElementById('edit-account_type').value = p.account_type || 'private';
+  document.getElementById('edit-duration_label').value = p.duration_label || '';
+  document.getElementById('edit-delivery_hours').value = p.delivery_hours || 2;
+  document.getElementById('edit-description').value = p.description || '';
+  document.getElementById('edit-image_url').value = p.image_url || '';
+
+  const preview = document.getElementById('edit-image-preview');
+  if (p.image_url) { preview.src = p.image_url; preview.classList.remove('hidden'); }
+  else { preview.classList.add('hidden'); }
+
+  document.getElementById('edit-image_url').oninput = (e) => {
+    if (e.target.value) { preview.src = e.target.value; preview.classList.remove('hidden'); }
+    else { preview.classList.add('hidden'); }
+  };
+
+  document.getElementById('edit-product-modal').classList.remove('hidden');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-product-modal').classList.add('hidden');
+  editProductId = null;
+}
+
+async function saveEditProduct() {
+  const body = {
+    name: document.getElementById('edit-name').value.trim(),
+    provider: document.getElementById('edit-provider').value.trim(),
+    category: document.getElementById('edit-category').value,
+    price_tnd: document.getElementById('edit-price_tnd').value,
+    badge: document.getElementById('edit-badge').value.trim() || null,
+    account_type: document.getElementById('edit-account_type').value,
+    duration_label: document.getElementById('edit-duration_label').value.trim(),
+    delivery_hours: parseInt(document.getElementById('edit-delivery_hours').value),
+    description: document.getElementById('edit-description').value.trim(),
+    image_url: document.getElementById('edit-image_url').value.trim() || null,
+  };
+  try {
+    await apiFetchAdmin(`/admin/products/${editProductId}`, { method: 'PUT', body });
+    showToast('Product saved!');
+    closeEditModal();
+    loadProducts();
+  } catch(err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ─── Messages ─────────────────────────────────────────────
+async function loadMessages() {
+  try {
+    const { messages } = await apiFetchAdmin('/admin/messages');
+    document.getElementById('messages-list').innerHTML = messages.length
+      ? messages.map(m => `
+        <div class="cartoon-card p-6">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <span class="font-black text-primary">${m.full_name}</span>
+              <span class="ml-3 text-sm font-bold text-on-surface/50">${m.email}</span>
+              ${m.category ? `<span class="ml-3 text-xs font-black text-accent uppercase">${m.category}</span>` : ''}
+            </div>
+            <span class="text-xs font-bold text-on-surface/40">${new Date(m.created_at).toLocaleString()}</span>
+          </div>
+          <p class="font-bold text-primary/70 text-sm mb-2">${m.subject || ''}</p>
+          <p class="text-sm text-on-surface/70 font-medium bg-primary/3 p-3 rounded-xl">${m.message}</p>
+        </div>`).join('')
+      : '<p class="text-primary/40 font-bold text-center py-8">No messages.</p>';
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+// Admin-specific fetch (uses same cookie auth)
+async function apiFetchAdmin(path, options = {}) {
+  const res = await fetch('/api' + path, {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...options.headers },
+    ...options,
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw { status: res.status, message: data.message || 'Request failed.' };
+  return data;
+}
+</script>
+</body>
+</html>

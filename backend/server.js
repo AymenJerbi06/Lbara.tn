@@ -57,7 +57,7 @@ app.use((req, res, next) => {
 });
 
 // ─── Serve Frontend Static Files (no-cache on HTML so browsers always get fresh pages)
-app.use(express.static(path.join(__dirname, '../frontend'), {
+app.use(express.static(path.join(__dirname, 'frontend'), {
   setHeaders(res, filePath) {
     if (filePath.endsWith('.html')) {
       res.setHeader('Cache-Control', 'no-store');
@@ -79,7 +79,7 @@ app.use('/api/admin', adminRoutes);
 // ─── Catch-all: serve frontend for any non-API route ─────
 app.get('*', (req, res) => {
   if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    res.sendFile(path.join(__dirname, 'frontend/index.html'));
   }
 });
 

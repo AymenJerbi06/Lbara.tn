@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contact Us - Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: { "primary": "#003060", "secondary": "#005F4B", "accent": "#B8860B", "on-surface": "#1A202C" },
+        fontFamily: { "headline": ["Quicksand", "sans-serif"], "body": ["Nunito", "sans-serif"] },
+        borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer base { body { @apply bg-[#F8FAFC] text-on-surface font-body; } }
+  .vibrant-gradient { background: linear-gradient(135deg, #001F3F 0%, #003B5C 100%); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .cartoon-card { @apply bg-white border-4 border-primary shadow-[8px_8px_0px_0px_#003060] transition-all; }
+  .cartoon-button { @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none; }
+  .cartoon-input { @apply w-full border-2 border-primary/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 transition-all font-bold text-primary placeholder:text-primary/30 bg-white; }
+</style>
+</head>
+<body class="selection:bg-primary/30 selection:text-primary">
+
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
+  <div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
+    <a href="/shop.html" class="text-3xl font-bold tracking-tight text-primary font-headline">Lbara.tn</a>
+    <div class="hidden md:flex items-center gap-8 font-headline font-bold text-sm">
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/index.html">Home</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/shop.html">Shop</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/how-it-works.html">How It Works</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/faq.html">FAQ</a>
+      <a class="text-primary border-b-4 border-primary" href="/contact.html">Contact</a>
+    </div>
+    <button id="nav-account-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">My Account</button>
+<button id="hamburger-btn" class="md:hidden flex flex-col gap-1.5 p-2" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+  <span class="block w-6 h-0.5 bg-primary"></span>
+  <span class="block w-6 h-0.5 bg-primary"></span>
+  <span class="block w-6 h-0.5 bg-primary"></span>
+</button>
+</div>
+</nav>
+<!-- Mobile menu (hidden by default) -->
+<div id="mobile-menu" class="hidden md:hidden fixed top-[73px] left-0 w-full bg-white border-b-4 border-primary z-40 shadow-lg">
+  <div class="flex flex-col px-6 py-4 gap-1 font-headline font-bold text-sm">
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/index.html">Home</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/shop.html">Shop</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/how-it-works.html">How It Works</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/faq.html">FAQ</a>
+    <a class="text-on-surface/70 hover:text-primary py-3" href="/contact.html">Contact</a>
+  </div>
+</div>
+
+<!-- Hero -->
+<div class="vibrant-gradient pt-32 pb-16 px-8">
+  <div class="max-w-screen-2xl mx-auto">
+    <h1 class="font-headline text-4xl md:text-5xl font-bold text-white mb-4">Direct Inquiry Hub</h1>
+    <p class="text-white/70 text-lg font-medium">Our team replies within 2–4 hours.</p>
+  </div>
+</div>
+
+<main class="max-w-screen-2xl mx-auto px-8 py-12">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+    <!-- Sidebar -->
+    <aside class="lg:col-span-1 space-y-6">
+      <div class="cartoon-card rounded-2xl p-6">
+        <h3 class="font-headline font-bold text-primary text-lg mb-6 uppercase tracking-widest">Quick Contact</h3>
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-primary/5">
+            <span class="material-symbols-outlined text-accent">mail</span>
+            <div>
+              <p class="text-xs font-black text-primary/50 uppercase tracking-widest">Email</p>
+              <p class="font-bold text-primary text-sm">hello@lbara.tn</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-primary/5">
+            <span class="material-symbols-outlined text-accent">schedule</span>
+            <div>
+              <p class="text-xs font-black text-primary/50 uppercase tracking-widest">Response Time</p>
+              <p class="font-bold text-secondary text-sm">2–4 hours</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-primary/5">
+            <span class="material-symbols-outlined text-accent">support_agent</span>
+            <div>
+              <p class="text-xs font-black text-primary/50 uppercase tracking-widest">Support Hours</p>
+              <p class="font-bold text-primary text-sm">9AM – 10PM Daily</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cartoon-card rounded-2xl p-6">
+        <h3 class="font-headline font-bold text-primary text-lg mb-4">Quick Links</h3>
+        <div class="space-y-2">
+          <a href="/faq.html" class="flex items-center gap-2 p-3 rounded-xl hover:bg-primary/5 font-bold text-sm text-primary transition-colors">
+            <span class="material-symbols-outlined text-secondary">help_outline</span> FAQ
+          </a>
+          <a href="/how-it-works.html" class="flex items-center gap-2 p-3 rounded-xl hover:bg-primary/5 font-bold text-sm text-primary transition-colors">
+            <span class="material-symbols-outlined text-secondary">info</span> How It Works
+          </a>
+          <a href="/shop.html" class="flex items-center gap-2 p-3 rounded-xl hover:bg-primary/5 font-bold text-sm text-primary transition-colors">
+            <span class="material-symbols-outlined text-secondary">store</span> Browse Services
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Contact Form -->
+    <div class="lg:col-span-2">
+      <div class="cartoon-card rounded-3xl overflow-hidden">
+        <div class="bg-primary p-6 text-white">
+          <h2 class="font-headline text-xl font-bold uppercase tracking-widest flex items-center gap-2">
+            <span class="material-symbols-outlined text-accent">edit_note</span>
+            Send a Message
+          </h2>
+        </div>
+        <div class="p-8">
+
+          <!-- Success message -->
+          <div id="contact-success" class="hidden mb-6 bg-secondary/10 border-4 border-secondary rounded-2xl p-6 text-center">
+            <span class="material-symbols-outlined text-secondary text-4xl block mb-2" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            <p class="font-black text-secondary text-lg">Message Sent!</p>
+            <p class="text-secondary/80 font-bold text-sm mt-1">We'll get back to you within 2–4 hours.</p>
+          </div>
+
+          <!-- Error message -->
+          <div id="contact-error" class="hidden mb-6 bg-red-50 border-2 border-red-400 text-red-700 px-4 py-3 rounded-xl font-bold text-sm"></div>
+
+          <form id="contact-form" class="space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Full Name *</label>
+                <input id="contact-name" class="cartoon-input" placeholder="Your full name" type="text" required/>
+              </div>
+              <div>
+                <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Email Address *</label>
+                <input id="contact-email" class="cartoon-input" placeholder="your@email.com" type="email" required/>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Category</label>
+                <select id="contact-category" class="cartoon-input">
+                  <option value="">Select a category</option>
+                  <option value="general">General</option>
+                  <option value="sales">Sales</option>
+                  <option value="technical">Technical</option>
+                  <option value="billing">Billing / Refund</option>
+                  <option value="feedback">Feedback</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Subject</label>
+                <input id="contact-subject" class="cartoon-input" placeholder="Brief subject" type="text"/>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Message *</label>
+              <textarea id="contact-message" class="cartoon-input h-36 resize-none" placeholder="Describe your issue or inquiry in detail..." required></textarea>
+            </div>
+            <button id="contact-submit" class="w-full cartoon-button bg-primary text-white font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-3" type="submit">
+              <span class="material-symbols-outlined">send</span>
+              Send Message
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="bg-primary w-full pt-20 pb-10 text-white mt-12">
+  <div class="text-center border-t-2 border-white/5 pt-10 px-8">
+    <p class="text-sm text-white/40 font-bold">© 2024 Lbara.tn - The Kinetic Curator of Tunisian Services.</p>
+  </div>
+</footer>
+
+<script src="/js/api.js"></script>
+<script src="/js/contact.js"></script>
+</body>
+</html>
