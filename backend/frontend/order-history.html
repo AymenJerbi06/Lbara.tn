@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lbara - Order History</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "secondary-container": "#fdc34d",
+          "surface-container-lowest": "#ffffff",
+          "on-tertiary-container": "#5ba68f",
+          "primary-fixed": "#d5e3ff",
+          "tertiary-fixed": "#a5f2d7",
+          "on-secondary-fixed-variant": "#5d4200",
+          "surface-container": "#e8eeff",
+          "on-tertiary-fixed-variant": "#00513f",
+          "surface-container-highest": "#dde2f3",
+          "outline-variant": "#c3c6d0",
+          "primary-fixed-dim": "#a7c8ff",
+          "error": "#ba1a1a",
+          "on-primary-fixed-variant": "#224778",
+          "surface-bright": "#f9f9ff",
+          "surface-container-low": "#f1f3ff",
+          "primary": "#001b3b",
+          "on-primary": "#ffffff",
+          "primary-container": "#003060",
+          "surface-dim": "#d4daea",
+          "on-secondary-container": "#715000",
+          "on-tertiary-fixed": "#002118",
+          "on-primary-fixed": "#001b3c",
+          "on-background": "#161c27",
+          "tertiary-fixed-dim": "#89d5bc",
+          "on-tertiary": "#ffffff",
+          "on-secondary": "#ffffff",
+          "on-primary-container": "#7799cf",
+          "on-surface-variant": "#43474f",
+          "secondary-fixed-dim": "#f7bd48",
+          "on-error": "#ffffff",
+          "on-secondary-fixed": "#271900",
+          "tertiary-container": "#00382b",
+          "surface-variant": "#dde2f3",
+          "surface-tint": "#3c5f92",
+          "error-container": "#ffdad6",
+          "on-error-container": "#93000a",
+          "secondary-fixed": "#ffdea6",
+          "surface": "#f9f9ff",
+          "outline": "#737780",
+          "inverse-primary": "#a7c8ff",
+          "tertiary": "#002118",
+          "on-surface": "#161c27",
+          "secondary": "#7b5800",
+          "surface-container-high": "#e3e8f9",
+          "inverse-surface": "#2a303d",
+          "background": "#f9f9ff",
+          "inverse-on-surface": "#ecf0ff"
+        },
+        fontFamily: {
+          "headline": ["Plus Jakarta Sans"],
+          "body": ["Be Vietnam Pro"],
+          "label": ["Plus Jakarta Sans"]
+        },
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f9f9ff; color: #161c27; }
+  .headline-font { font-family: 'Plus Jakarta Sans', sans-serif; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #f1f3ff; }
+  ::-webkit-scrollbar-thumb { background: #dde2f3; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #c3c6d0; }
+</style>
+</head>
+<body class="bg-surface text-on-surface">
+
+<!-- Sidebar -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full py-8 px-4 bg-slate-50 dark:bg-slate-900 w-64 border-r-0 z-50">
+  <div class="mb-10 px-4">
+    <a href="/index.html" class="text-2xl font-black text-blue-900 tracking-tight headline-font">Lbara</a>
+  </div>
+  <nav class="flex-1 space-y-2">
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200" href="/my-account.html">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-label">Dashboard</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-blue-900 font-bold border-r-4 border-blue-900 bg-white/50 translate-x-1 transition-transform duration-150" href="/order-history.html">
+      <span class="material-symbols-outlined">history</span>
+      <span class="font-label">Order History</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200" href="/security.html">
+      <span class="material-symbols-outlined">lock</span>
+      <span class="font-label">Security</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200" href="/contact.html">
+      <span class="material-symbols-outlined">support_agent</span>
+      <span class="font-label">Support</span>
+    </a>
+  </nav>
+  <div class="mt-auto px-4 py-6 bg-surface-container-low rounded-xl">
+    <div class="flex items-center gap-3 mb-4">
+      <div id="sidebar-avatar" class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold headline-font text-lg">?</div>
+      <div>
+        <p class="headline-font font-bold text-sm text-primary" id="sidebar-name">Loading...</p>
+        <p class="text-xs text-on-surface-variant" id="sidebar-email"></p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="w-full py-2 bg-secondary-container text-on-secondary-container font-bold rounded-full text-sm hover:opacity-90 transition-opacity">
+      Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- Top AppBar -->
+<header class="flex justify-between items-center w-full px-6 py-4 md:pl-72 sticky top-0 z-40 bg-white/70 backdrop-blur-xl shadow-sm">
+  <div class="flex items-center gap-4 flex-1">
+    <div class="relative w-full max-w-md hidden md:block">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+      <input id="search-input" oninput="filterOrders()" class="w-full pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all text-sm" placeholder="Find a transaction..." type="text"/>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <button class="p-2 text-slate-600 hover:text-blue-900 transition-all"><span class="material-symbols-outlined">notifications</span></button>
+    <button class="p-2 text-slate-600 hover:text-blue-900 transition-all"><span class="material-symbols-outlined">help</span></button>
+    <div class="h-8 w-[1px] bg-outline-variant mx-2 opacity-30"></div>
+    <div id="header-avatar" class="w-8 h-8 rounded-full border-2 border-primary-fixed bg-primary-container flex items-center justify-center text-white font-bold text-sm headline-font">?</div>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="md:pl-64 min-h-screen">
+  <div class="max-w-5xl mx-auto p-6 md:p-10">
+    <header class="mb-10">
+      <h1 class="text-4xl font-extrabold headline-font text-on-surface tracking-tight mb-2">Order History</h1>
+      <p class="text-on-surface-variant text-lg">Detailed record of all your purchases.</p>
+    </header>
+
+    <!-- Filters -->
+    <section class="mb-12 bg-surface-container-lowest p-6 rounded-[2rem] shadow-[0_10px_30px_rgba(22,28,39,0.04)] border border-outline-variant/10">
+      <div class="flex flex-col lg:flex-row gap-6 items-end">
+        <div class="flex-1 w-full">
+          <label class="block text-xs font-bold headline-font uppercase tracking-wider text-on-surface-variant mb-3 px-1">Search</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-outline">search</span>
+            <input id="filter-search" oninput="filterOrders()" class="w-full pl-10 py-2.5 bg-surface-container-low border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20" placeholder="Order ref or product name..." type="text"/>
+          </div>
+        </div>
+        <div class="w-full lg:w-48">
+          <label class="block text-xs font-bold headline-font uppercase tracking-wider text-on-surface-variant mb-3 px-1">Status</label>
+          <select id="filter-status" onchange="filterOrders()" class="w-full py-2.5 bg-surface-container-low border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20">
+            <option value="">All Status</option>
+            <option value="fulfilled">Fulfilled</option>
+            <option value="paid">Paid</option>
+            <option value="processing">Processing</option>
+            <option value="pending_payment">Pending</option>
+            <option value="payment_failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <button onclick="filterOrders()" class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-primary-container transition-colors">
+          <span class="material-symbols-outlined text-base">filter_alt</span>
+          Apply
+        </button>
+      </div>
+    </section>
+
+    <!-- Loading -->
+    <div id="orders-loading" class="flex flex-col items-center justify-center py-20 gap-4">
+      <div class="w-10 h-10 border-4 border-primary/10 border-t-primary rounded-full animate-spin"></div>
+      <p class="text-on-surface-variant font-medium text-sm">Loading your orders...</p>
+    </div>
+
+    <!-- Empty -->
+    <div id="orders-empty" style="display:none" class="flex flex-col items-center justify-center py-20 gap-4 text-on-surface-variant">
+      <span class="material-symbols-outlined text-6xl">shopping_bag</span>
+      <p class="headline-font font-bold text-xl">No orders found</p>
+      <a href="/shop.html" class="mt-2 px-6 py-3 bg-primary text-on-primary rounded-xl font-bold text-sm hover:bg-primary-container transition-colors">Browse Shop</a>
+    </div>
+
+    <!-- Orders grouped by month -->
+    <div id="orders-container" style="display:none" class="space-y-12"></div>
+
+    <footer class="mt-20 py-10 flex flex-col md:flex-row justify-between items-center gap-6 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+      <span class="headline-font font-black text-2xl tracking-tighter">Lbara.tn</span>
+      <div class="flex gap-8 text-xs font-bold uppercase tracking-widest headline-font">
+        <a class="hover:text-primary" href="#">Privacy</a>
+        <a class="hover:text-primary" href="#">Terms</a>
+        <a class="hover:text-primary" href="#">Help</a>
+      </div>
+    </footer>
+  </div>
+</main>
+
+<!-- Mobile Bottom Nav -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl flex justify-around items-center py-4 px-6 z-50 border-t border-outline-variant/10">
+  <a href="/my-account.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">dashboard</span>
+    <span class="text-[10px] font-bold headline-font">Home</span>
+  </a>
+  <a href="/order-history.html" class="flex flex-col items-center gap-1 text-primary">
+    <span class="material-symbols-outlined">history</span>
+    <span class="text-[10px] font-bold headline-font">History</span>
+  </a>
+  <a href="/security.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">lock</span>
+    <span class="text-[10px] font-bold headline-font">Security</span>
+  </a>
+  <button onclick="handleLogout()" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">logout</span>
+    <span class="text-[10px] font-bold headline-font">Sign Out</span>
+  </button>
+</nav>
+
+<script src="/js/api.js"></script>
+<script>
+const STATUS_MAP = {
+  fulfilled:       { label: 'Fulfilled',  bg: 'bg-tertiary-fixed',      text: 'text-on-tertiary-fixed-variant' },
+  paid:            { label: 'Paid',       bg: 'bg-primary-fixed',       text: 'text-primary' },
+  processing:      { label: 'Processing', bg: 'bg-secondary-fixed',     text: 'text-on-secondary-fixed-variant' },
+  pending_payment: { label: 'Pending',    bg: 'bg-surface-container',   text: 'text-on-surface-variant' },
+  payment_failed:  { label: 'Failed',     bg: 'bg-error-container',     text: 'text-on-error-container' },
+  cancelled:       { label: 'Cancelled',  bg: 'bg-error-container',     text: 'text-on-error-container' },
+  refunded:        { label: 'Refunded',   bg: 'bg-surface-container',   text: 'text-on-surface-variant' },
+};
+
+function badge(status) {
+  const s = STATUS_MAP[status] || { label: status, bg: 'bg-surface-container', text: 'text-on-surface-variant' };
+  return `<span class="text-[10px] font-black headline-font uppercase px-3 py-1 rounded-full ${s.bg} ${s.text}">${s.label}</span>`;
+}
+
+function fmtDateTime(iso) {
+  return new Date(iso).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function monthLabel(iso) {
+  return new Date(iso).toLocaleString('en-GB', { month: 'long', year: 'numeric' });
+}
+
+function orderCard(o) {
+  return `
+    <div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-[0_4px_20px_rgba(22,28,39,0.03)] border border-outline-variant/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:shadow-lg transition-all">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+        </div>
+        <div>
+          <h3 class="headline-font font-bold text-on-surface text-lg">${o.product_name || 'Order'}</h3>
+          <p class="text-sm text-on-surface-variant">${fmtDateTime(o.created_at)} &bull; <span class="font-medium">Order #${o.order_ref}</span></p>
+        </div>
+      </div>
+      <div class="flex items-center justify-between w-full md:w-auto md:text-right md:flex-col gap-2">
+        <span class="headline-font font-black text-xl text-on-surface">- ${parseFloat(o.amount_tnd).toFixed(3)} TND</span>
+        ${badge(o.status)}
+      </div>
+    </div>`;
+}
+
+let allOrders = [];
+
+function filterOrders() {
+  const search = (document.getElementById('filter-search')?.value || document.getElementById('search-input')?.value || '').toLowerCase();
+  const status = document.getElementById('filter-status')?.value || '';
+
+  const filtered = allOrders.filter(o => {
+    const matchSearch = !search ||
+      (o.product_name || '').toLowerCase().includes(search) ||
+      (o.order_ref || '').toLowerCase().includes(search);
+    const matchStatus = !status || o.status === status;
+    return matchSearch && matchStatus;
+  });
+
+  renderOrders(filtered);
+}
+
+function renderOrders(orders) {
+  const container = document.getElementById('orders-container');
+  const empty = document.getElementById('orders-empty');
+
+  if (orders.length === 0) {
+    container.style.display = 'none';
+    empty.style.display = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  container.style.display = '';
+
+  // Group by month
+  const groups = {};
+  orders.forEach(o => {
+    const key = monthLabel(o.created_at);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(o);
+  });
+
+  container.innerHTML = Object.entries(groups).map(([month, items]) => `
+    <div>
+      <div class="sticky top-20 z-30 py-4 bg-surface/80 backdrop-blur-md mb-6">
+        <h2 class="headline-font font-extrabold text-xl flex items-center gap-3">
+          ${month}
+          <span class="h-px flex-1 bg-outline-variant/30"></span>
+          <span class="text-xs font-medium text-on-surface-variant uppercase tracking-widest px-3 py-1 bg-surface-container rounded-full">${items.length} Order${items.length > 1 ? 's' : ''}</span>
+        </h2>
+      </div>
+      <div class="space-y-4">${items.map(orderCard).join('')}</div>
+    </div>
+  `).join('');
+}
+
+async function handleLogout() {
+  try { await api.logout(); } catch {}
+  window.location.href = '/login.html';
+}
+
+async function init() {
+  let user;
+  try {
+    const res = await api.me();
+    user = res.user;
+  } catch {
+    window.location.href = '/login.html';
+    return;
+  }
+
+  const name = user.full_name || user.email.split('@')[0];
+  document.getElementById('sidebar-name').textContent = name;
+  document.getElementById('sidebar-email').textContent = user.email;
+  document.getElementById('sidebar-avatar').textContent = name[0].toUpperCase();
+  document.getElementById('header-avatar').textContent = name[0].toUpperCase();
+
+  try {
+    const res = await api.myOrders();
+    allOrders = res.orders || [];
+    document.getElementById('orders-loading').style.display = 'none';
+    renderOrders(allOrders);
+  } catch {
+    document.getElementById('orders-loading').innerHTML =
+      '<p class="text-red-500 font-semibold text-center py-8">Failed to load orders.</p>';
+  }
+}
+
+init();
+</script>
+</body></html>

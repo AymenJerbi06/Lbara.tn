@@ -95,11 +95,11 @@
       <span class="material-symbols-outlined">dashboard</span>
       <span class="font-label">Dashboard</span>
     </button>
-    <button onclick="showSection('orders')" id="nav-orders"
-      class="w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200">
+    <a href="/order-history.html" id="nav-orders"
+      class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200">
       <span class="material-symbols-outlined">inventory_2</span>
       <span class="font-label">My Orders</span>
-    </button>
+    </a>
     <a href="/security.html" id="nav-security"
       class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200">
       <span class="material-symbols-outlined">lock</span>
@@ -188,10 +188,10 @@
                 <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">add_shopping_cart</span>
                 <span class="text-xs font-bold headline-font">Buy New</span>
               </a>
-              <button onclick="showSection('orders')" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
+              <a href="/order-history.html" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
                 <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">receipt_long</span>
                 <span class="text-xs font-bold headline-font">My Orders</span>
-              </button>
+              </a>
               <button onclick="window.location.href='/security.html'" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
                 <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">lock</span>
                 <span class="text-xs font-bold headline-font">Security</span>
@@ -209,7 +209,7 @@
           <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
             <div class="flex justify-between items-center mb-8">
               <h3 class="headline-font font-bold text-2xl">Recent Orders</h3>
-              <button onclick="showSection('orders')" class="text-primary font-bold text-sm underline underline-offset-4">View All</button>
+              <a href="/order-history.html" class="text-primary font-bold text-sm underline underline-offset-4">View All</a>
             </div>
             <div id="dashboard-orders-loading" class="text-center py-8 text-on-surface-variant">
               <span class="material-symbols-outlined text-4xl block mb-2">hourglass_empty</span>
@@ -342,10 +342,10 @@
     <span class="material-symbols-outlined">dashboard</span>
     <span class="text-[10px] font-bold headline-font">Home</span>
   </button>
-  <button onclick="showSection('orders')" class="flex flex-col items-center gap-1 text-on-surface-variant">
+  <a href="/order-history.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
     <span class="material-symbols-outlined">inventory_2</span>
     <span class="text-[10px] font-bold headline-font">Orders</span>
-  </button>
+  </a>
   <button onclick="window.location.href='/security.html'" class="flex flex-col items-center gap-1 text-on-surface-variant">
     <span class="material-symbols-outlined">lock</span>
     <span class="text-[10px] font-bold headline-font">Security</span>
