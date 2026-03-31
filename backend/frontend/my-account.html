@@ -113,128 +113,59 @@
 <main class="md:pl-64 min-h-screen pb-24 md:pb-0">
   <div class="max-w-6xl mx-auto p-6 md:p-10">
 
-    <!-- Dashboard View -->
+    <!-- ── DASHBOARD VIEW ─────────────────────────────────── -->
     <div id="view-dashboard">
 
-    <!-- Welcome header -->
-    <header class="mb-10">
-      <h1 class="text-4xl md:text-5xl font-extrabold font-headline text-on-surface tracking-tight mb-2" id="welcome-title">Hello 👋</h1>
-      <p class="text-on-surface-variant text-lg" id="welcome-sub">Loading your account...</p>
-    </header>
+      <!-- Welcome header -->
+      <header class="mb-10">
+        <h1 class="text-4xl md:text-5xl font-extrabold font-headline text-on-surface tracking-tight mb-2" id="welcome-title">Hello 👋</h1>
+        <p class="text-on-surface-variant text-lg" id="welcome-sub">Loading your account...</p>
+      </header>
 
-    <!-- Stats row -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-      <div class="bg-primary text-white p-6 rounded-2xl">
-        <p class="text-xs font-bold uppercase tracking-widest opacity-70 font-headline mb-1">Total Orders</p>
-        <p class="text-3xl font-black font-headline" id="stat-total">—</p>
-      </div>
-      <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
-        <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Fulfilled</p>
-        <p class="text-3xl font-black font-headline text-secondary" id="stat-fulfilled">—</p>
-      </div>
-      <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
-        <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Processing</p>
-        <p class="text-3xl font-black font-headline text-accent" id="stat-processing">—</p>
-      </div>
-      <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
-        <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Total Spent</p>
-        <p class="text-xl font-black font-headline text-primary" id="stat-spent">—</p>
-      </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <section class="mb-10">
-      <h3 class="font-headline font-bold text-xl mb-4">Quick Actions</h3>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="/shop.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
-          <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">add_shopping_cart</span>
-          <span class="text-xs font-bold font-headline">Buy New</span>
-        </a>
-        <a href="/order-confirmed.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
-          <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">receipt_long</span>
-          <span class="text-xs font-bold font-headline">My Orders</span>
-        </a>
-        <a href="/contact.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
-          <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">support_agent</span>
-          <span class="text-xs font-bold font-headline">Support</span>
-        </a>
-        <a href="/faq.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
-          <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">help</span>
-          <span class="text-xs font-bold font-headline">FAQ</span>
-        </a>
-      </div>
-    </section>
-
-    <!-- Security View -->
-    <div id="view-security" class="hidden">
-    <header class="mb-10">
-      <h1 class="text-4xl font-extrabold font-headline text-on-surface tracking-tight mb-2">Security</h1>
-      <p class="text-on-surface-variant text-lg">Manage your password and account security.</p>
-    </header>
-    <section class="bg-white rounded-2xl border border-outline-variant/20 p-8 mb-8">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary">lock</span>
+      <!-- Stats row -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        <div class="bg-primary text-white p-6 rounded-2xl">
+          <p class="text-xs font-bold uppercase tracking-widest opacity-70 font-headline mb-1">Total Orders</p>
+          <p class="text-3xl font-black font-headline" id="stat-total">—</p>
         </div>
-        <h3 class="font-headline font-bold text-2xl">Security</h3>
-      </div>
-
-      <!-- Step 1: Request code -->
-      <div id="security-step1">
-        <p class="text-on-surface-variant text-sm mb-6">To change your password, we'll send a 6-digit verification code to your email address.</p>
-        <button id="send-code-btn" onclick="sendCode()" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-full font-headline text-sm flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">mail</span>
-          Send Verification Code
-        </button>
-        <p id="send-code-msg" class="hidden mt-4 text-sm font-bold font-headline"></p>
-      </div>
-
-      <!-- Step 2: Enter code + new password -->
-      <div id="security-step2" class="hidden mt-6 border-t border-outline-variant/10 pt-6">
-        <p class="text-on-surface-variant text-sm mb-6">Enter the 6-digit code from your email and your new password.</p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">Verification Code</label>
-            <input id="otp-input" type="text" maxlength="6" inputmode="numeric" placeholder="123456"
-              class="w-full border-2 border-primary rounded-xl px-4 py-3 font-bold text-primary text-center text-xl tracking-widest placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
-          </div>
-          <div>
-            <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">New Password</label>
-            <div class="relative">
-              <input id="new-password-input" type="password" placeholder="Min. 8 characters"
-                class="w-full border-2 border-primary rounded-xl px-4 py-3 pr-12 font-bold text-primary placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
-              <button type="button" onclick="togglePwd('new-password-input','eye-new')" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
-                <span id="eye-new" class="material-symbols-outlined text-xl">visibility</span>
-              </button>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">Confirm Password</label>
-            <div class="relative">
-              <input id="confirm-password-input" type="password" placeholder="Repeat password"
-                class="w-full border-2 border-primary rounded-xl px-4 py-3 pr-12 font-bold text-primary placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
-              <button type="button" onclick="togglePwd('confirm-password-input','eye-confirm')" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
-                <span id="eye-confirm" class="material-symbols-outlined text-xl">visibility</span>
-              </button>
-            </div>
-          </div>
+        <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
+          <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Fulfilled</p>
+          <p class="text-3xl font-black font-headline text-secondary" id="stat-fulfilled">—</p>
         </div>
-        <div class="flex items-center gap-4 mt-6">
-          <button onclick="changePassword()" id="change-pwd-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-full font-headline text-sm flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">check</span>
-            Confirm Change
+        <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
+          <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Processing</p>
+          <p class="text-3xl font-black font-headline text-accent" id="stat-processing">—</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
+          <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Total Spent</p>
+          <p class="text-xl font-black font-headline text-primary" id="stat-spent">—</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <section class="mb-10">
+        <h3 class="font-headline font-bold text-xl mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <a href="/shop.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
+            <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">add_shopping_cart</span>
+            <span class="text-xs font-bold font-headline">Buy New</span>
+          </a>
+          <a href="/contact.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
+            <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">support_agent</span>
+            <span class="text-xs font-bold font-headline">Support</span>
+          </a>
+          <button onclick="showSection('security')" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
+            <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">lock</span>
+            <span class="text-xs font-bold font-headline">Security</span>
           </button>
-          <button onclick="cancelChange()" class="text-sm font-bold text-on-surface-variant hover:text-primary transition-colors font-headline">Cancel</button>
+          <a href="/faq.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
+            <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">help</span>
+            <span class="text-xs font-bold font-headline">FAQ</span>
+          </a>
         </div>
-        <p id="change-pwd-msg" class="hidden mt-4 text-sm font-bold font-headline"></p>
-      </div>
-    </section>
-    </div><!-- end view-security -->
+      </section>
 
-    <!-- Dashboard View -->
-    <div id="view-dashboard">
-
-    <!-- Orders list -->
+      <!-- Orders list -->
     <section class="bg-white rounded-2xl border border-outline-variant/20 p-8">
       <div class="flex justify-between items-center mb-8">
         <h3 class="font-headline font-bold text-2xl">Order History</h3>
@@ -258,7 +189,71 @@
       <div id="orders-list" class="hidden space-y-4"></div>
     </section>
 
-    </div><!-- end view-dashboard -->
+    </div><!-- ── END DASHBOARD VIEW ── -->
+
+    <!-- ── SECURITY VIEW ──────────────────────────────────── -->
+    <div id="view-security" class="hidden">
+      <header class="mb-10">
+        <h1 class="text-4xl font-extrabold font-headline text-on-surface tracking-tight mb-2">Security</h1>
+        <p class="text-on-surface-variant text-lg">Manage your password and account security.</p>
+      </header>
+      <section class="bg-white rounded-2xl border border-outline-variant/20 p-8">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary">lock</span>
+          </div>
+          <h3 class="font-headline font-bold text-2xl">Change Password</h3>
+        </div>
+        <!-- Step 1 -->
+        <div id="security-step1">
+          <p class="text-on-surface-variant text-sm mb-6">We'll send a 6-digit verification code to your email address.</p>
+          <button id="send-code-btn" onclick="sendCode()" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-full font-headline text-sm flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">mail</span>
+            Send Verification Code
+          </button>
+          <p id="send-code-msg" class="hidden mt-4 text-sm font-bold font-headline"></p>
+        </div>
+        <!-- Step 2 -->
+        <div id="security-step2" class="hidden mt-6 border-t border-outline-variant/10 pt-6">
+          <p class="text-on-surface-variant text-sm mb-6">Enter the 6-digit code from your email and your new password.</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">Verification Code</label>
+              <input id="otp-input" type="text" maxlength="6" inputmode="numeric" placeholder="123456"
+                class="w-full border-2 border-primary rounded-xl px-4 py-3 font-bold text-primary text-center text-xl tracking-widest placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
+            </div>
+            <div>
+              <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">New Password</label>
+              <div class="relative">
+                <input id="new-password-input" type="password" placeholder="Min. 8 characters"
+                  class="w-full border-2 border-primary rounded-xl px-4 py-3 pr-12 font-bold text-primary placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
+                <button type="button" onclick="togglePwd('new-password-input','eye-new')" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
+                  <span id="eye-new" class="material-symbols-outlined text-xl">visibility</span>
+                </button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-black text-primary uppercase tracking-widest mb-2">Confirm Password</label>
+              <div class="relative">
+                <input id="confirm-password-input" type="password" placeholder="Repeat password"
+                  class="w-full border-2 border-primary rounded-xl px-4 py-3 pr-12 font-bold text-primary placeholder:text-primary/30 focus:ring-0 focus:border-accent transition-colors"/>
+                <button type="button" onclick="togglePwd('confirm-password-input','eye-confirm')" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
+                  <span id="eye-confirm" class="material-symbols-outlined text-xl">visibility</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 mt-6">
+            <button onclick="changePassword()" id="change-pwd-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-full font-headline text-sm flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">check</span>
+              Confirm Change
+            </button>
+            <button onclick="cancelChange()" class="text-sm font-bold text-on-surface-variant hover:text-primary transition-colors font-headline">Cancel</button>
+          </div>
+          <p id="change-pwd-msg" class="hidden mt-4 text-sm font-bold font-headline"></p>
+        </div>
+      </section>
+    </div><!-- ── END SECURITY VIEW ── -->
 
   </div>
 </main>
@@ -336,7 +331,7 @@ function renderOrders(orders) {
 
 function showSection(section) {
   const isDashboard = section === 'dashboard';
-  document.querySelectorAll('#view-dashboard').forEach(el => el.classList.toggle('hidden', !isDashboard));
+  document.getElementById('view-dashboard').classList.toggle('hidden', !isDashboard);
   document.getElementById('view-security').classList.toggle('hidden', isDashboard);
 
   const dashBtn = document.getElementById('nav-dashboard');
