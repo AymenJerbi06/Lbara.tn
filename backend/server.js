@@ -93,6 +93,22 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3007;
-app.listen(PORT, () => {
-  console.log(`[INFO] Lbara.tn running on http://localhost:${PORT} (${process.env.NODE_ENV || 'development'})`);
-});
+
+async function start() {
+  if (process.env.RUN_SETUP === 'true') {
+    console.log('[INFO] RUN_SETUP detected — running DB migration...');
+    const { execSync } = require('child_process');
+    try {
+      execSync('node db/setup.js', { stdio: 'inherit', cwd: __dirname });
+      console.log('[INFO] DB migration complete.');
+    } catch (e) {
+      console.error('[ERROR] DB migration failed:', e.message);
+    }
+  }
+
+  app.listen(PORT, () => {
+    console.log(`[INFO] Lbara.tn running on http://localhost:${PORT} (${process.env.NODE_ENV || 'development'})`);
+  });
+}
+
+start();
