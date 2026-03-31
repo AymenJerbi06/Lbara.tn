@@ -64,10 +64,14 @@
     <a href="/index.html" class="text-2xl font-black text-primary tracking-tight font-headline">Lbara.tn</a>
   </div>
   <nav class="flex-1 space-y-1">
-    <a id="nav-dashboard" class="flex items-center gap-3 px-4 py-3 text-primary font-bold border-r-4 border-primary bg-surface-container transition-all" href="#">
+    <button onclick="showSection('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 text-primary font-bold border-r-4 border-primary bg-surface-container transition-all">
       <span class="material-symbols-outlined">dashboard</span>
       <span class="font-headline">Dashboard</span>
-    </a>
+    </button>
+    <button onclick="showSection('security')" id="nav-security" class="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:text-primary hover:bg-surface-container transition-colors border-r-4 border-transparent">
+      <span class="material-symbols-outlined">lock</span>
+      <span class="font-headline">Security</span>
+    </button>
     <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:text-primary hover:bg-surface-container transition-colors" href="/shop.html">
       <span class="material-symbols-outlined">add_shopping_cart</span>
       <span class="font-headline">Browse Shop</span>
@@ -108,6 +112,9 @@
 <!-- Main -->
 <main class="md:pl-64 min-h-screen pb-24 md:pb-0">
   <div class="max-w-6xl mx-auto p-6 md:p-10">
+
+    <!-- Dashboard View -->
+    <div id="view-dashboard">
 
     <!-- Welcome header -->
     <header class="mb-10">
@@ -158,7 +165,14 @@
       </div>
     </section>
 
-    <!-- Security Section -->
+    </div><!-- end view-dashboard -->
+
+    <!-- Security View -->
+    <div id="view-security" class="hidden">
+    <header class="mb-10">
+      <h1 class="text-4xl font-extrabold font-headline text-on-surface tracking-tight mb-2">Security</h1>
+      <p class="text-on-surface-variant text-lg">Manage your password and account security.</p>
+    </header>
     <section class="bg-white rounded-2xl border border-outline-variant/20 p-8 mb-8">
       <div class="flex items-center gap-3 mb-6">
         <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
@@ -217,6 +231,7 @@
         <p id="change-pwd-msg" class="hidden mt-4 text-sm font-bold font-headline"></p>
       </div>
     </section>
+    </div><!-- end view-security -->
 
     <!-- Orders list -->
     <section class="bg-white rounded-2xl border border-outline-variant/20 p-8">
@@ -259,6 +274,10 @@
     <span class="material-symbols-outlined">support_agent</span>
     <span class="text-[10px] font-bold font-headline">Support</span>
   </a>
+  <button onclick="showSection('security')" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">lock</span>
+    <span class="text-[10px] font-bold font-headline">Security</span>
+  </button>
   <button onclick="handleLogout()" class="flex flex-col items-center gap-1 text-on-surface-variant">
     <span class="material-symbols-outlined">logout</span>
     <span class="text-[10px] font-bold font-headline">Sign Out</span>
@@ -310,6 +329,18 @@ function renderOrders(orders) {
       </div>
     </div>
   `).join('');
+}
+
+function showSection(section) {
+  const isDashboard = section === 'dashboard';
+  document.getElementById('view-dashboard').classList.toggle('hidden', !isDashboard);
+  document.getElementById('view-security').classList.toggle('hidden', isDashboard);
+
+  const dashBtn = document.getElementById('nav-dashboard');
+  const secBtn = document.getElementById('nav-security');
+
+  dashBtn.className = `w-full flex items-center gap-3 px-4 py-3 font-bold border-r-4 transition-all ${isDashboard ? 'text-primary border-primary bg-surface-container' : 'text-on-surface-variant border-transparent hover:text-primary hover:bg-surface-container'}`;
+  secBtn.className = `w-full flex items-center gap-3 px-4 py-3 font-bold border-r-4 transition-all ${!isDashboard ? 'text-primary border-primary bg-surface-container' : 'text-on-surface-variant border-transparent hover:text-primary hover:bg-surface-container'}`;
 }
 
 function togglePwd(inputId, iconId) {
