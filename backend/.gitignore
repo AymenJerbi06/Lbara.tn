@@ -1,0 +1,19 @@
+# Environment
+.env
+.env.local
+.env.production
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Test artifacts
+cookies.txt
+*.txt.tmp
+
+# OS
+.DS_Store
+Thumbs.db

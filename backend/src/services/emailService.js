@@ -1,0 +1,100 @@
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT) || 587,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+async function send({ to, subject, html }) {
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || 'Lbara.tn <hello@lbara.tn>',
+    to,
+    subject,
+    html,
+  });
+}
+
+// ─── Email Templates ──────────────────────────────────────
+
+async function sendOrderConfirmation(order, product) {
+  await send({
+    to: order.delivery_email,
+    subject: `Order Confirmed — ${order.order_ref} | Lbara.tn`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9f9;">
+        <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #B8860B; margin: 0; font-size: 28px;">Lbara.tn</h1>
+          <p style="color: #fff; margin: 8px 0 0; font-size: 14px;">Your Order is Confirmed!</p>
+        </div>
+        <div style="background: #fff; border: 2px solid #003060; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+          <h2 style="color: #003060; margin-top: 0;">Order #${order.order_ref}</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Product</td><td style="padding: 8px 0; font-weight: bold; color: #003060;">${product.name}</td></tr>
+            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Duration</td><td style="padding: 8px 0; font-weight: bold; color: #003060;">${product.duration_label || '1 Month'}</td></tr>
+            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Amount Paid</td><td style="padding: 8px 0; font-weight: bold; color: #003060;">${order.amount_tnd} TND</td></tr>
+            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Delivery To</td><td style="padding: 8px 0; font-weight: bold; color: #003060;">${order.delivery_email}</td></tr>
+            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Estimated Delivery</td><td style="padding: 8px 0; font-weight: bold; color: #005F4B;">Within ${product.delivery_hours || 2} hour(s)</td></tr>
+          </table>
+        </div>
+        <p style="color: #666; font-size: 13px; text-align: center;">
+          Your credentials will be sent to this email once our team processes your order.<br>
+          Need help? Contact us at <a href="mailto:hello@lbara.tn" style="color: #003060;">hello@lbara.tn</a>
+        </p>
+      </div>
+    `,
+  });
+}
+
+async function sendFulfillmentEmail(order, product, credentials) {
+  await send({
+    to: order.delivery_email,
+    subject: `Your ${product.name} is Ready — ${order.order_ref} | Lbara.tn`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9f9;">
+        <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #B8860B; margin: 0; font-size: 28px;">Lbara.tn</h1>
+          <p style="color: #fff; margin: 8px 0 0;">Your Access is Ready! 🎉</p>
+        </div>
+        <div style="background: #fff; border: 4px solid #003060; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+          <h2 style="color: #003060; margin-top: 0;">${product.name} — Order #${order.order_ref}</h2>
+          <div style="background: #f0f4ff; border: 2px dashed #003060; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <p style="margin: 0; font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Your Access Details</p>
+            <pre style="margin: 8px 0 0; font-size: 15px; color: #003060; font-weight: bold; white-space: pre-wrap;">${credentials}</pre>
+          </div>
+          <p style="color: #666; font-size: 13px;">
+            ⚠️ Keep these credentials safe. Do not share them.<br>
+            📧 If you have any issues, reply to this email with your order reference: <strong>${order.order_ref}</strong>
+          </p>
+        </div>
+        <p style="color: #999; font-size: 12px; text-align: center;">
+          Thank you for choosing Lbara.tn — Breaking digital walls one subscription at a time.
+        </p>
+      </div>
+    `,
+  });
+}
+
+async function sendContactAck(name, email, messageId) {
+  await send({
+    to: email,
+    subject: `We received your message — Lbara.tn`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+        <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #B8860B; margin: 0;">Lbara.tn</h1>
+        </div>
+        <p>Hi <strong>${name}</strong>,</p>
+        <p>We received your message and will get back to you within <strong>2–4 hours</strong>.</p>
+        <p>Reference: <strong>#${messageId.split('-')[0].toUpperCase()}</strong></p>
+        <p>— The Lbara.tn Team</p>
+      </div>
+    `,
+  });
+}
+
+module.exports = { send, sendOrderConfirmation, sendFulfillmentEmail, sendContactAck };

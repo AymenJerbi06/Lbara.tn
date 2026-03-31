@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shop All Services - Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: { "primary": "#003060", "secondary": "#005F4B", "accent": "#B8860B", "on-surface": "#1A202C" },
+        fontFamily: { "headline": ["Quicksand", "sans-serif"], "body": ["Nunito", "sans-serif"] },
+        borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer base { body { @apply bg-[#F8FAFC] text-on-surface font-body; } }
+  .vibrant-gradient { background: linear-gradient(135deg, #001F3F 0%, #003B5C 100%); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .cartoon-card { @apply bg-white border-4 border-primary shadow-[8px_8px_0px_0px_#003060] transition-all; }
+  .cartoon-card:hover { @apply translate-x-[-2px] translate-y-[-2px] shadow-[10px_10px_0px_0px_#003060]; }
+  .cartoon-button { @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none; }
+  .filter-item { @apply flex items-center justify-between w-full px-4 py-3 rounded-xl hover:bg-primary/5 transition-colors font-bold text-sm text-on-surface/70 cursor-pointer; }
+  .filter-item.active { @apply bg-primary text-white shadow-[4px_4px_0px_0px_#B8860B]; }
+</style>
+</head>
+<body class="selection:bg-primary/30 selection:text-primary">
+
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
+  <div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
+    <a href="/index.html" class="text-3xl font-bold tracking-tight text-primary font-headline">Lbara.tn</a>
+    <div class="hidden md:flex items-center gap-8 font-headline font-bold text-sm">
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/index.html">Home</a>
+      <a class="text-primary border-b-4 border-primary" href="/shop.html">Shop</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/how-it-works.html">How It Works</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/faq.html">FAQ</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/contact.html">Contact</a>
+    </div>
+    <button id="nav-account-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">My Account</button>
+<button id="hamburger-btn" class="md:hidden flex flex-col gap-1.5 p-2" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+  <span class="block w-6 h-0.5 bg-primary"></span>
+  <span class="block w-6 h-0.5 bg-primary"></span>
+  <span class="block w-6 h-0.5 bg-primary"></span>
+</button>
+</div>
+</nav>
+<!-- Mobile menu (hidden by default) -->
+<div id="mobile-menu" class="hidden md:hidden fixed top-[73px] left-0 w-full bg-white border-b-4 border-primary z-40 shadow-lg">
+  <div class="flex flex-col px-6 py-4 gap-1 font-headline font-bold text-sm">
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/index.html">Home</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/shop.html">Shop</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/how-it-works.html">How It Works</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/faq.html">FAQ</a>
+    <a class="text-on-surface/70 hover:text-primary py-3" href="/contact.html">Contact</a>
+  </div>
+</div>
+
+<!-- Hero Banner -->
+<div class="vibrant-gradient pt-32 pb-12 px-8">
+  <div class="max-w-screen-2xl mx-auto">
+    <h1 class="font-headline text-4xl md:text-5xl font-bold text-white mb-4">All Digital Services</h1>
+    <p class="text-white/70 text-lg font-medium mb-8">Pay with your Tunisian card. Receive instantly.</p>
+    <div class="relative max-w-xl">
+      <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary/40">search</span>
+      <input id="shop-search" class="w-full bg-white border-4 border-white/20 rounded-2xl pl-12 pr-6 py-4 font-bold text-primary placeholder:text-primary/30 focus:outline-none focus:border-accent" placeholder="Search services..."/>
+    </div>
+  </div>
+</div>
+
+<main class="max-w-screen-2xl mx-auto px-8 py-12">
+  <div class="flex gap-10">
+
+    <!-- Sidebar Filters -->
+    <aside class="hidden md:block w-64 shrink-0">
+      <div class="cartoon-card rounded-2xl p-6 sticky top-28">
+        <h3 class="font-headline font-bold text-primary text-lg mb-6 uppercase tracking-widest">Categories</h3>
+        <div class="space-y-2">
+          <button data-category="all" class="filter-item active">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">apps</span> All Services</span>
+          </button>
+          <button data-category="streaming" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">play_circle</span> Streaming</span>
+          </button>
+          <button data-category="ai_tools" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">auto_awesome</span> AI Tools</span>
+          </button>
+          <button data-category="gaming" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">sports_esports</span> Gaming</span>
+          </button>
+          <button data-category="productivity" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">work</span> Productivity</span>
+          </button>
+          <button data-category="education" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">school</span> Education</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Product Grid -->
+    <div class="flex-grow">
+      <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Populated by shop.js -->
+        <div class="col-span-3 text-center py-20 text-primary/40 font-bold text-lg">
+          <span class="material-symbols-outlined text-4xl block mb-4 animate-spin">autorenew</span>
+          Loading services...
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div id="pagination" class="flex items-center justify-center gap-2 mt-12"></div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="bg-primary w-full pt-20 pb-10 text-white mt-12">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-16 px-8 max-w-screen-2xl mx-auto">
+    <div class="md:col-span-1">
+      <span class="text-3xl font-bold text-accent mb-6 block font-headline">Lbara.tn</span>
+      <p class="text-sm text-white/60 leading-relaxed font-medium">Breaking the digital walls one subscription at a time.</p>
+    </div>
+    <div>
+      <h4 class="font-headline font-bold text-xl mb-8">Explore</h4>
+      <ul class="space-y-4">
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html">All Services</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html?category=streaming">Streaming</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html?category=ai_tools">AI Tools</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html?category=gaming">Gaming</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-headline font-bold text-xl mb-8">Company</h4>
+      <ul class="space-y-4">
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/how-it-works.html">How It Works</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Terms of Service</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Privacy Policy</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Refund Policy</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-headline font-bold text-xl mb-8">Contact</h4>
+      <ul class="space-y-6">
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/contact.html">Contact Support</a></li>
+        <li class="flex items-center gap-3 text-white/60 text-sm font-bold">
+          <span class="material-symbols-outlined text-accent">mail</span> hello@lbara.tn
+        </li>
+        <li class="flex items-center gap-3 text-white/60 text-sm font-bold">
+          <span class="material-symbols-outlined text-accent">phone</span> +216 71 000 000
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="mt-20 border-t-2 border-white/5 pt-10 px-8 max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+    <p class="text-sm text-white/40 font-bold">© 2024 Lbara.tn - The Kinetic Curator of Tunisian Services.</p>
+    <div class="flex gap-6">
+      <span class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold text-white/60 border border-white/10 uppercase tracking-widest">Secure Payment</span>
+      <span class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold text-white/60 border border-white/10 uppercase tracking-widest">24/7 Support</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/api.js"></script>
+<script src="/js/shop.js"></script>
+</body>
+</html>

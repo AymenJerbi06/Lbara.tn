@@ -1,0 +1,201 @@
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#003060",
+                        "secondary": "#005F4B",
+                        "accent": "#B8860B",
+                        "background-light": "#001F3F",
+                        "surface": "#FFFFFF",
+                        "on-surface": "#1A202C",
+                        "on-primary": "#FFFFFF",
+                        "sky-glow": "#003B5C",
+                        "peach-glow": "#002B4B",
+                    },
+                    fontFamily: {
+                        "headline": ["Quicksand", "sans-serif"],
+                        "body": ["Nunito", "sans-serif"],
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-white text-on-surface font-body;
+            }
+        }
+        .vibrant-gradient {
+            background: linear-gradient(135deg, #001F3F 0%, #000C1A 100%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .cartoon-card {
+            @apply bg-white border-4 border-primary shadow-[8px_8px_0px_0px_#003060] transition-all;
+        }
+        .cartoon-card:hover {
+            @apply translate-x-[-2px] translate-y-[-2px] shadow-[10px_10px_0px_0px_#003060];
+        }
+        .cartoon-button {
+            @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none;
+        }
+        .cartoon-input {
+            @apply border-2 border-primary rounded-xl px-4 py-3 focus:ring-0 focus:border-accent transition-colors font-bold text-primary placeholder:text-primary/30;
+        }
+    </style>
+</head>
+<body class="selection:bg-primary/30 selection:text-primary">
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
+<a href="/shop.html" class="text-3xl font-bold tracking-tight text-primary font-headline">Lbara.tn</a>
+<div class="hidden md:flex items-center gap-8 font-headline font-bold text-sm">
+<a class="text-on-surface/70 hover:text-primary transition-colors" href="/index.html">Home</a>
+<a class="text-on-surface/70 hover:text-primary transition-colors" href="/shop.html">Shop</a>
+<a class="text-on-surface/70 hover:text-primary transition-colors" href="/how-it-works.html">How It Works</a>
+<a class="text-on-surface/70 hover:text-primary transition-colors" href="/faq.html">FAQ</a>
+<a class="text-on-surface/70 hover:text-primary transition-colors" href="/contact.html">Contact</a>
+</div>
+<button id="nav-account-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">
+                Join Now
+            </button>
+<button id="hamburger-btn" class="md:hidden flex flex-col gap-1.5 p-2" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+  <span class="block w-6 h-0.5 bg-primary"></span>
+  <span class="block w-6 h-0.5 bg-primary"></span>
+  <span class="block w-6 h-0.5 bg-primary"></span>
+</button>
+</div>
+</nav>
+<!-- Mobile menu (hidden by default) -->
+<div id="mobile-menu" class="hidden md:hidden fixed top-[73px] left-0 w-full bg-white border-b-4 border-primary z-40 shadow-lg">
+  <div class="flex flex-col px-6 py-4 gap-1 font-headline font-bold text-sm">
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/index.html">Home</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/shop.html">Shop</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/how-it-works.html">How It Works</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/faq.html">FAQ</a>
+    <a class="text-on-surface/70 hover:text-primary py-3" href="/contact.html">Contact</a>
+  </div>
+</div>
+<main class="vibrant-gradient min-h-screen pt-32 pb-24 flex items-center justify-center px-6">
+<div class="w-full max-w-lg">
+<div class="cartoon-card rounded-3xl p-8 md:p-12 relative">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2">
+<div class="w-24 h-24 bg-white border-4 border-primary rounded-full flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-primary text-6xl" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</div>
+</div>
+<div class="text-center mt-8 mb-10">
+<h1 class="font-headline text-3xl font-black text-primary uppercase tracking-tight">Welcome Back</h1>
+<p class="text-primary/60 font-bold">Access your digital bridge</p>
+<div id="login-error" class="hidden mt-4 bg-red-50 border-2 border-red-400 text-red-700 px-4 py-3 rounded-xl font-bold text-sm"></div>
+</div>
+<form id="login-form" class="space-y-6">
+<div>
+<label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Email or Username</label>
+<input id="login-email" class="w-full cartoon-input" placeholder="e.g. curator_tn" type="text"/>
+</div>
+<div>
+<div class="flex justify-between items-center mb-2 px-1">
+<label class="text-sm font-black text-primary uppercase tracking-widest">Password</label>
+<a class="text-xs font-bold text-accent hover:underline" href="#">Forgot Password?</a>
+</div>
+<input id="login-password" class="w-full cartoon-input" placeholder="••••••••" type="password"/>
+</div>
+<div class="flex items-center gap-3 px-1">
+<input class="w-5 h-5 border-2 border-primary rounded text-primary focus:ring-0" id="remember" type="checkbox"/>
+<label class="text-sm font-bold text-primary/70 cursor-pointer" for="remember">Stay logged in</label>
+</div>
+<button id="login-btn" class="w-full cartoon-button bg-primary text-white font-black py-4 rounded-2xl text-xl flex items-center justify-center gap-3 mt-4" type="submit">
+<span class="material-symbols-outlined">login</span>
+                        LOGIN
+                    </button>
+</form>
+<div class="mt-10 pt-8 border-t-4 border-dashed border-primary/10 text-center">
+<p class="text-on-surface/60 font-bold mb-4">New to the community?</p>
+<a class="inline-flex items-center gap-2 text-primary font-black text-lg hover:text-accent transition-colors" href="/signup.html">
+                        SIGN UP FOR AN ACCOUNT
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</a>
+</div>
+</div>
+<div class="mt-8 grid grid-cols-2 gap-4">
+<div class="cartoon-card p-4 rounded-2xl flex items-center justify-center gap-2 cursor-pointer bg-white/50 border-dashed border-primary/20 shadow-none hover:bg-white">
+<span class="material-symbols-outlined text-primary">contact_support</span>
+<span class="text-xs font-black text-primary uppercase tracking-wider">Need Help?</span>
+</div>
+<div class="cartoon-card p-4 rounded-2xl flex items-center justify-center gap-2 cursor-pointer bg-white/50 border-dashed border-primary/20 shadow-none hover:bg-white">
+<span class="material-symbols-outlined text-primary">verified_user</span>
+<span class="text-xs font-black text-primary uppercase tracking-wider">Secure Access</span>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-primary w-full pt-20 pb-10 text-white">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-16 px-8 max-w-screen-2xl mx-auto">
+<div class="md:col-span-1">
+<span class="text-3xl font-bold text-accent mb-6 block font-headline">Lbara.tn</span>
+<p class="text-sm text-white/60 leading-relaxed font-medium">
+                    The Kinetic Curator of Tunisian Services. Breaking the digital walls one subscription at a time.
+                </p>
+<div class="flex gap-4 mt-8">
+<div class="w-10 h-10 rounded-xl bg-white/10 border-2 border-white/10 flex items-center justify-center hover:bg-accent transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-xl">share</span>
+</div>
+<div class="w-10 h-10 rounded-xl bg-white/10 border-2 border-white/10 flex items-center justify-center hover:bg-accent transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-xl">podcasts</span>
+</div>
+</div>
+</div>
+<div>
+<h4 class="font-headline font-bold text-xl mb-8">Explore</h4>
+<ul class="space-y-4">
+<li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html">All Services</a></li>
+<li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html">Streaming Bundles</a></li>
+<li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html">AI Tools</a></li>
+<li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html">Gaming Keys</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline font-bold text-xl mb-8">Company</h4>
+<ul class="space-y-4">
+<li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Our Story</a></li>
+<li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Terms of Service</a></li>
+<li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Privacy Policy</a></li>
+<li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="#">Refund Policy</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline font-bold text-xl mb-8">Contact</h4>
+<ul class="space-y-6">
+<li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/contact.html">Contact Support</a></li>
+<li class="flex items-center gap-3 text-white/60 text-sm font-bold">
+<span class="material-symbols-outlined text-accent">mail</span>
+                        hello@lbara.tn
+                    </li>
+<li class="flex items-center gap-3 text-white/60 text-sm font-bold">
+<span class="material-symbols-outlined text-accent">phone</span>
+                        +216 71 000 000
+                    </li>
+</ul>
+</div>
+</div>
+<div class="mt-20 border-t-2 border-white/5 pt-10 px-8 max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="text-sm text-white/40 font-bold">© 2024 Lbara.tn - The Kinetic Curator of Tunisian Services.</p>
+<div class="flex gap-6">
+<span class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold text-white/60 border border-white/10 uppercase tracking-widest">Secure Payment</span>
+<span class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold text-white/60 border border-white/10 uppercase tracking-widest">24/7 Support</span>
+</div>
+</div>
+</footer>
+<script src="/js/api.js"></script><script src="/js/auth.js"></script>
+</body></html>
