@@ -2,7 +2,7 @@
 // Docs: https://paymee.tn/paymee-integration-with-redirection/
 const axios = require('axios');
 
-const BASE_URL = 'https://app.paymee.tn/api/v2';
+const BASE_URL = process.env.PAYMEE_BASE_URL || 'https://sandbox.paymee.tn/api/v2';
 
 async function createPayment({ orderId, orderRef, amount }) {
   const payload = {

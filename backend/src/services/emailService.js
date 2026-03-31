@@ -97,4 +97,28 @@ async function sendContactAck(name, email, messageId) {
   });
 }
 
-module.exports = { send, sendOrderConfirmation, sendFulfillmentEmail, sendContactAck };
+async function sendPasswordChangeOTP(email, otp) {
+  await send({
+    to: email,
+    subject: `Your password change code — Lbara.tn`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9ff;">
+        <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #B8860B; margin: 0; font-size: 28px;">Lbara.tn</h1>
+          <p style="color: #fff; margin: 8px 0 0; font-size: 14px;">Password Change Request</p>
+        </div>
+        <div style="background: #fff; border: 2px solid #003060; border-radius: 12px; padding: 32px; text-align: center;">
+          <p style="color: #43474f; font-size: 15px; margin-top: 0;">Use the code below to confirm your password change.</p>
+          <div style="background: #f1f3ff; border: 2px dashed #003060; border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <p style="margin: 0; font-size: 13px; color: #43474f; text-transform: uppercase; letter-spacing: 2px;">Verification Code</p>
+            <p style="margin: 8px 0 0; font-size: 48px; font-weight: 900; color: #003060; letter-spacing: 12px;">${otp}</p>
+          </div>
+          <p style="color: #43474f; font-size: 13px;">This code expires in <strong>15 minutes</strong>.</p>
+          <p style="color: #999; font-size: 12px;">If you did not request this, you can safely ignore this email.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+module.exports = { send, sendOrderConfirmation, sendFulfillmentEmail, sendContactAck, sendPasswordChangeOTP };

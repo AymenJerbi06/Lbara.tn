@@ -1,7 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const pool = require('../config/db');
 const audit = require('../utils/audit');
+const emailService = require('../services/emailService');
 
 function issueToken(user, res) {
   const payload = { id: user.id, email: user.email, is_admin: user.is_admin };
@@ -91,4 +93,67 @@ async function me(req, res) {
   }
 }
 
-module.exports = { register, login, logout, me };
+async function requestPasswordChange(req, res) {
+  try {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
+    const hash = await bcrypt.hash(otp, 10);
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    await pool.query(
+      'UPDATE users SET password_reset_token = $1, password_reset_expires = $2 WHERE id = $3',
+      [hash, expires, req.user.id]
+    );
+
+    const userResult = await pool.query('SELECT email FROM users WHERE id = $1', [req.user.id]);
+    const email = userResult.rows[0].email;
+
+    await emailService.sendPasswordChangeOTP(email, otp);
+    res.json({ success: true, message: 'Verification code sent to your email.' });
+  } catch (err) {
+    console.error('[requestPasswordChange]', err);
+    res.status(500).json({ success: false, message: 'Failed to send verification code.' });
+  }
+}
+
+async function confirmPasswordChange(req, res) {
+  const { otp, new_password } = req.body;
+  if (!otp || !new_password) {
+    return res.status(400).json({ success: false, message: 'Code and new password are required.' });
+  }
+  if (new_password.length < 8) {
+    return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT password_reset_token, password_reset_expires FROM users WHERE id = $1',
+      [req.user.id]
+    );
+    const user = result.rows[0];
+
+    if (!user.password_reset_token || !user.password_reset_expires) {
+      return res.status(400).json({ success: false, message: 'No verification code found. Request a new one.' });
+    }
+    if (new Date() > new Date(user.password_reset_expires)) {
+      return res.status(400).json({ success: false, message: 'Verification code expired. Request a new one.' });
+    }
+    const valid = await bcrypt.compare(otp, user.password_reset_token);
+    if (!valid) {
+      return res.status(400).json({ success: false, message: 'Invalid verification code.' });
+    }
+
+    const password_hash = await bcrypt.hash(new_password, 12);
+    await pool.query(
+      'UPDATE users SET password_hash = $1, password_reset_token = NULL, password_reset_expires = NULL WHERE id = $2',
+      [password_hash, req.user.id]
+    );
+
+    await audit.log({ entityType: 'user', entityId: req.user.id, action: 'password_changed', actorId: req.user.id, actorType: 'user' });
+    res.json({ success: true, message: 'Password changed successfully.' });
+  } catch (err) {
+    console.error('[confirmPasswordChange]', err);
+    res.status(500).json({ success: false, message: 'Failed to change password.' });
+  }
+}
+
+module.exports = { register, login, logout, me, requestPasswordChange, confirmPasswordChange };

@@ -106,11 +106,21 @@
 </div>
 <div>
 <label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Password</label>
-<input id="signup-password" class="w-full cartoon-input" placeholder="••••••••" type="password"/>
+<div class="relative">
+<input id="signup-password" class="w-full cartoon-input pr-12" placeholder="••••••••" type="password"/>
+<button type="button" onclick="(function(){var i=document.getElementById('signup-password'),e=document.getElementById('eye-signup');if(i.type==='password'){i.type='text';e.textContent='visibility_off';}else{i.type='password';e.textContent='visibility';}})()" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
+  <span id="eye-signup" class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
 </div>
 <div>
 <label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Confirm Password</label>
-<input id="signup-confirm" class="w-full cartoon-input" placeholder="••••••••" type="password"/>
+<div class="relative">
+<input id="signup-confirm" class="w-full cartoon-input pr-12" placeholder="••••••••" type="password"/>
+<button type="button" onclick="(function(){var i=document.getElementById('signup-confirm'),e=document.getElementById('eye-confirm');if(i.type==='password'){i.type='text';e.textContent='visibility_off';}else{i.type='password';e.textContent='visibility';}})()" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
+  <span id="eye-confirm" class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
 </div>
 <div class="flex items-start gap-3 px-1 mt-4">
 <input class="mt-1 w-5 h-5 border-2 border-primary rounded text-primary focus:ring-0 cursor-pointer" id="signup-terms" type="checkbox"/>
