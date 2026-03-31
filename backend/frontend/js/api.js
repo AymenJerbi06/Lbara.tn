@@ -60,7 +60,7 @@ async function initNav() {
   const user = await loadAuthState();
   if (user) {
     btn.textContent = user.is_admin ? 'Admin Panel' : 'My Account';
-    btn.onclick = () => { window.location.href = user.is_admin ? '/admin/dashboard.html' : '#'; };
+    btn.onclick = () => { window.location.href = user.is_admin ? '/admin/dashboard.html' : '/my-account.html'; };
   } else {
     btn.textContent = 'Login / Sign Up';
     btn.onclick = () => { window.location.href = '/login.html'; };

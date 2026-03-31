@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Account — Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#003060",
+          "secondary": "#005F4B",
+          "accent": "#B8860B",
+          "surface": "#FFFFFF",
+          "on-surface": "#1A202C",
+          "on-primary": "#FFFFFF",
+          "surface-container": "#e8eeff",
+          "surface-container-low": "#f1f3ff",
+          "surface-container-high": "#e3e8f9",
+          "surface-container-lowest": "#ffffff",
+          "outline-variant": "#c3c6d0",
+          "on-surface-variant": "#43474f",
+          "tertiary-fixed": "#a5f2d7",
+          "on-tertiary-fixed-variant": "#00513f",
+          "error-container": "#ffdad6",
+          "on-error-container": "#93000a",
+          "secondary-container": "#fdc34d",
+          "on-secondary-container": "#715000",
+          "secondary-fixed": "#ffdea6",
+          "on-secondary-fixed-variant": "#5d4200",
+          "primary-fixed": "#d5e3ff",
+          "error": "#ba1a1a",
+        },
+        fontFamily: {
+          "headline": ["Quicksand", "sans-serif"],
+          "body": ["Nunito", "sans-serif"],
+        },
+        borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer base {
+    body { @apply bg-white text-on-surface font-body; }
+  }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .cartoon-button {
+    @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none;
+  }
+</style>
+</head>
+<body class="bg-surface-container-low text-on-surface">
+
+<!-- Sidebar -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full py-8 px-4 bg-white border-r border-outline-variant/20 w-64 z-50">
+  <div class="mb-10 px-4">
+    <a href="/index.html" class="text-2xl font-black text-primary tracking-tight font-headline">Lbara.tn</a>
+  </div>
+  <nav class="flex-1 space-y-1">
+    <a id="nav-dashboard" class="flex items-center gap-3 px-4 py-3 text-primary font-bold border-r-4 border-primary bg-surface-container transition-all" href="#">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-headline">Dashboard</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:text-primary hover:bg-surface-container transition-colors" href="/shop.html">
+      <span class="material-symbols-outlined">add_shopping_cart</span>
+      <span class="font-headline">Browse Shop</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:text-primary hover:bg-surface-container transition-colors" href="/contact.html">
+      <span class="material-symbols-outlined">support_agent</span>
+      <span class="font-headline">Support</span>
+    </a>
+  </nav>
+  <!-- User info + logout -->
+  <div class="mt-auto px-4 py-6 bg-surface-container-low rounded-2xl">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold font-headline text-lg" id="sidebar-avatar">?</div>
+      <div>
+        <p class="font-headline font-bold text-sm text-primary" id="sidebar-name">Loading...</p>
+        <p class="text-xs text-on-surface-variant" id="sidebar-email"></p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="w-full py-2 bg-primary text-white font-bold rounded-full text-sm hover:opacity-90 transition-opacity font-headline cartoon-button">
+      Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- Top bar -->
+<header class="flex justify-between items-center w-full px-6 py-4 md:pl-72 sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-outline-variant/10">
+  <h2 class="font-headline font-bold text-lg text-primary">My Account</h2>
+  <div class="flex items-center gap-3">
+    <a href="/shop.html" class="cartoon-button bg-primary text-white font-bold px-5 py-2 rounded-full text-sm font-headline">
+      Browse Shop
+    </a>
+    <button onclick="handleLogout()" class="md:hidden p-2 text-on-surface-variant hover:text-primary transition-colors">
+      <span class="material-symbols-outlined">logout</span>
+    </button>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="md:pl-64 min-h-screen pb-24 md:pb-0">
+  <div class="max-w-6xl mx-auto p-6 md:p-10">
+
+    <!-- Welcome header -->
+    <header class="mb-10">
+      <h1 class="text-4xl md:text-5xl font-extrabold font-headline text-on-surface tracking-tight mb-2" id="welcome-title">Hello 👋</h1>
+      <p class="text-on-surface-variant text-lg" id="welcome-sub">Loading your account...</p>
+    </header>
+
+    <!-- Stats row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+      <div class="bg-primary text-white p-6 rounded-2xl">
+        <p class="text-xs font-bold uppercase tracking-widest opacity-70 font-headline mb-1">Total Orders</p>
+        <p class="text-3xl font-black font-headline" id="stat-total">—</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
+        <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Fulfilled</p>
+        <p class="text-3xl font-black font-headline text-secondary" id="stat-fulfilled">—</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
+        <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Processing</p>
+        <p class="text-3xl font-black font-headline text-accent" id="stat-processing">—</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl border border-outline-variant/20">
+        <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant font-headline mb-1">Total Spent</p>
+        <p class="text-xl font-black font-headline text-primary" id="stat-spent">—</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <section class="mb-10">
+      <h3 class="font-headline font-bold text-xl mb-4">Quick Actions</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <a href="/shop.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
+          <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">add_shopping_cart</span>
+          <span class="text-xs font-bold font-headline">Buy New</span>
+        </a>
+        <a href="/order-confirmed.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
+          <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">receipt_long</span>
+          <span class="text-xs font-bold font-headline">My Orders</span>
+        </a>
+        <a href="/contact.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
+          <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">support_agent</span>
+          <span class="text-xs font-bold font-headline">Support</span>
+        </a>
+        <a href="/faq.html" class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white border border-outline-variant/20 hover:bg-primary hover:text-white hover:border-primary transition-all group">
+          <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-white">help</span>
+          <span class="text-xs font-bold font-headline">FAQ</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Orders list -->
+    <section class="bg-white rounded-2xl border border-outline-variant/20 p-8">
+      <div class="flex justify-between items-center mb-8">
+        <h3 class="font-headline font-bold text-2xl">Order History</h3>
+      </div>
+
+      <!-- Loading state -->
+      <div id="orders-loading" class="text-center py-12 text-on-surface-variant">
+        <span class="material-symbols-outlined text-5xl mb-3 block">hourglass_empty</span>
+        <p class="font-headline font-bold">Loading orders...</p>
+      </div>
+
+      <!-- Empty state -->
+      <div id="orders-empty" class="hidden text-center py-12 text-on-surface-variant">
+        <span class="material-symbols-outlined text-5xl mb-3 block">shopping_bag</span>
+        <p class="font-headline font-bold text-lg mb-2">No orders yet</p>
+        <p class="text-sm mb-6">Start browsing our digital services.</p>
+        <a href="/shop.html" class="cartoon-button bg-primary text-white font-bold px-6 py-3 rounded-full font-headline inline-block">Browse Shop</a>
+      </div>
+
+      <!-- Orders table -->
+      <div id="orders-list" class="hidden space-y-4"></div>
+    </section>
+
+  </div>
+</main>
+
+<!-- Mobile bottom nav -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl flex justify-around items-center py-4 px-6 z-50 border-t border-outline-variant/10">
+  <button class="flex flex-col items-center gap-1 text-primary">
+    <span class="material-symbols-outlined">dashboard</span>
+    <span class="text-[10px] font-bold font-headline">Home</span>
+  </button>
+  <a href="/shop.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">store</span>
+    <span class="text-[10px] font-bold font-headline">Shop</span>
+  </a>
+  <a href="/contact.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">support_agent</span>
+    <span class="text-[10px] font-bold font-headline">Support</span>
+  </a>
+  <button onclick="handleLogout()" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">logout</span>
+    <span class="text-[10px] font-bold font-headline">Sign Out</span>
+  </button>
+</nav>
+
+<script src="/js/api.js"></script>
+<script>
+const STATUS_STYLES = {
+  fulfilled:       { label: 'Fulfilled',   bg: 'bg-tertiary-fixed',      text: 'text-on-tertiary-fixed-variant' },
+  paid:            { label: 'Paid',        bg: 'bg-primary-fixed',       text: 'text-primary' },
+  processing:      { label: 'Processing',  bg: 'bg-secondary-container', text: 'text-on-secondary-container' },
+  pending_payment: { label: 'Pending',     bg: 'bg-secondary-fixed',     text: 'text-on-secondary-fixed-variant' },
+  payment_failed:  { label: 'Failed',      bg: 'bg-error-container',     text: 'text-on-error-container' },
+  cancelled:       { label: 'Cancelled',   bg: 'bg-error-container',     text: 'text-on-error-container' },
+  refunded:        { label: 'Refunded',    bg: 'bg-surface-container',   text: 'text-on-surface-variant' },
+};
+
+function statusBadge(status) {
+  const s = STATUS_STYLES[status] || { label: status, bg: 'bg-surface-container', text: 'text-on-surface-variant' };
+  return `<span class="text-[10px] font-black font-headline uppercase px-2 py-1 rounded-full ${s.bg} ${s.text}">${s.label}</span>`;
+}
+
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function renderOrders(orders) {
+  if (!orders.length) {
+    document.getElementById('orders-empty').classList.remove('hidden');
+    return;
+  }
+  const list = document.getElementById('orders-list');
+  list.classList.remove('hidden');
+  list.innerHTML = orders.map(o => `
+    <div class="flex items-center justify-between py-4 border-b border-outline-variant/10 last:border-0">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-primary">shopping_bag</span>
+        </div>
+        <div>
+          <p class="font-headline font-bold text-on-surface">${o.product_name || 'Order'}</p>
+          <p class="text-xs text-on-surface-variant">${o.order_ref} &bull; ${formatDate(o.created_at)}</p>
+        </div>
+      </div>
+      <div class="text-right flex flex-col items-end gap-1">
+        <p class="font-bold font-headline text-on-surface">${parseFloat(o.amount_tnd).toFixed(3)} TND</p>
+        ${statusBadge(o.status)}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function handleLogout() {
+  try { await api.logout(); } catch {}
+  window.location.href = '/login.html';
+}
+
+async function init() {
+  // Guard: redirect to login if not authenticated
+  let user;
+  try {
+    const res = await api.me();
+    user = res.user;
+  } catch {
+    window.location.href = '/login.html';
+    return;
+  }
+
+  // Populate user info
+  const name = user.full_name || user.email.split('@')[0];
+  const initial = name[0].toUpperCase();
+  document.getElementById('welcome-title').textContent = `Hello, ${name} 👋`;
+  document.getElementById('welcome-sub').textContent = user.email;
+  document.getElementById('sidebar-name').textContent = name;
+  document.getElementById('sidebar-email').textContent = user.email;
+  document.getElementById('sidebar-avatar').textContent = initial;
+
+  // Load orders
+  document.getElementById('orders-loading').classList.remove('hidden');
+  try {
+    const res = await api.myOrders();
+    const orders = res.orders || [];
+    document.getElementById('orders-loading').classList.add('hidden');
+
+    // Stats
+    const fulfilled = orders.filter(o => o.status === 'fulfilled').length;
+    const processing = orders.filter(o => ['paid', 'processing'].includes(o.status)).length;
+    const spent = orders
+      .filter(o => ['paid', 'processing', 'fulfilled'].includes(o.status))
+      .reduce((sum, o) => sum + parseFloat(o.amount_tnd), 0);
+
+    document.getElementById('stat-total').textContent = orders.length;
+    document.getElementById('stat-fulfilled').textContent = fulfilled;
+    document.getElementById('stat-processing').textContent = processing;
+    document.getElementById('stat-spent').textContent = spent.toFixed(3) + ' TND';
+
+    renderOrders(orders);
+  } catch {
+    document.getElementById('orders-loading').innerHTML =
+      '<p class="text-center text-error font-headline font-bold py-8">Failed to load orders.</p>';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
