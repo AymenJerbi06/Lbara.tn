@@ -156,4 +156,24 @@ async function confirmPasswordChange(req, res) {
   }
 }
 
-module.exports = { register, login, logout, me, requestPasswordChange, confirmPasswordChange };
+async function updateProfile(req, res) {
+  const { full_name } = req.body;
+  if (!full_name || !full_name.trim()) {
+    return res.status(400).json({ success: false, message: 'Display name cannot be empty.' });
+  }
+  if (full_name.trim().length > 100) {
+    return res.status(400).json({ success: false, message: 'Display name is too long.' });
+  }
+  try {
+    const result = await pool.query(
+      'UPDATE users SET full_name = $1 WHERE id = $2 RETURNING id, email, full_name',
+      [full_name.trim(), req.user.id]
+    );
+    res.json({ success: true, user: result.rows[0] });
+  } catch (err) {
+    console.error('[updateProfile]', err);
+    res.status(500).json({ success: false, message: 'Failed to update profile.' });
+  }
+}
+
+module.exports = { register, login, logout, me, updateProfile, requestPasswordChange, confirmPasswordChange };
