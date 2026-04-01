@@ -111,8 +111,8 @@
 </div>
 <div class="relative">
 <input id="login-password" class="w-full cartoon-input pr-12" placeholder="••••••••" type="password"/>
-<button type="button" onclick="(function(){var i=document.getElementById('login-password'),e=document.getElementById('eye-login');if(i.type==='password'){i.type='text';e.textContent='visibility_off';}else{i.type='password';e.textContent='visibility';}})()" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
-  <span id="eye-login" class="material-symbols-outlined text-xl">visibility</span>
+<button type="button" data-eye="login-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary transition-colors">
+  <span class="material-symbols-outlined text-xl">visibility</span>
 </button>
 </div>
 </div>
@@ -203,4 +203,17 @@
 </div>
 </footer>
 <script src="/js/api.js"></script><script src="/js/auth.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-eye]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var inp = document.getElementById(btn.getAttribute('data-eye'));
+      var ico = btn.querySelector('.material-symbols-outlined');
+      if (!inp) return;
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      if (ico) ico.textContent = inp.type === 'password' ? 'visibility' : 'visibility_off';
+    });
+  });
+});
+</script>
 </body></html>
