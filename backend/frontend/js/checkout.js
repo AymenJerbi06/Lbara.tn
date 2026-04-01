@@ -54,20 +54,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Payment method radio selection styling
-  document.querySelectorAll('input[name="payment"]').forEach((radio) => {
-    radio.addEventListener('change', () => {
-      document.querySelectorAll('.payment-option').forEach((el) => {
-        el.classList.remove('border-accent', 'bg-accent/5');
-        el.classList.add('border-primary/10');
-      });
-      const selected = radio.closest('.payment-option');
-      if (selected) {
-        selected.classList.add('border-accent', 'bg-accent/5');
-        selected.classList.remove('border-primary/10');
-      }
-    });
-  });
+  // Payment method selection
+  var selectedPayment = 'd17';
+
+  function updatePaymentUI(value) {
+    selectedPayment = value;
+    var d17Option = document.getElementById('option-d17');
+    var cardOption = document.getElementById('option-card');
+    var dotD17 = document.getElementById('dot-d17');
+    var dotCard = document.getElementById('dot-card');
+    if (!d17Option || !cardOption || !dotD17 || !dotCard) return;
+
+    // Reset d17
+    d17Option.style.borderColor = '';
+    d17Option.style.backgroundColor = '';
+    dotD17.style.backgroundColor = '';
+    dotD17.style.borderColor = '';
+    dotD17.innerHTML = '';
+
+    // Reset card
+    cardOption.style.borderColor = '';
+    cardOption.style.backgroundColor = '';
+    dotCard.style.backgroundColor = '';
+    dotCard.style.borderColor = '';
+    dotCard.innerHTML = '';
+
+    // Apply selected styles
+    var activeOption = value === 'd17' ? d17Option : cardOption;
+    var activeDot   = value === 'd17' ? dotD17   : dotCard;
+    activeOption.style.borderColor = '#B8860B';
+    activeOption.style.backgroundColor = 'rgba(184,134,11,0.05)';
+    activeDot.style.backgroundColor = '#B8860B';
+    activeDot.style.borderColor = '#B8860B';
+    activeDot.innerHTML = '<div style="width:8px;height:8px;background:#fff;border-radius:50%;"></div>';
+
+    // Sync the actual radio
+    var radio = document.querySelector('input[name="payment"][value="' + value + '"]');
+    if (radio) radio.checked = true;
+  }
+
+  document.getElementById('option-d17').addEventListener('click', function () { updatePaymentUI('d17'); });
+  document.getElementById('option-card').addEventListener('click', function () { updatePaymentUI('card'); });
+
+  // Set initial state via JS
+  updatePaymentUI('d17');
 
   // Place order
   const placeOrderBtn = document.getElementById('place-order-btn');
@@ -82,7 +112,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      const selectedPayment = document.querySelector('input[name="payment"]:checked');
       if (!selectedPayment) {
         showToast('Please select a payment method.', 'error');
         return;
@@ -100,6 +129,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // Clear cart and redirect to payment gateway
+        if (!result.payment_url) {
+          throw new Error('Payment gateway not configured. Please contact support.');
+        }
         sessionStorage.setItem('lbara_pending_order', result.order_id);
         sessionStorage.removeItem('lbara_cart');
         window.location.href = result.payment_url;
