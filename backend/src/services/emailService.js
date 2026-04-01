@@ -1,25 +1,19 @@
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 
-const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: smtpPort,
-  secure: smtpPort === 465,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
+const BREVO_URL = 'https://api.brevo.com/v3/smtp/email';
+const FROM = { name: 'Lbara.tn', email: process.env.BREVO_SENDER_EMAIL || 'hello@lbara.tn' };
 
 async function send({ to, subject, html }) {
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM || 'Lbara.tn <hello@lbara.tn>',
-    to,
+  await axios.post(BREVO_URL, {
+    sender: FROM,
+    to: [{ email: to }],
     subject,
-    html,
+    htmlContent: html,
+  }, {
+    headers: {
+      'api-key': process.env.BREVO_API_KEY,
+      'Content-Type': 'application/json',
+    },
   });
 }
 
@@ -62,7 +56,7 @@ async function sendFulfillmentEmail(order, product, credentials) {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9f9;">
         <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
           <h1 style="color: #B8860B; margin: 0; font-size: 28px;">Lbara.tn</h1>
-          <p style="color: #fff; margin: 8px 0 0;">Your Access is Ready! 🎉</p>
+          <p style="color: #fff; margin: 8px 0 0;">Your Access is Ready!</p>
         </div>
         <div style="background: #fff; border: 4px solid #003060; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
           <h2 style="color: #003060; margin-top: 0;">${product.name} — Order #${order.order_ref}</h2>
@@ -71,8 +65,8 @@ async function sendFulfillmentEmail(order, product, credentials) {
             <pre style="margin: 8px 0 0; font-size: 15px; color: #003060; font-weight: bold; white-space: pre-wrap;">${credentials}</pre>
           </div>
           <p style="color: #666; font-size: 13px;">
-            ⚠️ Keep these credentials safe. Do not share them.<br>
-            📧 If you have any issues, reply to this email with your order reference: <strong>${order.order_ref}</strong>
+            Keep these credentials safe. Do not share them.<br>
+            If you have any issues, reply to this email with your order reference: <strong>${order.order_ref}</strong>
           </p>
         </div>
         <p style="color: #999; font-size: 12px; text-align: center;">
