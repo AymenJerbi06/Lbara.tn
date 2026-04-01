@@ -478,7 +478,7 @@ async function loadProducts() {
       ? products.map(p => `
         <tr class="border-t border-primary/5">
           <td class="p-4 font-bold flex items-center gap-3">
-            ${p.image_url ? `<img src="${p.image_url}" class="w-10 h-10 rounded-lg object-cover border border-primary/10" alt=""/>` : `<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary text-lg">image</span></div>`}
+            ${p.image_url ? `<img src="${p.image_url}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid rgba(0,48,96,0.1);flex-shrink:0;" alt=""/>` : `<div style="width:40px;height:40px;border-radius:8px;background:rgba(0,48,96,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span class="material-symbols-outlined text-primary text-lg">image</span></div>`}
             ${p.name}
           </td>
           <td class="p-4 text-sm text-on-surface/60 font-bold">${p.provider}</td>
