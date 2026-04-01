@@ -39,8 +39,8 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3007',
   credentials: true,
 }));
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 app.use(cookieParser());
 
 // ─── Request Logger ───────────────────────────────────────
