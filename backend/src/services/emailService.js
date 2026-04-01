@@ -3,17 +3,23 @@ const axios = require('axios');
 const FROM = process.env.EMAIL_FROM || 'Lbara.tn <onboarding@resend.dev>';
 
 async function send({ to, subject, html }) {
-  await axios.post('https://api.resend.com/emails', {
-    from: FROM,
-    to: [to],
-    subject,
-    html,
-  }, {
-    headers: {
-      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-  });
+  try {
+    await axios.post('https://api.resend.com/emails', {
+      from: FROM,
+      to: [to],
+      subject,
+      html,
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (err) {
+    const details = err.response?.data || err.message;
+    console.error('[emailService] Resend error:', JSON.stringify(details));
+    throw new Error(typeof details === 'object' ? (details.message || JSON.stringify(details)) : details);
+  }
 }
 
 // ─── Email Templates ──────────────────────────────────────
