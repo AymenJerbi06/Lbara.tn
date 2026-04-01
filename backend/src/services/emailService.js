@@ -1,17 +1,16 @@
 const axios = require('axios');
 
-const BREVO_URL = 'https://api.brevo.com/v3/smtp/email';
-const FROM = { name: 'Lbara.tn', email: process.env.BREVO_SENDER_EMAIL || 'hello@lbara.tn' };
+const FROM = process.env.EMAIL_FROM || 'Lbara.tn <onboarding@resend.dev>';
 
 async function send({ to, subject, html }) {
-  await axios.post(BREVO_URL, {
-    sender: FROM,
-    to: [{ email: to }],
+  await axios.post('https://api.resend.com/emails', {
+    from: FROM,
+    to: [to],
     subject,
-    htmlContent: html,
+    html,
   }, {
     headers: {
-      'api-key': process.env.BREVO_API_KEY,
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
   });
