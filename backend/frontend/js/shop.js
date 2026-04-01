@@ -53,12 +53,20 @@ async function renderProducts() {
               <span class="text-2xl font-black text-primary">${parseFloat(p.price_tnd).toFixed(3)}</span>
               <span class="text-sm font-bold text-primary ml-1">TND</span>
             </div>
-            <button
-              onclick="addToCart('${p.id}', '${p.name}', ${p.price_tnd})"
-              class="cartoon-button bg-primary text-white font-bold px-5 py-2 rounded-xl text-sm flex items-center gap-1">
-              <span class="material-symbols-outlined text-sm">add_shopping_cart</span>
-              Buy Now
-            </button>
+            <div class="flex items-center gap-2">
+              <button
+                onclick="openDetails(${JSON.stringify(p).replace(/"/g, '&quot;')})"
+                class="border-2 border-primary text-primary font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-1 hover:bg-primary/5 transition-colors">
+                <span class="material-symbols-outlined text-sm">info</span>
+                Details
+              </button>
+              <button
+                onclick="addToCart('${p.id}', '${p.name}', ${p.price_tnd})"
+                class="cartoon-button bg-primary text-white font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">add_shopping_cart</span>
+                Buy Now
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -91,8 +99,36 @@ function addToCart(productId, productName, priceTnd) {
   setTimeout(() => { window.location.href = '/checkout.html'; }, 800);
 }
 
+function openDetails(p) {
+  document.getElementById('modal-provider').textContent = p.provider;
+  document.getElementById('modal-name').textContent = p.name;
+  document.getElementById('modal-description').textContent = p.description || 'No description available.';
+  document.getElementById('modal-account-type').textContent = p.account_type === 'private' ? 'Private' : 'Shared';
+  document.getElementById('modal-duration').textContent = p.duration_label || '1 Month';
+  document.getElementById('modal-delivery').textContent = `Within ${p.delivery_hours || 2} hour(s)`;
+  document.getElementById('modal-price').textContent = `${parseFloat(p.price_tnd).toFixed(3)} TND`;
+  const badge = document.getElementById('modal-badge');
+  if (p.badge) { badge.textContent = p.badge; badge.style.display = ''; }
+  else { badge.style.display = 'none'; }
+  document.getElementById('modal-buy-btn').onclick = function () {
+    closeDetails();
+    addToCart(p.id, p.name, p.price_tnd);
+  };
+  document.getElementById('details-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetails() {
+  document.getElementById('details-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderProducts();
+
+  document.getElementById('details-close').addEventListener('click', closeDetails);
+  document.getElementById('details-backdrop').addEventListener('click', closeDetails);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDetails(); });
 
   // Category filter buttons
   document.querySelectorAll('[data-category]').forEach((btn) => {

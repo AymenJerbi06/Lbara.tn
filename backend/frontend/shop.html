@@ -165,6 +165,44 @@
   </div>
 </footer>
 
+<!-- Product Details Modal -->
+<div id="details-modal" style="display:none" class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <div id="details-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  <div class="relative cartoon-card rounded-3xl p-8 w-full max-w-lg z-10 bg-white">
+    <button id="details-close" class="absolute top-4 right-4 text-primary/50 hover:text-primary transition-colors">
+      <span class="material-symbols-outlined text-2xl">close</span>
+    </button>
+    <div class="flex items-center gap-3 mb-2">
+      <span id="modal-provider" class="text-xs font-black text-secondary uppercase tracking-widest"></span>
+      <span id="modal-badge" class="text-[10px] font-black bg-primary text-white px-3 py-1 rounded-full uppercase tracking-widest" style="display:none"></span>
+    </div>
+    <h2 id="modal-name" class="font-headline font-bold text-primary text-2xl mb-4"></h2>
+    <p id="modal-description" class="text-on-surface/70 font-medium leading-relaxed mb-6"></p>
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <div class="bg-primary/5 rounded-xl p-3">
+        <p class="text-[10px] font-black text-primary/50 uppercase tracking-widest mb-1">Account Type</p>
+        <p id="modal-account-type" class="font-bold text-primary text-sm"></p>
+      </div>
+      <div class="bg-primary/5 rounded-xl p-3">
+        <p class="text-[10px] font-black text-primary/50 uppercase tracking-widest mb-1">Duration</p>
+        <p id="modal-duration" class="font-bold text-primary text-sm"></p>
+      </div>
+      <div class="bg-primary/5 rounded-xl p-3">
+        <p class="text-[10px] font-black text-primary/50 uppercase tracking-widest mb-1">Delivery</p>
+        <p id="modal-delivery" class="font-bold text-primary text-sm"></p>
+      </div>
+      <div class="bg-primary/5 rounded-xl p-3">
+        <p class="text-[10px] font-black text-primary/50 uppercase tracking-widest mb-1">Price</p>
+        <p id="modal-price" class="font-bold text-primary text-sm"></p>
+      </div>
+    </div>
+    <button id="modal-buy-btn" class="w-full cartoon-button bg-primary text-white font-black py-3 rounded-2xl text-base flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined">add_shopping_cart</span>
+      Buy Now
+    </button>
+  </div>
+</div>
+
 <script src="/js/api.js"></script>
 <script src="/js/shop.js"></script>
 </body>
