@@ -9,6 +9,7 @@ router.post('/login', authLimiter, login);
 router.post('/logout', logout);
 router.get('/me', authMiddleware, me);
 router.put('/profile', authMiddleware, updateProfile);
+router.post('/profile', authMiddleware, updateProfile);
 router.post('/request-password-change', authMiddleware, authLimiter, requestPasswordChange);
 router.post('/confirm-password-change', authMiddleware, authLimiter, confirmPasswordChange);
 

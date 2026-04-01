@@ -40,6 +40,13 @@ const api = {
 
   // Contact
   sendContact: (body) => apiFetch('/contact', { method: 'POST', body }),
+
+  // Profile
+  updateProfile: (body) => apiFetch('/auth/profile', { method: 'POST', body }),
+
+  // Password change
+  requestPasswordChange: () => apiFetch('/auth/request-password-change', { method: 'POST' }),
+  confirmPasswordChange: (body) => apiFetch('/auth/confirm-password-change', { method: 'POST', body }),
 };
 
 // ─── Auth State Helpers ───────────────────────────────────
@@ -89,3 +96,5 @@ function showToast(message, type = 'success') {
 }
 
 document.addEventListener('DOMContentLoaded', initNav);
+window.api = api;
+window.showToast = showToast;

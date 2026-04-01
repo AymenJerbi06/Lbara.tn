@@ -42,7 +42,7 @@ const api = {
   sendContact: (body) => apiFetch('/contact', { method: 'POST', body }),
 
   // Profile
-  updateProfile: (body) => apiFetch('/auth/profile', { method: 'PUT', body }),
+  updateProfile: (body) => apiFetch('/auth/profile', { method: 'POST', body }),
 
   // Password change
   requestPasswordChange: () => apiFetch('/auth/request-password-change', { method: 'POST' }),
@@ -96,3 +96,5 @@ function showToast(message, type = 'success') {
 }
 
 document.addEventListener('DOMContentLoaded', initNav);
+window.api = api;
+window.showToast = showToast;

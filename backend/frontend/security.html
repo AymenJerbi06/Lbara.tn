@@ -175,7 +175,7 @@
                   <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="display_name">New Display Name</label>
                   <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="display_name" placeholder="e.g. Alex J." type="text"/>
                 </div>
-                <button onclick="saveName()" id="save-name-btn" class="w-fit bg-primary text-on-primary px-8 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2">
+                <button type="button" onclick="saveName()" id="save-name-btn" class="w-fit bg-primary text-on-primary px-8 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2">
                   Save Name
                   <span class="material-symbols-outlined text-sm">check</span>
                 </button>
@@ -236,7 +236,7 @@
                 </div>
                 <div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/20">
                   <p class="text-xs text-on-surface-variant mb-4">For your security, a 6-digit code will be sent to your registered email.</p>
-                  <button onclick="sendCode()" id="send-code-btn" class="w-full py-2 bg-white border border-outline-variant text-primary font-bold text-xs rounded-lg hover:bg-surface-container-highest transition-colors mb-4">
+                  <button type="button" onclick="sendCode()" id="send-code-btn" class="w-full py-2 bg-white border border-outline-variant text-primary font-bold text-xs rounded-lg hover:bg-surface-container-highest transition-colors mb-4">
                     Request Verification Code
                   </button>
                   <p id="send-code-msg" class="hidden text-xs font-semibold mb-3"></p>
@@ -250,7 +250,7 @@
 
             <div class="mt-10 pt-8 border-t border-outline-variant/10 flex items-center justify-between">
               <p id="change-pwd-msg" class="hidden text-sm font-semibold"></p>
-              <button onclick="changePassword()" id="change-pwd-btn" class="ml-auto bg-primary text-on-primary px-10 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2 shadow-lg shadow-primary/10">
+              <button type="button" onclick="changePassword()" id="change-pwd-btn" class="ml-auto bg-primary text-on-primary px-10 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2 shadow-lg shadow-primary/10">
                 Update Password
                 <span class="material-symbols-outlined text-sm">shield_lock</span>
               </button>
@@ -323,11 +323,7 @@ function requestPasswordChangeCompat() {
 }
 
 function updateProfileCompat(body) {
-  if (window.api && typeof window.api.updateProfile === 'function') {
-    return window.api.updateProfile(body);
-  }
-
-  return securityApiFetch('/auth/profile', { method: 'PUT', body });
+  return securityApiFetch('/auth/profile', { method: 'POST', body });
 }
 
 function confirmPasswordChangeCompat(body) {
