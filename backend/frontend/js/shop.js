@@ -12,91 +12,69 @@ let currentPage = 1;
 let currentCategory = 'all';
 let currentSearch = '';
 
-async function renderProducts() {
+// product data keyed by id — used by click handlers
+const productMap = {};
+
+function renderProducts() {
   const grid = document.getElementById('products-grid');
   const paginationEl = document.getElementById('pagination');
   if (!grid) return;
 
-  grid.innerHTML = `<div class="col-span-3 text-center py-12 text-primary/40 font-bold">Loading...</div>`;
+  grid.innerHTML = '<div class="col-span-3 text-center py-12 text-primary/40 font-bold">Loading...</div>';
 
-  try {
-    const params = { page: currentPage, limit: 9 };
-    if (currentCategory !== 'all') params.category = currentCategory;
-    if (currentSearch) params.search = currentSearch;
+  const params = { page: currentPage, limit: 9 };
+  if (currentCategory !== 'all') params.category = currentCategory;
+  if (currentSearch) params.search = currentSearch;
 
-    const { products, total } = await api.getProducts(params);
+  api.getProducts(params).then(function (res) {
+    const products = res.products || [];
+    const total = res.total || 0;
 
     if (!products.length) {
-      grid.innerHTML = `<div class="col-span-3 text-center py-12 text-primary/40 font-bold">No services found.</div>`;
+      grid.innerHTML = '<div class="col-span-3 text-center py-12 text-primary/40 font-bold">No services found.</div>';
       if (paginationEl) paginationEl.innerHTML = '';
       return;
     }
 
-    grid.innerHTML = products.map((p) => `
-      <div class="cartoon-card rounded-2xl overflow-hidden flex flex-col" data-product-id="${p.id}">
-        <div class="relative ${p.image_url ? '' : 'bg-primary/5'} p-6 flex items-center justify-between overflow-hidden" style="min-height:96px;">
-          ${p.image_url
-            ? `<img src="${p.image_url}" alt="${p.name}" class="absolute inset-0 w-full h-full object-cover"/><div class="absolute inset-0 bg-primary/30"></div><span class="relative material-symbols-outlined text-white text-4xl">${CATEGORY_ICONS[p.category] || 'stars'}</span>`
-            : `<span class="material-symbols-outlined text-primary text-4xl">${CATEGORY_ICONS[p.category] || 'stars'}</span>`}
-          ${p.badge ? `<span class="relative bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${p.badge}</span>` : ''}
-        </div>
-        <div class="p-6 flex flex-col flex-grow">
-          <p class="text-xs font-black text-secondary uppercase tracking-widest mb-1">${p.provider}</p>
-          <h3 class="font-headline font-bold text-primary text-lg leading-tight mb-2">${p.name}</h3>
-          <p class="text-sm text-on-surface/60 font-medium flex-grow mb-4">${p.description || ''}</p>
-          <div class="flex items-center gap-2 mb-4">
-            <span class="text-xs font-bold bg-primary/5 text-primary px-2 py-1 rounded-lg">${p.account_type === 'private' ? 'Private' : 'Shared'}</span>
-            <span class="text-xs font-bold bg-secondary/5 text-secondary px-2 py-1 rounded-lg">${p.duration_label || '1 Month'}</span>
-          </div>
-          <div class="flex items-center justify-between pt-4 border-t-2 border-primary/5">
-            <div>
-              <span class="text-2xl font-black text-primary">${parseFloat(p.price_tnd).toFixed(3)}</span>
-              <span class="text-sm font-bold text-primary ml-1">TND</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <button
-                onclick="openDetails(${JSON.stringify(p).replace(/"/g, '&quot;')})"
-                class="border-2 border-primary text-primary font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-1 hover:bg-primary/5 transition-colors">
-                <span class="material-symbols-outlined text-sm">info</span>
-                Details
-              </button>
-              <button
-                onclick="addToCart('${p.id}', '${p.name}', ${p.price_tnd})"
-                class="cartoon-button bg-primary text-white font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm">add_shopping_cart</span>
-                Buy Now
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `).join('');
+    // store in map for click handlers
+    products.forEach(function (p) { productMap[p.id] = p; });
+
+    grid.innerHTML = products.map(function (p) {
+      var imgHtml = p.image_url
+        ? '<img src="' + p.image_url + '" alt="' + p.name + '" class="absolute inset-0 w-full h-full object-cover"/><div class="absolute inset-0 bg-primary/30"></div><span class="relative material-symbols-outlined text-white text-4xl">' + (CATEGORY_ICONS[p.category] || 'stars') + '</span>'
+        : '<span class="material-symbols-outlined text-primary text-4xl">' + (CATEGORY_ICONS[p.category] || 'stars') + '</span>';
+      var badgeHtml = p.badge ? '<span class="relative bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">' + p.badge + '</span>' : '';
+      return '<div class="cartoon-card rounded-2xl overflow-hidden flex flex-col">'
+        + '<div class="relative ' + (p.image_url ? '' : 'bg-primary/5') + ' p-6 flex items-center justify-between overflow-hidden" style="min-height:96px;">'
+        + imgHtml + badgeHtml
+        + '</div>'
+        + '<div class="p-6 flex flex-col flex-grow">'
+        + '<p class="text-xs font-black text-secondary uppercase tracking-widest mb-1">' + p.provider + '</p>'
+        + '<h3 class="font-headline font-bold text-primary text-lg leading-tight mb-2">' + p.name + '</h3>'
+        + '<p class="text-sm text-on-surface/60 font-medium flex-grow mb-4">' + (p.description || '') + '</p>'
+        + '<div class="flex items-center gap-2 mb-4">'
+        + '<span class="text-xs font-bold bg-primary/5 text-primary px-2 py-1 rounded-lg">' + (p.account_type === 'private' ? 'Private' : 'Shared') + '</span>'
+        + '<span class="text-xs font-bold bg-secondary/5 text-secondary px-2 py-1 rounded-lg">' + (p.duration_label || '1 Month') + '</span>'
+        + '</div>'
+        + '<div class="flex items-center justify-between pt-4 border-t-2 border-primary/5">'
+        + '<div><span class="text-2xl font-black text-primary">' + parseFloat(p.price_tnd).toFixed(3) + '</span><span class="text-sm font-bold text-primary ml-1">TND</span></div>'
+        + '<div class="flex items-center gap-2">'
+        + '<button data-action="details" data-id="' + p.id + '" class="border-2 border-primary text-primary font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-1 hover:bg-primary/5 transition-colors"><span class="material-symbols-outlined text-sm">info</span> Details</button>'
+        + '<button data-action="buy" data-id="' + p.id + '" class="cartoon-button bg-primary text-white font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-1"><span class="material-symbols-outlined text-sm">add_shopping_cart</span> Buy Now</button>'
+        + '</div></div></div></div>';
+    }).join('');
 
     // Pagination
     if (paginationEl) {
-      const totalPages = Math.ceil(total / 9);
-      paginationEl.innerHTML = Array.from({ length: totalPages }, (_, i) => i + 1)
-        .map((n) => `
-          <button onclick="goToPage(${n})"
-            class="w-10 h-10 rounded-xl font-black text-sm border-2 ${n === currentPage ? 'bg-primary text-white border-primary' : 'border-primary/20 text-primary hover:bg-primary/5'}">
-            ${n}
-          </button>
-        `).join('');
+      var totalPages = Math.ceil(total / 9);
+      paginationEl.innerHTML = Array.from({ length: totalPages }, function (_, i) { return i + 1; }).map(function (n) {
+        return '<button data-page="' + n + '" class="w-10 h-10 rounded-xl font-black text-sm border-2 ' + (n === currentPage ? 'bg-primary text-white border-primary' : 'border-primary/20 text-primary hover:bg-primary/5') + '">' + n + '</button>';
+      }).join('');
     }
-  } catch (err) {
-    grid.innerHTML = `<div class="col-span-3 text-center py-12 text-red-500 font-bold">${err.message}</div>`;
-  }
-}
 
-function goToPage(n) {
-  currentPage = n;
-  renderProducts();
-}
-
-function addToCart(productId, productName, priceTnd) {
-  sessionStorage.setItem('lbara_cart', JSON.stringify({ product_id: productId, product_name: productName, price_tnd: priceTnd }));
-  showToast(`${productName} added! Heading to checkout...`);
-  setTimeout(() => { window.location.href = '/checkout.html'; }, 800);
+  }).catch(function (err) {
+    grid.innerHTML = '<div class="col-span-3 text-center py-12 text-red-500 font-bold">' + (err.message || 'Failed to load products.') + '</div>';
+  });
 }
 
 function openDetails(p) {
@@ -105,15 +83,12 @@ function openDetails(p) {
   document.getElementById('modal-description').textContent = p.description || 'No description available.';
   document.getElementById('modal-account-type').textContent = p.account_type === 'private' ? 'Private' : 'Shared';
   document.getElementById('modal-duration').textContent = p.duration_label || '1 Month';
-  document.getElementById('modal-delivery').textContent = `Within ${p.delivery_hours || 2} hour(s)`;
-  document.getElementById('modal-price').textContent = `${parseFloat(p.price_tnd).toFixed(3)} TND`;
-  const badge = document.getElementById('modal-badge');
+  document.getElementById('modal-delivery').textContent = 'Within ' + (p.delivery_hours || 2) + ' hour(s)';
+  document.getElementById('modal-price').textContent = parseFloat(p.price_tnd).toFixed(3) + ' TND';
+  var badge = document.getElementById('modal-badge');
   if (p.badge) { badge.textContent = p.badge; badge.style.display = ''; }
   else { badge.style.display = 'none'; }
-  document.getElementById('modal-buy-btn').onclick = function () {
-    closeDetails();
-    addToCart(p.id, p.name, p.price_tnd);
-  };
+  document.getElementById('modal-buy-btn').setAttribute('data-id', p.id);
   document.getElementById('details-modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
@@ -123,31 +98,64 @@ function closeDetails() {
   document.body.style.overflow = '';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function addToCart(p) {
+  sessionStorage.setItem('lbara_cart', JSON.stringify({ product_id: p.id, product_name: p.name, price_tnd: p.price_tnd }));
+  showToast(p.name + ' added! Heading to checkout...');
+  setTimeout(function () { window.location.href = '/checkout.html'; }, 800);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
   renderProducts();
 
+  // ── event delegation on grid ────────────────────────────
+  document.getElementById('products-grid').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    var p = productMap[btn.getAttribute('data-id')];
+    if (!p) return;
+    if (btn.getAttribute('data-action') === 'details') openDetails(p);
+    if (btn.getAttribute('data-action') === 'buy') addToCart(p);
+  });
+
+  // ── pagination delegation ───────────────────────────────
+  document.getElementById('pagination').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-page]');
+    if (!btn) return;
+    currentPage = parseInt(btn.getAttribute('data-page'));
+    renderProducts();
+  });
+
+  // ── modal buy button ────────────────────────────────────
+  document.getElementById('modal-buy-btn').addEventListener('click', function () {
+    var p = productMap[this.getAttribute('data-id')];
+    if (!p) return;
+    closeDetails();
+    addToCart(p);
+  });
+
+  // ── modal close ─────────────────────────────────────────
   document.getElementById('details-close').addEventListener('click', closeDetails);
   document.getElementById('details-backdrop').addEventListener('click', closeDetails);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDetails(); });
 
-  // Category filter buttons
-  document.querySelectorAll('[data-category]').forEach((btn) => {
-    btn.addEventListener('click', () => {
+  // ── category filters ────────────────────────────────────
+  document.querySelectorAll('[data-category]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
       currentCategory = btn.dataset.category;
       currentPage = 1;
-      document.querySelectorAll('[data-category]').forEach((b) => b.classList.remove('active'));
+      document.querySelectorAll('[data-category]').forEach(function (b) { b.classList.remove('active'); });
       btn.classList.add('active');
       renderProducts();
     });
   });
 
-  // Search
-  const searchInput = document.getElementById('shop-search');
+  // ── search ──────────────────────────────────────────────
+  var searchInput = document.getElementById('shop-search');
   if (searchInput) {
-    let debounce;
-    searchInput.addEventListener('input', (e) => {
+    var debounce;
+    searchInput.addEventListener('input', function (e) {
       clearTimeout(debounce);
-      debounce = setTimeout(() => {
+      debounce = setTimeout(function () {
         currentSearch = e.target.value.trim();
         currentPage = 1;
         renderProducts();
