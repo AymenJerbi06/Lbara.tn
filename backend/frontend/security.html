@@ -179,7 +179,7 @@
                   Save Name
                   <span class="material-symbols-outlined text-sm">check</span>
                 </button>
-                <p id="save-name-msg" class="hidden text-sm font-semibold"></p>
+                <p id="save-name-msg" style="display:none"></p>
               </div>
             </div>
           </div>
@@ -239,7 +239,7 @@
                   <button type="button" onclick="sendCode()" id="send-code-btn" class="w-full py-2 bg-white border border-outline-variant text-primary font-bold text-xs rounded-lg hover:bg-surface-container-highest transition-colors mb-4">
                     Request Verification Code
                   </button>
-                  <p id="send-code-msg" class="hidden text-xs font-semibold mb-3"></p>
+                  <p id="send-code-msg" style="display:none"></p>
                   <div class="space-y-2">
                     <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-1 px-1" for="verify_code">Enter 6-Digit Code</label>
                     <input class="w-full px-4 py-2 bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 transition-all text-sm text-center tracking-[0.5em] font-bold" id="verify_code" maxlength="6" placeholder="000000" type="text"/>
@@ -249,7 +249,7 @@
             </div>
 
             <div class="mt-10 pt-8 border-t border-outline-variant/10 flex items-center justify-between">
-              <p id="change-pwd-msg" class="hidden text-sm font-semibold"></p>
+              <p id="change-pwd-msg" style="display:none"></p>
               <button type="button" onclick="changePassword()" id="change-pwd-btn" class="ml-auto bg-primary text-on-primary px-10 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2 shadow-lg shadow-primary/10">
                 Update Password
                 <span class="material-symbols-outlined text-sm">shield_lock</span>
@@ -291,166 +291,122 @@
   </button>
 </nav>
 
-<script src="/js/api.js"></script>
 <script>
-async function securityApiFetch(path, options = {}) {
-  const requestOptions = {
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    ...options,
-  };
-
-  if (options.body !== undefined) {
-    requestOptions.body = JSON.stringify(options.body);
-  }
-
-  const res = await fetch(`/api${path}`, requestOptions);
-  const data = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    throw new Error(data.message || 'Something went wrong.');
-  }
-
-  return data;
+// ── single fetch helper ───────────────────────────────────
+async function req(path, method, body) {
+  const opts = { method: method || 'GET', credentials: 'include', headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch('/api' + path, opts);
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.message || 'Something went wrong.');
+  return d;
 }
 
-function requestPasswordChangeCompat() {
-  if (window.api && typeof window.api.requestPasswordChange === 'function') {
-    return window.api.requestPasswordChange();
-  }
-
-  return securityApiFetch('/auth/request-password-change', { method: 'POST' });
+function showMsg(id, text, ok) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.style.display = 'block';
+  el.style.color = ok ? '#16a34a' : '#dc2626';
+  el.style.fontWeight = '600';
+  el.style.fontSize = '0.875rem';
+  el.style.marginTop = '0.5rem';
 }
 
-function updateProfileCompat(body) {
-  return securityApiFetch('/auth/profile', { method: 'POST', body });
-}
+function hideMsg(id) { document.getElementById(id).style.display = 'none'; }
 
-function confirmPasswordChangeCompat(body) {
-  if (window.api && typeof window.api.confirmPasswordChange === 'function') {
-    return window.api.confirmPasswordChange(body);
-  }
-
-  return securityApiFetch('/auth/confirm-password-change', { method: 'POST', body });
-}
-
+// ── toggle password visibility ────────────────────────────
 function togglePwd(inputId, iconId) {
-  const input = document.getElementById(inputId);
-  const icon = document.getElementById(iconId);
-  input.type = input.type === 'password' ? 'text' : 'password';
-  icon.textContent = input.type === 'password' ? 'visibility' : 'visibility_off';
+  const inp = document.getElementById(inputId);
+  const ico = document.getElementById(iconId);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  ico.textContent = inp.type === 'password' ? 'visibility' : 'visibility_off';
 }
 
+// ── save display name ─────────────────────────────────────
+async function saveName() {
+  const name = document.getElementById('display_name').value.trim();
+  const btn = document.getElementById('save-name-btn');
+  if (!name) { showMsg('save-name-msg', 'Name cannot be empty.', false); return; }
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  try {
+    const res = await req('/auth/profile', 'POST', { full_name: name });
+    const updated = (res.user && res.user.full_name) || name;
+    document.getElementById('display_name').value = updated;
+    document.getElementById('sidebar-name').textContent = updated;
+    document.getElementById('sidebar-avatar').textContent = updated[0].toUpperCase();
+    document.getElementById('header-avatar').textContent = updated[0].toUpperCase();
+    showMsg('save-name-msg', '✓ Name saved!', true);
+    setTimeout(() => hideMsg('save-name-msg'), 3000);
+  } catch (e) {
+    showMsg('save-name-msg', e.message || 'Failed to save.', false);
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Save Name <span class="material-symbols-outlined text-sm">check</span>';
+}
+
+// ── request OTP ───────────────────────────────────────────
 async function sendCode() {
   const btn = document.getElementById('send-code-btn');
   const msg = document.getElementById('send-code-msg');
   btn.disabled = true;
   btn.textContent = 'Sending...';
   try {
-    await securityApiFetch('/auth/request-password-change', { method: 'POST' });
-    msg.textContent = '✓ Code sent! Check your inbox.';
-    msg.className = 'text-xs font-semibold text-green-700 mb-3';
+    await req('/auth/request-password-change', 'POST');
+    showMsg('send-code-msg', '✓ Code sent — check your email.', true);
     btn.textContent = 'Resend Code';
-  } catch (err) {
-    msg.textContent = err.message || 'Failed to send code.';
-    msg.className = 'text-xs font-semibold text-red-600 mb-3';
+  } catch (e) {
+    showMsg('send-code-msg', e.message || 'Failed to send code.', false);
     btn.textContent = 'Request Verification Code';
   }
   btn.disabled = false;
 }
 
-async function saveName() {
-  const name = document.getElementById('display_name').value.trim();
-  const btn = document.getElementById('save-name-btn');
-  const msg = document.getElementById('save-name-msg');
-  if (!name) {
-    msg.textContent = 'Name cannot be empty.';
-    msg.style.display = 'block';
-    msg.style.color = '#dc2626';
-    return;
-  }
-  btn.disabled = true;
-  btn.textContent = 'Saving...';
-  try {
-    const res = await securityApiFetch('/auth/profile', { method: 'POST', body: { full_name: name } });
-    const updated = (res.user && res.user.full_name) || name;
-    msg.textContent = '✓ Name updated!';
-    msg.style.display = 'block';
-    msg.style.color = '#16a34a';
-    document.getElementById('display_name').value = updated;
-    document.getElementById('sidebar-name').textContent = updated;
-    document.getElementById('sidebar-avatar').textContent = updated[0].toUpperCase();
-    document.getElementById('header-avatar').textContent = updated[0].toUpperCase();
-    setTimeout(() => { msg.style.display = 'none'; }, 3000);
-  } catch (err) {
-    msg.textContent = err.message || 'Failed to update name.';
-    msg.style.display = 'block';
-    msg.style.color = '#dc2626';
-  }
-  btn.disabled = false;
-  btn.innerHTML = 'Save Name <span class="material-symbols-outlined text-sm">check</span>';
-}
-
+// ── change password ───────────────────────────────────────
 async function changePassword() {
   const newPwd = document.getElementById('new_password').value;
   const confirmPwd = document.getElementById('confirm_password').value;
   const otp = document.getElementById('verify_code').value.trim();
   const btn = document.getElementById('change-pwd-btn');
-  const msg = document.getElementById('change-pwd-msg');
-
-  msg.className = 'hidden text-sm font-semibold';
-
-  if (newPwd !== confirmPwd) {
-    msg.textContent = 'Passwords do not match.';
-    msg.className = 'text-sm font-semibold text-red-600';
-    return;
-  }
-  if (!otp) {
-    msg.textContent = 'Please request and enter the verification code first.';
-    msg.className = 'text-sm font-semibold text-red-600';
-    return;
-  }
-
+  hideMsg('change-pwd-msg');
+  if (newPwd.length < 8) { showMsg('change-pwd-msg', 'Password must be at least 8 characters.', false); return; }
+  if (newPwd !== confirmPwd) { showMsg('change-pwd-msg', 'Passwords do not match.', false); return; }
+  if (!otp) { showMsg('change-pwd-msg', 'Please request and enter the verification code first.', false); return; }
   btn.disabled = true;
   btn.textContent = 'Verifying...';
   try {
-    await securityApiFetch('/auth/confirm-password-change', { method: 'POST', body: { otp, new_password: newPwd } });
-    msg.textContent = '✓ Password updated successfully!';
-    msg.className = 'text-sm font-semibold text-green-700';
+    await req('/auth/confirm-password-change', 'POST', { otp, new_password: newPwd });
+    showMsg('change-pwd-msg', '✓ Password updated successfully!', true);
     document.getElementById('new_password').value = '';
     document.getElementById('confirm_password').value = '';
     document.getElementById('verify_code').value = '';
-  } catch (err) {
-    msg.textContent = err.message || 'Failed to update password.';
-    msg.className = 'text-sm font-semibold text-red-600';
+  } catch (e) {
+    showMsg('change-pwd-msg', e.message || 'Failed to update password.', false);
   }
   btn.disabled = false;
   btn.innerHTML = 'Update Password <span class="material-symbols-outlined text-sm">shield_lock</span>';
 }
 
-async function handleLogout() {
-  try { await securityApiFetch('/auth/logout', { method: 'POST' }); } catch {}
-  window.location.href = '/login.html';
+// ── logout ────────────────────────────────────────────────
+function handleLogout() {
+  fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).finally(() => {
+    window.location.href = '/login.html';
+  });
 }
 
-async function init() {
-  let user;
-  try {
-    const res = await securityApiFetch('/auth/me');
-    user = res.user;
-  } catch {
-    window.location.href = '/login.html';
-    return;
-  }
-  const name = user.full_name || user.email.split('@')[0];
+// ── init ──────────────────────────────────────────────────
+req('/auth/me').then(function(res) {
+  const user = res.user;
+  const name = (user && user.full_name) || (user && user.email.split('@')[0]) || '';
+  if (!name) { window.location.href = '/login.html'; return; }
   const initial = name[0].toUpperCase();
   document.getElementById('sidebar-name').textContent = name;
   document.getElementById('sidebar-email').textContent = user.email;
   document.getElementById('sidebar-avatar').textContent = initial;
   document.getElementById('header-avatar').textContent = initial;
   document.getElementById('display_name').value = user.full_name || '';
-}
-
-init();
+}).catch(function() {
+  window.location.href = '/login.html';
+});
 </script>
 </body></html>
