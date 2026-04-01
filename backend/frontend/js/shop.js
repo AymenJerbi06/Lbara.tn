@@ -41,7 +41,7 @@ function renderProducts() {
 
     grid.innerHTML = products.map(function (p) {
       var imgHtml = p.image_url
-        ? '<img src="' + p.image_url + '" alt="' + p.name + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"/><div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,48,96,0.3);"></div><span class="relative material-symbols-outlined text-white text-4xl">' + (CATEGORY_ICONS[p.category] || 'stars') + '</span>'
+        ? '<img src="' + p.image_url + '" alt="' + p.name + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"/><div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,48,96,0.3);"></div><span class="relative material-symbols-outlined text-white text-4xl">' + (CATEGORY_ICONS[p.category] || 'stars') + '</span>'
         : '<span class="material-symbols-outlined text-primary text-4xl">' + (CATEGORY_ICONS[p.category] || 'stars') + '</span>';
       var badgeHtml = p.badge ? '<span class="relative bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">' + p.badge + '</span>' : '';
       return '<div class="cartoon-card rounded-2xl overflow-hidden flex flex-col">'
