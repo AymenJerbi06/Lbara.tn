@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS products (
   duration_label   VARCHAR(100),            -- e.g. "1 Month"
   delivery_hours   INTEGER DEFAULT 2,
   active           BOOLEAN DEFAULT TRUE,
+  image_url        TEXT,
   created_at       TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -116,6 +117,9 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, enti
 -- ─── Password Reset Columns (safe to run on existing DB) ──
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token VARCHAR(128);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires TIMESTAMPTZ;
+
+-- ─── Product Image URL (safe to run on existing DB) ──────
+ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;
 
 -- ─── Seed Products ────────────────────────────────────────
 INSERT INTO products (slug, name, provider, category, description, price_tnd, badge, account_type, duration_label, delivery_hours)
