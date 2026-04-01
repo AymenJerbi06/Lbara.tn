@@ -106,6 +106,25 @@ async function start() {
     }
   }
 
+  // Auto-create admin account if ADMIN_EMAIL + ADMIN_PASSWORD env vars are set
+  if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+    try {
+      const bcrypt = require('bcryptjs');
+      const pool = require('./src/config/db');
+      const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 12);
+      const r = await pool.query(
+        `INSERT INTO users (email, password_hash, full_name, is_admin)
+         VALUES ($1, $2, 'Admin', TRUE)
+         ON CONFLICT (email) DO UPDATE SET is_admin = TRUE, password_hash = $2
+         RETURNING email`,
+        [process.env.ADMIN_EMAIL.toLowerCase(), hash]
+      );
+      console.log('[INFO] Admin account ready:', r.rows[0]?.email);
+    } catch (e) {
+      console.error('[ERROR] Failed to create admin:', e.message);
+    }
+  }
+
   app.listen(PORT, () => {
     console.log(`[INFO] Lbara.tn running on http://localhost:${PORT} (${process.env.NODE_ENV || 'development'})`);
   });
