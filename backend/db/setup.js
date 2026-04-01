@@ -5,6 +5,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
+const bcrypt = require('bcryptjs');
 
 const pool = process.env.DATABASE_URL
   ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
@@ -23,9 +24,27 @@ async function setup() {
     console.log('✅ Database schema applied successfully.');
   } catch (err) {
     console.error('❌ Schema error:', err.message);
-  } finally {
-    await pool.end();
   }
+
+  // Seed admin account if ADMIN_EMAIL + ADMIN_PASSWORD are set
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (adminEmail && adminPassword) {
+    try {
+      const hash = await bcrypt.hash(adminPassword, 12);
+      await pool.query(
+        `INSERT INTO users (email, password_hash, full_name, is_admin)
+         VALUES ($1, $2, 'Admin', TRUE)
+         ON CONFLICT (email) DO UPDATE SET is_admin = TRUE, password_hash = $2`,
+        [adminEmail.toLowerCase(), hash]
+      );
+      console.log('✅ Admin account ready:', adminEmail);
+    } catch (err) {
+      console.error('❌ Admin seed error:', err.message);
+    }
+  }
+
+  await pool.end();
 }
 
 setup();

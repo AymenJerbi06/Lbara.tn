@@ -68,27 +68,6 @@ app.use(express.static(path.join(__dirname, 'frontend'), {
 // ─── Health Check ────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', env: process.env.NODE_ENV }));
 
-// ─── One-time admin setup (disabled once SETUP_TOKEN is removed) ─
-app.get('/api/init-admin', async (req, res) => {
-  const token = process.env.SETUP_TOKEN;
-  if (!token || req.query.token !== token) return res.status(403).json({ error: 'Forbidden' });
-  try {
-    const bcrypt = require('bcryptjs');
-    const pool = require('./src/config/db');
-    const password = process.env.ADMIN_PASSWORD || 'Admin@1234';
-    const hash = await bcrypt.hash(password, 12);
-    const email = (process.env.ADMIN_EMAIL || 'jerbiaymen6@gmail.com').toLowerCase();
-    await pool.query(
-      `INSERT INTO users (email, password_hash, full_name, is_admin)
-       VALUES ($1, $2, 'Admin', TRUE)
-       ON CONFLICT (email) DO UPDATE SET is_admin = TRUE, password_hash = $2`,
-      [email, hash]
-    );
-    res.json({ success: true, message: `Admin ready. Email: ${email} / Password: ${password}` });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
 
 // ─── API Routes ───────────────────────────────────────────
 app.use('/api/auth', authRoutes);
