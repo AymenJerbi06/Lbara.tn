@@ -135,20 +135,8 @@
 </aside>
 
 <!-- Top AppBar -->
-<header class="flex justify-between items-center w-full px-6 py-4 md:pl-72 sticky top-0 z-40 bg-white/70 backdrop-blur-xl shadow-sm">
-  <div class="flex items-center gap-4 flex-1">
-    <div class="relative w-full max-w-md hidden md:block">
-      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-      <input class="w-full pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all text-sm" placeholder="Search settings..." type="text"/>
-    </div>
-  </div>
+<header class="flex justify-end items-center w-full px-6 py-4 md:pl-72 sticky top-0 z-40 bg-white/70 backdrop-blur-xl shadow-sm">
   <div class="flex items-center gap-4">
-    <button class="p-2 text-slate-600 hover:text-blue-900 transition-all">
-      <span class="material-symbols-outlined">notifications</span>
-    </button>
-    <button class="p-2 text-slate-600 hover:text-blue-900 transition-all">
-      <span class="material-symbols-outlined">help</span>
-    </button>
     <div class="h-8 w-[1px] bg-outline-variant mx-2 opacity-30"></div>
     <div id="header-avatar" class="w-8 h-8 rounded-full border-2 border-primary-fixed bg-primary-container flex items-center justify-center text-white font-bold text-sm headline-font">?</div>
   </div>
@@ -305,6 +293,51 @@
 
 <script src="/js/api.js"></script>
 <script>
+async function securityApiFetch(path, options = {}) {
+  const requestOptions = {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options,
+  };
+
+  if (options.body !== undefined) {
+    requestOptions.body = JSON.stringify(options.body);
+  }
+
+  const res = await fetch(`/api${path}`, requestOptions);
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data.message || 'Something went wrong.');
+  }
+
+  return data;
+}
+
+function requestPasswordChangeCompat() {
+  if (window.api && typeof window.api.requestPasswordChange === 'function') {
+    return window.api.requestPasswordChange();
+  }
+
+  return securityApiFetch('/auth/request-password-change', { method: 'POST' });
+}
+
+function updateProfileCompat(body) {
+  if (window.api && typeof window.api.updateProfile === 'function') {
+    return window.api.updateProfile(body);
+  }
+
+  return securityApiFetch('/auth/profile', { method: 'PUT', body });
+}
+
+function confirmPasswordChangeCompat(body) {
+  if (window.api && typeof window.api.confirmPasswordChange === 'function') {
+    return window.api.confirmPasswordChange(body);
+  }
+
+  return securityApiFetch('/auth/confirm-password-change', { method: 'POST', body });
+}
+
 function togglePwd(inputId, iconId) {
   const input = document.getElementById(inputId);
   const icon = document.getElementById(iconId);
@@ -318,7 +351,7 @@ async function sendCode() {
   btn.disabled = true;
   btn.textContent = 'Sending...';
   try {
-    await api.requestPasswordChange();
+    await requestPasswordChangeCompat();
     msg.textContent = '✓ Code sent! Check your inbox.';
     msg.className = 'text-xs font-semibold text-green-700 mb-3';
     btn.textContent = 'Resend Code';
@@ -342,16 +375,23 @@ async function saveName() {
   btn.disabled = true;
   btn.textContent = 'Saving...';
   try {
-    const res = await api.updateProfile({ full_name: name });
+    const res = await updateProfileCompat({ full_name: name });
     const updated = res.user.full_name || name;
     msg.textContent = '✓ Name updated!';
     msg.className = 'text-sm font-semibold text-green-700';
+    document.getElementById('display_name').value = updated;
     document.getElementById('sidebar-name').textContent = updated;
     document.getElementById('sidebar-avatar').textContent = updated[0].toUpperCase();
     document.getElementById('header-avatar').textContent = updated[0].toUpperCase();
+    if (typeof showToast === 'function') {
+      showToast('Name updated successfully.');
+    }
   } catch (err) {
     msg.textContent = err.message || 'Failed to update name.';
     msg.className = 'text-sm font-semibold text-red-600';
+    if (typeof showToast === 'function') {
+      showToast(err.message || 'Failed to update name.', 'error');
+    }
   }
   btn.disabled = false;
   btn.innerHTML = 'Save Name <span class="material-symbols-outlined text-sm">check</span>';
@@ -380,7 +420,7 @@ async function changePassword() {
   btn.disabled = true;
   btn.textContent = 'Verifying...';
   try {
-    await api.confirmPasswordChange({ otp, new_password: newPwd });
+    await confirmPasswordChangeCompat({ otp, new_password: newPwd });
     msg.textContent = '✓ Password updated successfully!';
     msg.className = 'text-sm font-semibold text-green-700';
     document.getElementById('new_password').value = '';
