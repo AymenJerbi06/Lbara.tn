@@ -286,6 +286,7 @@
 // ─── Admin Dashboard Logic ────────────────────────────────
 
 var fulfillOrderId = null;
+var productsMap = {};
 
 function showTab(tab) {
   ['dashboard','orders','products','messages'].forEach(function(t) {
@@ -331,6 +332,25 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('create-product-btn').addEventListener('click', function() { createProduct(); });
     // Wire up orders filter
     document.getElementById('orders-filter').addEventListener('change', function() { loadOrders(this.value); });
+    // Event delegation for orders table (Fulfill / Approve buttons)
+    document.getElementById('orders-tbody').addEventListener('click', function(e) {
+      var btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      if (btn.dataset.action === 'fulfill') openFulfillModal(btn.dataset.id, btn.dataset.ref);
+      if (btn.dataset.action === 'approve') updateStatus(btn.dataset.id, 'paid');
+    });
+    // Event delegation for recent orders list (Fulfill buttons)
+    document.getElementById('recent-orders-list').addEventListener('click', function(e) {
+      var btn = e.target.closest('button[data-action="fulfill"]');
+      if (btn) openFulfillModal(btn.dataset.id, btn.dataset.ref);
+    });
+    // Event delegation for products table (Edit / Toggle buttons)
+    document.getElementById('products-tbody').addEventListener('click', function(e) {
+      var btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      if (btn.dataset.action === 'edit') openEditModal(productsMap[btn.dataset.id]);
+      if (btn.dataset.action === 'toggle') toggleProduct(btn.dataset.id, btn.dataset.active === 'true');
+    });
     // Show dashboard tab initially
     showTab('dashboard');
   }).catch(function() {
@@ -385,8 +405,8 @@ async function loadOrders(status = '') {
           <td class="p-4"><span class="status-pill status-${o.status}">${o.status.replace('_',' ')}</span></td>
           <td class="p-4 text-xs text-on-surface/50 font-bold">${new Date(o.created_at).toLocaleDateString()}</td>
           <td class="p-4">
-            ${o.status === 'paid' ? `<button onclick="openFulfillModal('${o.id}','${o.order_ref}')" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">Fulfill</button>` : ''}
-            ${o.status === 'flagged' ? `<button onclick="updateStatus('${o.id}','paid')" class="cartoon-button bg-primary text-white font-bold px-3 py-1 rounded-lg text-xs ml-1">Approve</button>` : ''}
+            ${o.status === 'paid' ? `<button data-action="fulfill" data-id="${o.id}" data-ref="${o.order_ref}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">Fulfill</button>` : ''}
+            ${o.status === 'flagged' ? `<button data-action="approve" data-id="${o.id}" class="cartoon-button bg-primary text-white font-bold px-3 py-1 rounded-lg text-xs ml-1">Approve</button>` : ''}
           </td>
         </tr>`).join('')
       : '<tr><td colspan="7" class="text-center p-8 text-primary/40 font-bold">No orders found.</td></tr>';
@@ -404,7 +424,7 @@ function renderOrderRow(o) {
     </div>
     <div class="flex items-center gap-3">
       <span class="font-black text-primary">${parseFloat(o.amount_tnd).toFixed(3)} TND</span>
-      <button onclick="openFulfillModal('${o.id}','${o.order_ref}')" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">Fulfill</button>
+      <button data-action="fulfill" data-id="${o.id}" data-ref="${o.order_ref}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">Fulfill</button>
     </div>
   </div>`;
 }
@@ -452,6 +472,8 @@ async function updateStatus(orderId, status) {
 async function loadProducts() {
   try {
     const { products } = await apiFetchAdmin('/admin/products');
+    productsMap = {};
+    products.forEach(function(p) { productsMap[p.id] = p; });
     document.getElementById('products-tbody').innerHTML = products.length
       ? products.map(p => `
         <tr class="border-t border-primary/5">
@@ -464,8 +486,8 @@ async function loadProducts() {
           <td class="p-4 font-black text-primary">${parseFloat(p.price_tnd).toFixed(3)}</td>
           <td class="p-4"><span class="status-pill ${p.active ? 'status-fulfilled' : 'status-cancelled'}">${p.active ? 'Active' : 'Inactive'}</span></td>
           <td class="p-4 flex items-center gap-2">
-            <button onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="cartoon-button bg-accent/10 text-accent border-accent/30 font-bold px-3 py-1 rounded-lg text-xs">Edit</button>
-            <button onclick="toggleProduct('${p.id}', ${!p.active})" class="cartoon-button ${p.active ? 'bg-red-50 text-red-600 border-red-200' : 'bg-secondary/10 text-secondary border-secondary/20'} font-bold px-3 py-1 rounded-lg text-xs">
+            <button data-action="edit" data-id="${p.id}" class="cartoon-button bg-accent/10 text-accent border-accent/30 font-bold px-3 py-1 rounded-lg text-xs">Edit</button>
+            <button data-action="toggle" data-id="${p.id}" data-active="${!p.active}" class="cartoon-button ${p.active ? 'bg-red-50 text-red-600 border-red-200' : 'bg-secondary/10 text-secondary border-secondary/20'} font-bold px-3 py-1 rounded-lg text-xs">
               ${p.active ? 'Deactivate' : 'Activate'}
             </button>
           </td>
