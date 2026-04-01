@@ -28,8 +28,9 @@
   .cartoon-button { @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none; }
   .vibrant-gradient { background: linear-gradient(135deg, #001F3F 0%, #000C1A 100%); }
   .faq-item { @apply border-b-2 border-primary/10; }
+</style>
+<style>
   .faq-answer { display: none; }
-  .faq-answer.open { display: block; }
 </style>
 </head>
 <body class="selection:bg-primary/30 selection:text-primary">
@@ -327,18 +328,18 @@
 <script src="/js/api.js"></script>
 <script>
   function toggleFaq(btn) {
-    const answer = btn.nextElementSibling;
-    const icon = btn.querySelector('.material-symbols-outlined');
-    const isOpen = answer.classList.contains('open');
+    var answer = btn.nextElementSibling;
+    var icon = btn.querySelector('.material-symbols-outlined');
+    var isOpen = answer.style.display === 'block';
 
     // Close all
-    document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
-    document.querySelectorAll('.faq-item button .material-symbols-outlined').forEach(i => {
+    document.querySelectorAll('.faq-answer').forEach(function(a) { a.style.display = 'none'; });
+    document.querySelectorAll('.faq-item button .material-symbols-outlined').forEach(function(i) {
       i.style.transform = '';
     });
 
     if (!isOpen) {
-      answer.classList.add('open');
+      answer.style.display = 'block';
       icon.style.transform = 'rotate(180deg)';
     }
   }
