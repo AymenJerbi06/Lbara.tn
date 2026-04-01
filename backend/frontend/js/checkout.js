@@ -65,18 +65,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     var dotCard = document.getElementById('dot-card');
     if (!d17Option || !cardOption || !dotD17 || !dotCard) return;
 
-    // Reset d17
-    d17Option.style.borderColor = '';
-    d17Option.style.backgroundColor = '';
-    dotD17.style.backgroundColor = '';
-    dotD17.style.borderColor = '';
+    // Explicitly override CSS classes with deselected inline styles
+    var offBorder = 'rgba(0,48,96,0.1)';
+    var offBg = 'transparent';
+    var offDotBg = 'transparent';
+    var offDotBorder = 'rgba(0,48,96,0.2)';
+
+    d17Option.style.borderColor = offBorder;
+    d17Option.style.backgroundColor = offBg;
+    dotD17.style.backgroundColor = offDotBg;
+    dotD17.style.borderColor = offDotBorder;
     dotD17.innerHTML = '';
 
-    // Reset card
-    cardOption.style.borderColor = '';
-    cardOption.style.backgroundColor = '';
-    dotCard.style.backgroundColor = '';
-    dotCard.style.borderColor = '';
+    cardOption.style.borderColor = offBorder;
+    cardOption.style.backgroundColor = offBg;
+    dotCard.style.backgroundColor = offDotBg;
+    dotCard.style.borderColor = offDotBorder;
     dotCard.innerHTML = '';
 
     // Apply selected styles
