@@ -121,4 +121,24 @@ async function sendPasswordChangeOTP(email, otp) {
   });
 }
 
-module.exports = { send, sendOrderConfirmation, sendFulfillmentEmail, sendContactAck, sendPasswordChangeOTP };
+async function sendPasswordResetLink(email, resetUrl) {
+  await send({
+    to: email,
+    subject: `Reset your password — Lbara.tn`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9ff;">
+        <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #B8860B; margin: 0; font-size: 28px;">Lbara.tn</h1>
+          <p style="color: #fff; margin: 8px 0 0; font-size: 14px;">Password Reset Request</p>
+        </div>
+        <div style="background: #fff; border: 2px solid #003060; border-radius: 12px; padding: 32px; text-align: center;">
+          <p style="color: #43474f; font-size: 15px; margin-top: 0;">Click the button below to reset your password. This link expires in <strong>30 minutes</strong>.</p>
+          <a href="${resetUrl}" style="display: inline-block; background: #003060; color: #fff; font-weight: bold; font-size: 16px; padding: 14px 32px; border-radius: 12px; text-decoration: none; margin: 16px 0;">Reset My Password</a>
+          <p style="color: #999; font-size: 12px; margin-top: 24px;">If you did not request this, you can safely ignore this email.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+module.exports = { send, sendOrderConfirmation, sendFulfillmentEmail, sendContactAck, sendPasswordChangeOTP, sendPasswordResetLink };

@@ -156,6 +156,66 @@ async function confirmPasswordChange(req, res) {
   }
 }
 
+async function forgotPassword(req, res) {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ success: false, message: 'Email is required.' });
+
+  try {
+    const result = await pool.query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
+    // Always respond OK to not leak whether email exists
+    if (!result.rows[0]) return res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
+
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const expires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    await pool.query(
+      'UPDATE users SET password_reset_token = $1, password_reset_expires = $2 WHERE id = $3',
+      [hashedToken, expires, result.rows[0].id]
+    );
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password.html?token=${rawToken}`;
+    await emailService.sendPasswordResetLink(email.toLowerCase(), resetUrl);
+
+    res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
+  } catch (err) {
+    console.error('[forgotPassword]', err);
+    res.status(500).json({ success: false, message: 'Failed to send reset email. Please try again.' });
+  }
+}
+
+async function resetPassword(req, res) {
+  const { token, new_password } = req.body;
+  if (!token || !new_password) return res.status(400).json({ success: false, message: 'Token and new password are required.' });
+  if (new_password.length < 8) return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
+
+  try {
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    const result = await pool.query(
+      'SELECT id, password_reset_expires FROM users WHERE password_reset_token = $1',
+      [hashedToken]
+    );
+    const user = result.rows[0];
+
+    if (!user) return res.status(400).json({ success: false, message: 'Invalid or expired reset link.' });
+    if (new Date() > new Date(user.password_reset_expires)) {
+      return res.status(400).json({ success: false, message: 'Reset link has expired. Please request a new one.' });
+    }
+
+    const password_hash = await bcrypt.hash(new_password, 12);
+    await pool.query(
+      'UPDATE users SET password_hash = $1, password_reset_token = NULL, password_reset_expires = NULL WHERE id = $2',
+      [password_hash, user.id]
+    );
+
+    await audit.log({ entityType: 'user', entityId: user.id, action: 'password_reset', actorId: user.id, actorType: 'user' });
+    res.json({ success: true, message: 'Password reset successfully. You can now log in.' });
+  } catch (err) {
+    console.error('[resetPassword]', err);
+    res.status(500).json({ success: false, message: 'Failed to reset password. Please try again.' });
+  }
+}
+
 async function updateProfile(req, res) {
   const { full_name } = req.body;
   if (!full_name || !full_name.trim()) {
@@ -176,4 +236,4 @@ async function updateProfile(req, res) {
   }
 }
 
-module.exports = { register, login, logout, me, updateProfile, requestPasswordChange, confirmPasswordChange };
+module.exports = { register, login, logout, me, updateProfile, requestPasswordChange, confirmPasswordChange, forgotPassword, resetPassword };
