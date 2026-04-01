@@ -40,15 +40,19 @@ function renderProducts() {
     products.forEach(function (p) { productMap[p.id] = p; });
 
     grid.innerHTML = products.map(function (p) {
-      var imgHtml = p.image_url
-        ? '<img src="' + p.image_url + '" alt="' + p.name + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"/><div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,48,96,0.3);"></div><span class="relative material-symbols-outlined text-white text-4xl">' + (CATEGORY_ICONS[p.category] || 'stars') + '</span>'
-        : '<span class="material-symbols-outlined text-primary text-4xl">' + (CATEGORY_ICONS[p.category] || 'stars') + '</span>';
-      var badgeHtml = p.badge ? '<span class="relative bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">' + p.badge + '</span>' : '';
+      var badgeHtml = p.badge ? '<span style="position:absolute;top:10px;right:10px;background:#003060;color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:0.08em;">' + p.badge + '</span>' : '';
+      var headerHtml = p.image_url
+        ? '<div style="position:relative;overflow:hidden;min-height:120px;">'
+            + '<img src="' + p.image_url + '" alt="' + p.name + '" style="width:100%;height:120px;object-fit:cover;display:block;"/>'
+            + badgeHtml
+          + '</div>'
+        : '<div style="position:relative;background:rgba(0,48,96,0.05);padding:24px;display:flex;align-items:center;justify-content:space-between;min-height:96px;">'
+            + '<span class="material-symbols-outlined text-primary text-4xl">' + (CATEGORY_ICONS[p.category] || 'stars') + '</span>'
+            + badgeHtml
+          + '</div>';
       return '<div class="cartoon-card rounded-2xl overflow-hidden flex flex-col">'
-        + '<div class="relative ' + (p.image_url ? '' : 'bg-primary/5') + ' p-6 flex items-center justify-between overflow-hidden" style="min-height:96px;">'
-        + imgHtml + badgeHtml
-        + '</div>'
-        + '<div class="p-6 flex flex-col flex-grow">'
+        + headerHtml
+        + '<div class="p-6 flex flex-col flex-grow" style="flex:1;">'
         + '<p class="text-xs font-black text-secondary uppercase tracking-widest mb-1">' + p.provider + '</p>'
         + '<h3 class="font-headline font-bold text-primary text-lg leading-tight mb-2">' + p.name + '</h3>'
         + '<p class="text-sm text-on-surface/60 font-medium flex-grow mb-4">' + (p.description || '') + '</p>'
