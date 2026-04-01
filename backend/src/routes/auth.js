@@ -7,6 +7,7 @@ const { register, login, logout, me, updateProfile, requestPasswordChange, confi
 router.post('/register', authLimiter, register);
 router.post('/login', authLimiter, login);
 router.post('/logout', logout);
+router.get('/logout', (req, res) => { res.clearCookie('token'); res.redirect('/login.html'); });
 router.get('/me', authMiddleware, me);
 router.put('/profile', authMiddleware, updateProfile);
 router.post('/profile', authMiddleware, updateProfile);

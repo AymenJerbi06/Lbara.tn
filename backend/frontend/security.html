@@ -128,9 +128,9 @@
         <p class="text-xs text-on-surface-variant" id="sidebar-email"></p>
       </div>
     </div>
-    <button onclick="handleLogout()" class="w-full py-2 bg-secondary-container text-on-secondary-container font-bold rounded-full text-sm hover:opacity-90 transition-opacity">
+    <a href="/api/auth/logout" class="block w-full py-2 bg-secondary-container text-on-secondary-container font-bold rounded-full text-sm hover:opacity-90 transition-opacity text-center">
       Sign Out
-    </button>
+    </a>
   </div>
 </aside>
 
@@ -175,7 +175,7 @@
                   <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="display_name">New Display Name</label>
                   <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="display_name" placeholder="e.g. Alex J." type="text"/>
                 </div>
-                <button type="button" onclick="saveName()" id="save-name-btn" class="w-fit bg-primary text-on-primary px-8 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2">
+                <button type="button" id="save-name-btn" class="w-fit bg-primary text-on-primary px-8 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2">
                   Save Name
                   <span class="material-symbols-outlined text-sm">check</span>
                 </button>
@@ -210,8 +210,8 @@
                     <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="new_password">New Password</label>
                     <div class="relative">
                       <input class="w-full px-4 py-3 pr-12 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm" id="new_password" placeholder="••••••••" type="password"/>
-                      <button type="button" onclick="togglePwd('new_password','eye1')" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors">
-                        <span id="eye1" class="material-symbols-outlined text-xl">visibility</span>
+                      <button type="button" data-eye="new_password" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors">
+                        <span class="material-symbols-outlined text-xl">visibility</span>
                       </button>
                     </div>
                   </div>
@@ -219,8 +219,8 @@
                     <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="confirm_password">Confirm New Password</label>
                     <div class="relative">
                       <input class="w-full px-4 py-3 pr-12 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm" id="confirm_password" placeholder="••••••••" type="password"/>
-                      <button type="button" onclick="togglePwd('confirm_password','eye2')" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors">
-                        <span id="eye2" class="material-symbols-outlined text-xl">visibility</span>
+                      <button type="button" data-eye="confirm_password" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors">
+                        <span class="material-symbols-outlined text-xl">visibility</span>
                       </button>
                     </div>
                   </div>
@@ -236,7 +236,7 @@
                 </div>
                 <div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/20">
                   <p class="text-xs text-on-surface-variant mb-4">For your security, a 6-digit code will be sent to your registered email.</p>
-                  <button type="button" onclick="sendCode()" id="send-code-btn" class="w-full py-2 bg-white border border-outline-variant text-primary font-bold text-xs rounded-lg hover:bg-surface-container-highest transition-colors mb-4">
+                  <button type="button" id="send-code-btn" class="w-full py-2 bg-white border border-outline-variant text-primary font-bold text-xs rounded-lg hover:bg-surface-container-highest transition-colors mb-4">
                     Request Verification Code
                   </button>
                   <p id="send-code-msg" style="display:none"></p>
@@ -250,7 +250,7 @@
 
             <div class="mt-10 pt-8 border-t border-outline-variant/10 flex items-center justify-between">
               <p id="change-pwd-msg" style="display:none"></p>
-              <button type="button" onclick="changePassword()" id="change-pwd-btn" class="ml-auto bg-primary text-on-primary px-10 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2 shadow-lg shadow-primary/10">
+              <button type="button" id="change-pwd-btn" class="ml-auto bg-primary text-on-primary px-10 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2 shadow-lg shadow-primary/10">
                 Update Password
                 <span class="material-symbols-outlined text-sm">shield_lock</span>
               </button>
@@ -285,128 +285,135 @@
     <span class="material-symbols-outlined">lock</span>
     <span class="text-[10px] font-bold headline-font">Security</span>
   </a>
-  <button onclick="handleLogout()" class="flex flex-col items-center gap-1 text-on-surface-variant">
+  <a href="/api/auth/logout" class="flex flex-col items-center gap-1 text-on-surface-variant">
     <span class="material-symbols-outlined">logout</span>
     <span class="text-[10px] font-bold headline-font">Sign Out</span>
-  </button>
+  </a>
 </nav>
 
 <script>
-// ── single fetch helper ───────────────────────────────────
-async function req(path, method, body) {
-  const opts = { method: method || 'GET', credentials: 'include', headers: { 'Content-Type': 'application/json' } };
-  if (body) opts.body = JSON.stringify(body);
-  const r = await fetch('/api' + path, opts);
-  const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(d.message || 'Something went wrong.');
-  return d;
-}
+document.addEventListener('DOMContentLoaded', function () {
 
-function showMsg(id, text, ok) {
-  const el = document.getElementById(id);
-  el.textContent = text;
-  el.style.display = 'block';
-  el.style.color = ok ? '#16a34a' : '#dc2626';
-  el.style.fontWeight = '600';
-  el.style.fontSize = '0.875rem';
-  el.style.marginTop = '0.5rem';
-}
-
-function hideMsg(id) { document.getElementById(id).style.display = 'none'; }
-
-// ── toggle password visibility ────────────────────────────
-function togglePwd(inputId, iconId) {
-  const inp = document.getElementById(inputId);
-  const ico = document.getElementById(iconId);
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-  ico.textContent = inp.type === 'password' ? 'visibility' : 'visibility_off';
-}
-
-// ── save display name ─────────────────────────────────────
-async function saveName() {
-  const name = document.getElementById('display_name').value.trim();
-  const btn = document.getElementById('save-name-btn');
-  if (!name) { showMsg('save-name-msg', 'Name cannot be empty.', false); return; }
-  btn.disabled = true;
-  btn.textContent = 'Saving...';
-  try {
-    const res = await req('/auth/profile', 'POST', { full_name: name });
-    const updated = (res.user && res.user.full_name) || name;
-    document.getElementById('display_name').value = updated;
-    document.getElementById('sidebar-name').textContent = updated;
-    document.getElementById('sidebar-avatar').textContent = updated[0].toUpperCase();
-    document.getElementById('header-avatar').textContent = updated[0].toUpperCase();
-    showMsg('save-name-msg', '✓ Name saved!', true);
-    setTimeout(() => hideMsg('save-name-msg'), 3000);
-  } catch (e) {
-    showMsg('save-name-msg', e.message || 'Failed to save.', false);
+  // ── fetch helper ────────────────────────────────────────
+  function req(path, method, body) {
+    var opts = {
+      method: method || 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    return fetch('/api' + path, opts).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (!r.ok) throw new Error(d.message || 'Something went wrong.');
+        return d;
+      });
+    });
   }
-  btn.disabled = false;
-  btn.innerHTML = 'Save Name <span class="material-symbols-outlined text-sm">check</span>';
-}
 
-// ── request OTP ───────────────────────────────────────────
-async function sendCode() {
-  const btn = document.getElementById('send-code-btn');
-  const msg = document.getElementById('send-code-msg');
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
-  try {
-    await req('/auth/request-password-change', 'POST');
-    showMsg('send-code-msg', '✓ Code sent — check your email.', true);
-    btn.textContent = 'Resend Code';
-  } catch (e) {
-    showMsg('send-code-msg', e.message || 'Failed to send code.', false);
-    btn.textContent = 'Request Verification Code';
+  function msg(id, text, ok) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text;
+    el.style.cssText = 'display:block;margin-top:8px;font-size:14px;font-weight:600;color:' + (ok ? '#16a34a' : '#dc2626');
   }
-  btn.disabled = false;
-}
+  function clearMsg(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; }
 
-// ── change password ───────────────────────────────────────
-async function changePassword() {
-  const newPwd = document.getElementById('new_password').value;
-  const confirmPwd = document.getElementById('confirm_password').value;
-  const otp = document.getElementById('verify_code').value.trim();
-  const btn = document.getElementById('change-pwd-btn');
-  hideMsg('change-pwd-msg');
-  if (newPwd.length < 8) { showMsg('change-pwd-msg', 'Password must be at least 8 characters.', false); return; }
-  if (newPwd !== confirmPwd) { showMsg('change-pwd-msg', 'Passwords do not match.', false); return; }
-  if (!otp) { showMsg('change-pwd-msg', 'Please request and enter the verification code first.', false); return; }
-  btn.disabled = true;
-  btn.textContent = 'Verifying...';
-  try {
-    await req('/auth/confirm-password-change', 'POST', { otp, new_password: newPwd });
-    showMsg('change-pwd-msg', '✓ Password updated successfully!', true);
-    document.getElementById('new_password').value = '';
-    document.getElementById('confirm_password').value = '';
-    document.getElementById('verify_code').value = '';
-  } catch (e) {
-    showMsg('change-pwd-msg', e.message || 'Failed to update password.', false);
+  // ── eye toggle ──────────────────────────────────────────
+  document.querySelectorAll('[data-eye]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var inp = document.getElementById(btn.getAttribute('data-eye'));
+      var ico = btn.querySelector('.material-symbols-outlined');
+      if (!inp) return;
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      if (ico) ico.textContent = inp.type === 'password' ? 'visibility' : 'visibility_off';
+    });
+  });
+
+  // ── save name ───────────────────────────────────────────
+  var saveBtn = document.getElementById('save-name-btn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', function () {
+      var name = (document.getElementById('display_name').value || '').trim();
+      if (!name) { msg('save-name-msg', 'Name cannot be empty.', false); return; }
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving...';
+      req('/auth/profile', 'POST', { full_name: name }).then(function (res) {
+        var updated = (res.user && res.user.full_name) || name;
+        document.getElementById('display_name').value = updated;
+        var sn = document.getElementById('sidebar-name'); if (sn) sn.textContent = updated;
+        var sa = document.getElementById('sidebar-avatar'); if (sa) sa.textContent = updated[0].toUpperCase();
+        var ha = document.getElementById('header-avatar'); if (ha) ha.textContent = updated[0].toUpperCase();
+        msg('save-name-msg', '✓ Name saved!', true);
+        setTimeout(function () { clearMsg('save-name-msg'); }, 3000);
+      }).catch(function (e) {
+        msg('save-name-msg', e.message || 'Failed to save name.', false);
+      }).finally(function () {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = 'Save Name <span class="material-symbols-outlined text-sm">check</span>';
+      });
+    });
   }
-  btn.disabled = false;
-  btn.innerHTML = 'Update Password <span class="material-symbols-outlined text-sm">shield_lock</span>';
-}
 
-// ── logout ────────────────────────────────────────────────
-function handleLogout() {
-  fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).finally(() => {
+  // ── request OTP ─────────────────────────────────────────
+  var codeBtn = document.getElementById('send-code-btn');
+  if (codeBtn) {
+    codeBtn.addEventListener('click', function () {
+      codeBtn.disabled = true;
+      codeBtn.textContent = 'Sending...';
+      req('/auth/request-password-change', 'POST').then(function () {
+        msg('send-code-msg', '✓ Code sent — check your email.', true);
+        codeBtn.textContent = 'Resend Code';
+      }).catch(function (e) {
+        msg('send-code-msg', e.message || 'Failed to send code.', false);
+        codeBtn.textContent = 'Request Verification Code';
+      }).finally(function () {
+        codeBtn.disabled = false;
+      });
+    });
+  }
+
+  // ── update password ──────────────────────────────────────
+  var pwdBtn = document.getElementById('change-pwd-btn');
+  if (pwdBtn) {
+    pwdBtn.addEventListener('click', function () {
+      clearMsg('change-pwd-msg');
+      var newPwd = document.getElementById('new_password').value;
+      var confirmPwd = document.getElementById('confirm_password').value;
+      var otp = (document.getElementById('verify_code').value || '').trim();
+      if (newPwd.length < 8) { msg('change-pwd-msg', 'Password must be at least 8 characters.', false); return; }
+      if (newPwd !== confirmPwd) { msg('change-pwd-msg', 'Passwords do not match.', false); return; }
+      if (!otp) { msg('change-pwd-msg', 'Enter the verification code first.', false); return; }
+      pwdBtn.disabled = true;
+      pwdBtn.textContent = 'Verifying...';
+      req('/auth/confirm-password-change', 'POST', { otp: otp, new_password: newPwd }).then(function () {
+        msg('change-pwd-msg', '✓ Password updated successfully!', true);
+        document.getElementById('new_password').value = '';
+        document.getElementById('confirm_password').value = '';
+        document.getElementById('verify_code').value = '';
+      }).catch(function (e) {
+        msg('change-pwd-msg', e.message || 'Failed to update password.', false);
+      }).finally(function () {
+        pwdBtn.disabled = false;
+        pwdBtn.innerHTML = 'Update Password <span class="material-symbols-outlined text-sm">shield_lock</span>';
+      });
+    });
+  }
+
+  // ── load user ────────────────────────────────────────────
+  req('/auth/me').then(function (res) {
+    var user = res.user;
+    if (!user) { window.location.href = '/login.html'; return; }
+    var name = user.full_name || user.email.split('@')[0];
+    var initial = name[0].toUpperCase();
+    var sn = document.getElementById('sidebar-name'); if (sn) sn.textContent = name;
+    var se = document.getElementById('sidebar-email'); if (se) se.textContent = user.email;
+    var sa = document.getElementById('sidebar-avatar'); if (sa) sa.textContent = initial;
+    var ha = document.getElementById('header-avatar'); if (ha) ha.textContent = initial;
+    var dn = document.getElementById('display_name'); if (dn) dn.value = user.full_name || '';
+  }).catch(function () {
     window.location.href = '/login.html';
   });
-}
 
-// ── init ──────────────────────────────────────────────────
-req('/auth/me').then(function(res) {
-  const user = res.user;
-  const name = (user && user.full_name) || (user && user.email.split('@')[0]) || '';
-  if (!name) { window.location.href = '/login.html'; return; }
-  const initial = name[0].toUpperCase();
-  document.getElementById('sidebar-name').textContent = name;
-  document.getElementById('sidebar-email').textContent = user.email;
-  document.getElementById('sidebar-avatar').textContent = initial;
-  document.getElementById('header-avatar').textContent = initial;
-  document.getElementById('display_name').value = user.full_name || '';
-}).catch(function() {
-  window.location.href = '/login.html';
 });
 </script>
 </body></html>
