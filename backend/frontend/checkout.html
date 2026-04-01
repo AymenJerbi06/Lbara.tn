@@ -43,7 +43,7 @@
       <a class="text-on-surface/70 hover:text-primary transition-colors" href="/contact.html">Contact</a>
     </div>
     <button id="nav-account-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">My Account</button>
-<button id="hamburger-btn" class="md:hidden flex flex-col gap-1.5 p-2" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+<button id="hamburger-btn" class="md:hidden flex flex-col gap-1.5 p-2">
   <span class="block w-6 h-0.5 bg-primary"></span>
   <span class="block w-6 h-0.5 bg-primary"></span>
   <span class="block w-6 h-0.5 bg-primary"></span>
@@ -51,7 +51,7 @@
 </div>
 </nav>
 <!-- Mobile menu (hidden by default) -->
-<div id="mobile-menu" class="hidden md:hidden fixed top-[73px] left-0 w-full bg-white border-b-4 border-primary z-40 shadow-lg">
+<div id="mobile-menu" style="display:none" class="md:hidden fixed top-[73px] left-0 w-full bg-white border-b-4 border-primary z-40 shadow-lg">
   <div class="flex flex-col px-6 py-4 gap-1 font-headline font-bold text-sm">
     <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/index.html">Home</a>
     <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/shop.html">Shop</a>

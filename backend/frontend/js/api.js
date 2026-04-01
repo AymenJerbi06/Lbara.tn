@@ -95,6 +95,16 @@ function showToast(message, type = 'success') {
   setTimeout(() => toast.remove(), 4000);
 }
 
-document.addEventListener('DOMContentLoaded', initNav);
+document.addEventListener('DOMContentLoaded', function() {
+  initNav();
+
+  var hamburger = document.getElementById('hamburger-btn');
+  var mobileMenu = document.getElementById('mobile-menu');
+  if (hamburger && mobileMenu) {
+    hamburger.addEventListener('click', function() {
+      mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'block' : 'none';
+    });
+  }
+});
 window.api = api;
 window.showToast = showToast;
