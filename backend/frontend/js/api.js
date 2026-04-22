@@ -63,15 +63,19 @@ async function loadAuthState() {
 // Update nav button based on auth state
 async function initNav() {
   const btn = document.getElementById('nav-account-btn');
-  if (!btn) return;
+  const btnMobile = document.getElementById('nav-account-btn-mobile');
+  const btns = [btn, btnMobile].filter(Boolean);
+  if (!btns.length) return;
   const user = await loadAuthState();
-  if (user) {
-    btn.textContent = user.is_admin ? 'Admin Panel' : 'My Account';
-    btn.onclick = () => { window.location.href = user.is_admin ? '/admin/dashboard.html' : '/my-account.html'; };
-  } else {
-    btn.textContent = 'Login / Sign Up';
-    btn.onclick = () => { window.location.href = '/login.html'; };
-  }
+  btns.forEach(b => {
+    if (user) {
+      b.textContent = user.is_admin ? 'Admin Panel' : 'My Account';
+      b.onclick = () => { window.location.href = user.is_admin ? '/admin/dashboard.html' : '/my-account.html'; };
+    } else {
+      b.textContent = 'Login / Sign Up';
+      b.onclick = () => { window.location.href = '/login.html'; };
+    }
+  });
 }
 
 // Show toast notifications

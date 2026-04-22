@@ -35,28 +35,31 @@
 
 <!-- Nav -->
 <nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
-  <div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
-    <a class="text-3xl font-bold tracking-tight text-primary font-headline" href="/index.html">Lbara.tn</a>
-    <div class="hidden md:flex items-center gap-8 font-headline font-bold text-sm">
+  <div class="flex justify-between items-center w-full px-4 lg:px-8 py-4 max-w-screen-2xl mx-auto">
+    <a class="text-2xl lg:text-3xl font-bold tracking-tight text-primary font-headline flex-shrink-0" href="/index.html">Lbara.tn</a>
+    <div class="hidden lg:flex items-center gap-8 font-headline font-bold text-sm">
       <a class="text-on-surface/70 hover:text-primary transition-colors" href="/index.html">Home</a>
       <a class="text-on-surface/70 hover:text-primary transition-colors" href="/shop.html">Shop</a>
       <a class="text-primary border-b-4 border-primary" href="/how-it-works.html">How It Works</a>
       <a class="text-on-surface/70 hover:text-primary transition-colors" href="/faq.html">FAQ</a>
       <a class="text-on-surface/70 hover:text-primary transition-colors" href="/contact.html">Contact</a>
     </div>
-    <button id="nav-account-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">Join Now</button>
-<button id="hamburger-btn" class="md:hidden flex flex-col gap-1.5 p-2">
-  <span class="block w-6 h-0.5 bg-primary"></span>
-  <span class="block w-6 h-0.5 bg-primary"></span>
-  <span class="block w-6 h-0.5 bg-primary"></span>
-</button>
+    <button id="nav-account-btn" class="hidden lg:block cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">Join Now</button>
+<div class="lg:hidden flex items-center gap-2 flex-shrink-0">
+  <button id="nav-account-btn-mobile" class="cartoon-button bg-primary text-white font-bold px-3 py-1.5 rounded-full text-xs whitespace-nowrap">Get Started</button>
+  <a href="/shop.html" class="text-primary font-bold font-headline text-xs whitespace-nowrap px-1">Shop</a>
+  <button id="hamburger-btn" class="flex-shrink-0 flex flex-col gap-1.5 p-1.5">
+    <span class="block w-5 h-0.5 bg-primary"></span>
+    <span class="block w-5 h-0.5 bg-primary"></span>
+    <span class="block w-5 h-0.5 bg-primary"></span>
+  </button>
+</div>
 </div>
 </nav>
 <!-- Mobile menu (hidden by default) -->
-<div id="mobile-menu" style="display:none" class="md:hidden fixed top-[73px] left-0 w-full bg-white border-b-4 border-primary z-40 shadow-lg">
+<div id="mobile-menu" style="display:none" class="lg:hidden fixed top-[66px] left-0 w-full bg-white border-b-4 border-primary z-40 shadow-lg">
   <div class="flex flex-col px-6 py-4 gap-1 font-headline font-bold text-sm">
     <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/index.html">Home</a>
-    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/shop.html">Shop</a>
     <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/how-it-works.html">How It Works</a>
     <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/faq.html">FAQ</a>
     <a class="text-on-surface/70 hover:text-primary py-3" href="/contact.html">Contact</a>
