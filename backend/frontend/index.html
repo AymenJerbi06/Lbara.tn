@@ -59,6 +59,82 @@
         50% { transform: translateY(-15px) rotate(1deg); }
       }
     </style>
+<style>
+/* ── Phone-landscape hero: height-based responsive treatment ───────────── */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+
+  /* Section: drop full-height constraint, align to top */
+  #hero-section {
+    min-height: 0 !important;
+    padding-top: 4.25rem !important;
+    padding-bottom: 1.25rem !important;
+    align-items: flex-start !important;
+  }
+
+  /* Grid: switch to 2 columns so illustration moves beside the text */
+  #hero-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.25rem !important;
+    align-items: center !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Hide the decorative eyebrow label to save space */
+  #hero-eyebrow { display: none !important; }
+
+  /* Compact heading */
+  #hero-h1 {
+    font-size: 1.5rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0.375rem !important;
+  }
+  /* Remove the forced line break inside the h1 */
+  #hero-h1 br { display: none !important; }
+
+  /* Compact paragraph */
+  #hero-paragraph {
+    font-size: 0.78rem !important;
+    line-height: 1.45 !important;
+    margin-bottom: 0.625rem !important;
+  }
+
+  /* Compact CTA buttons */
+  #hero-buttons { gap: 0.5rem !important; }
+  #hero-buttons a {
+    padding: 0.375rem 1rem !important;
+    font-size: 0.78rem !important;
+  }
+  #hero-buttons .material-symbols-outlined { font-size: 1rem !important; }
+
+  /* Tighten trust badge */
+  #hero-trust {
+    margin-top: 0.625rem !important;
+    gap: 0.625rem !important;
+  }
+  #hero-trust .w-12 {
+    width: 1.625rem !important;
+    height: 1.625rem !important;
+    font-size: 0.5rem !important;
+  }
+  #hero-trust p { font-size: 0.65rem !important; }
+
+  /* Illustration: shorter container, scaled-down cards */
+  #hero-illustration {
+    height: 280px !important;
+    overflow: hidden !important;
+  }
+  /* Re-define the floating animation to bake in the scale,
+     keeping the float effect while making the cards smaller */
+  .floating-2d {
+    animation: float2d-ls 5s ease-in-out infinite !important;
+  }
+  @keyframes float2d-ls {
+    0%, 100% { transform: scale(0.52) translateY(0px) rotate(-1deg); }
+    50%       { transform: scale(0.52) translateY(-8px) rotate(1deg); }
+  }
+}
+</style>
 </head>
 <body class="selection:bg-primary/30 selection:text-primary">
 <nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
@@ -95,17 +171,17 @@
   </div>
 </div>
 <main>
-<section class="relative min-h-screen flex items-center pt-20 overflow-hidden vibrant-gradient">
-<div class="max-w-screen-2xl mx-auto px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<section id="hero-section" class="relative min-h-screen flex items-center pt-20 overflow-hidden vibrant-gradient">
+<div id="hero-grid" class="max-w-screen-2xl mx-auto px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 <div class="z-10">
-<span class="font-bold text-accent tracking-widest uppercase text-sm mb-4 block">Bridge the Digital Gap</span>
-<h1 class="font-headline text-5xl md:text-7xl font-bold leading-tight mb-6 text-white">
+<span id="hero-eyebrow" class="font-bold text-accent tracking-widest uppercase text-sm mb-4 block">Bridge the Digital Gap</span>
+<h1 id="hero-h1" class="font-headline text-5xl md:text-7xl font-bold leading-tight mb-6 text-white">
                     Your gateway to <br/><span class="text-white underline decoration-accent decoration-8 underline-offset-8">what's outside.</span>
 </h1>
-<p class="text-white/80 text-lg md:text-xl max-w-xl mb-10 leading-relaxed font-medium">
+<p id="hero-paragraph" class="text-white/80 text-lg md:text-xl max-w-xl mb-10 leading-relaxed font-medium">
                     Buy digital services unavailable in Tunisia. Pay locally with your Tunisian cards. No international credit card required.
                 </p>
-<div class="flex flex-wrap gap-4">
+<div id="hero-buttons" class="flex flex-wrap gap-4">
 <a href="/shop.html" class="cartoon-button bg-accent text-white border-accent shadow-[4px_4px_0px_0px_#8B6508] font-bold px-8 py-4 rounded-full flex items-center gap-2 text-lg">
                         Browse Services
                         <span class="material-symbols-outlined">arrow_forward</span>
@@ -114,7 +190,7 @@
                         How It Works
                     </a>
 </div>
-<div class="mt-12 flex items-center gap-6">
+<div id="hero-trust" class="mt-12 flex items-center gap-6">
 <div class="flex -space-x-3">
 <div class="w-12 h-12 rounded-full bg-secondary border-4 border-white flex items-center justify-center font-bold text-white text-xs">TN</div>
 <div class="w-12 h-12 rounded-full bg-accent border-4 border-white flex items-center justify-center font-bold text-white text-xs">99+</div>
@@ -122,7 +198,7 @@
 <p class="text-sm font-bold text-white/60">Trusted by 2,000+ Tunisians this month.</p>
 </div>
 </div>
-<div class="relative h-[600px] flex items-center justify-center">
+<div id="hero-illustration" class="relative h-[600px] flex items-center justify-center">
 <div class="relative w-full h-full floating-2d">
 <div class="absolute top-1/4 left-1/4 cartoon-card p-6 rounded-2xl w-64 transform -rotate-6">
 <div class="flex justify-between items-start mb-4">
