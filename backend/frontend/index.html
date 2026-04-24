@@ -135,10 +135,10 @@
   }
 }
 
-/* ── Mobile portrait hero: scale the desktop composition down ───────────── */
+/* ── Mobile portrait hero: desktop card composition, no scaling ─────────── */
 @media screen and (max-width: 1023px) and (orientation: portrait) {
 
-  /* Drop the full-viewport-height lock and vertical centering */
+  /* Remove full-viewport-height lock and vertical centering */
   #hero-section {
     min-height: 0 !important;
     align-items: flex-start !important;
@@ -153,26 +153,21 @@
     padding-right: 1.25rem !important;
   }
 
-  /* Clip the container to exactly the scaled visual height.
-     scale(0.5) on a 600px canvas → 300px visual height.
-     The bottom card (bottom-10) sits at layout y=560px → visual y=280px,
-     so 320px gives it a little breathing room. */
+  /* Clip to a height where both main cards (Netflix + ChatGPT) are fully
+     visible and the Spotify card peeks at the bottom for depth. */
   #hero-illustration {
-    height: 320px !important;
+    height: 500px !important;
     overflow: hidden !important;
   }
 
-  /* Scale the whole card group as one unit from the top-centre anchor.
-     This preserves every overlap, rotation, z-index and depth exactly as
-     on desktop — just at 50% size. The animation is redefined to bake
-     scale(0.5) into each keyframe so the float still plays correctly. */
+  /* Force the inner canvas to stay at 600px so every card's
+     top-1/4 / top-1/2 / bottom-10 position is identical to desktop.
+     margin-top gives the float-up animation (−15 px) room to breathe
+     without clipping at the container edge.
+     The original float2d animation runs without any override. */
   #hero-illustration .floating-2d {
-    transform-origin: top center !important;
-    animation: float2d-portrait 4s ease-in-out infinite !important;
-  }
-  @keyframes float2d-portrait {
-    0%, 100% { transform: scale(0.5) translateY(0px)   rotate(-1deg); }
-    50%       { transform: scale(0.5) translateY(-12px) rotate(1deg);  }
+    height: 600px !important;
+    margin-top: 20px !important;
   }
 }
 </style>
