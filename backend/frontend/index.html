@@ -153,48 +153,53 @@
     padding-right: 1.25rem !important;
   }
 
-  /* Clip to a height where both main cards (Netflix + ChatGPT) are fully
-     visible and the Spotify card peeks at the bottom for depth. */
+  /* Container: tall enough for a clean triangular 3-card composition
+     where each card is individually visible.                              */
   #hero-illustration {
-    height: 500px !important;
+    height: 540px !important;
     overflow: hidden !important;
   }
 
-  /* Force the inner canvas to stay at 600px so absolute positions
-     work correctly. margin-top buffers the float-up peak (−15px). */
+  /* Canvas stays 600px so absolute positions work identically to desktop.
+     margin-top: 40px gives the top card generous breathing room above it
+     and ensures the float-up animation peak (−15px) never touches the
+     container edge (40 − 15 = 25px minimum clearance).                   */
   #hero-illustration .floating-2d {
     height: 600px !important;
-    margin-top: 20px !important;
+    margin-top: 40px !important;
   }
 
-  /* ── Card 1 (Netflix) — upper-left rear card ───────────────────────────
-     Pushed high and left so its top edge + badge are clearly visible
-     above Card 2. More angle to separate it visually.                    */
+  /* ── Triangular card composition ────────────────────────────────────────
+     Card 1  → upper-left   (container y  100 – 306)  fully visible
+     Card 2  → center-front (container y  240 – 446)  fully visible, z-20
+     Card 3  → lower-right  (container y  370 – 540)  170 px visible
+
+     Card 1 and Card 3 have a 64 px vertical gap so they never touch.
+     Card 2 overlaps the bottom of Card 1 and the top of Card 3, acting
+     as the premium front layer between them.                             */
+
+  /* Card 1 (Netflix) — upper-left rear */
   #hero-illustration .floating-2d > div:nth-child(1) {
-    top:    30px !important;
-    left:   10px !important;
+    top:    60px !important;
+    left:   5px !important;
     right:  auto !important;
     bottom: auto !important;
-    transform: rotate(-8deg) !important;
+    transform: rotate(-6deg) !important;
   }
 
-  /* ── Card 2 (ChatGPT) — dominant front card, centered ─────────────────
-     z-20 already makes it the top layer. Centered horizontally and
-     placed at mid-height so it sits cleanly in front of both others.    */
+  /* Card 2 (ChatGPT) — dominant front card, horizontally centred */
   #hero-illustration .floating-2d > div:nth-child(2) {
-    top:    175px !important;
+    top:    200px !important;
     left:   calc(50% - 128px) !important;
     right:  auto !important;
     bottom: auto !important;
     transform: rotate(3deg) !important;
   }
 
-  /* ── Card 3 (Spotify) — lower-right rear card ──────────────────────────
-     Offset to the right and below Card 2 so its top edge and icon
-     peek out visibly beneath it. Clip at 500px shows ~160px of it.      */
+  /* Card 3 (Spotify) — lower-right rear, no vertical overlap with Card 1 */
   #hero-illustration .floating-2d > div:nth-child(3) {
-    top:    295px !important;
-    right:  15px !important;
+    top:    330px !important;
+    right:  10px !important;
     left:   auto !important;
     bottom: auto !important;
     transform: rotate(-4deg) !important;
