@@ -160,14 +160,44 @@
     overflow: hidden !important;
   }
 
-  /* Force the inner canvas to stay at 600px so every card's
-     top-1/4 / top-1/2 / bottom-10 position is identical to desktop.
-     margin-top gives the float-up animation (−15 px) room to breathe
-     without clipping at the container edge.
-     The original float2d animation runs without any override. */
+  /* Force the inner canvas to stay at 600px so absolute positions
+     work correctly. margin-top buffers the float-up peak (−15px). */
   #hero-illustration .floating-2d {
     height: 600px !important;
     margin-top: 20px !important;
+  }
+
+  /* ── Card 1 (Netflix) — upper-left rear card ───────────────────────────
+     Pushed high and left so its top edge + badge are clearly visible
+     above Card 2. More angle to separate it visually.                    */
+  #hero-illustration .floating-2d > div:nth-child(1) {
+    top:    30px !important;
+    left:   10px !important;
+    right:  auto !important;
+    bottom: auto !important;
+    transform: rotate(-8deg) !important;
+  }
+
+  /* ── Card 2 (ChatGPT) — dominant front card, centered ─────────────────
+     z-20 already makes it the top layer. Centered horizontally and
+     placed at mid-height so it sits cleanly in front of both others.    */
+  #hero-illustration .floating-2d > div:nth-child(2) {
+    top:    175px !important;
+    left:   calc(50% - 128px) !important;
+    right:  auto !important;
+    bottom: auto !important;
+    transform: rotate(3deg) !important;
+  }
+
+  /* ── Card 3 (Spotify) — lower-right rear card ──────────────────────────
+     Offset to the right and below Card 2 so its top edge and icon
+     peek out visibly beneath it. Clip at 500px shows ~160px of it.      */
+  #hero-illustration .floating-2d > div:nth-child(3) {
+    top:    295px !important;
+    right:  15px !important;
+    left:   auto !important;
+    bottom: auto !important;
+    transform: rotate(-4deg) !important;
   }
 }
 </style>
