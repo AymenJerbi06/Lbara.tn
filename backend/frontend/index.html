@@ -135,7 +135,7 @@
   }
 }
 
-/* ── Mobile portrait hero: remove desktop positioning, natural stacking ─── */
+/* ── Mobile portrait hero: scale the desktop composition down ───────────── */
 @media screen and (max-width: 1023px) and (orientation: portrait) {
 
   /* Drop the full-viewport-height lock and vertical centering */
@@ -153,45 +153,26 @@
     padding-right: 1.25rem !important;
   }
 
-  /* Let the illustration column shrink to fit its content instead of h-[600px] */
+  /* Clip the container to exactly the scaled visual height.
+     scale(0.5) on a 600px canvas → 300px visual height.
+     The bottom card (bottom-10) sits at layout y=560px → visual y=280px,
+     so 320px gives it a little breathing room. */
   #hero-illustration {
-    height: auto !important;
-    overflow: visible !important;
+    height: 320px !important;
+    overflow: hidden !important;
   }
 
-  /* Cards wrapper: switch from absolute-positioning canvas to a flex column */
+  /* Scale the whole card group as one unit from the top-centre anchor.
+     This preserves every overlap, rotation, z-index and depth exactly as
+     on desktop — just at 50% size. The animation is redefined to bake
+     scale(0.5) into each keyframe so the float still plays correctly. */
   #hero-illustration .floating-2d {
-    position: relative !important;
-    height: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 0.75rem !important;
-    padding: 0 0 0.75rem !important;
-    animation: none !important;
+    transform-origin: top center !important;
+    animation: float2d-portrait 4s ease-in-out infinite !important;
   }
-
-  /* Each card: restore document flow, smaller size */
-  #hero-illustration .floating-2d > div {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    width: 215px !important;
-    padding: 0.875rem !important;
-    box-shadow: 5px 5px 0 0 #003060 !important;
-  }
-
-  /* Alternate horizontal stagger + rotation for a layered depth feel */
-  #hero-illustration .floating-2d > div:nth-child(1) {
-    transform: rotate(-4deg) translateX(-14px) !important;
-  }
-  #hero-illustration .floating-2d > div:nth-child(2) {
-    transform: rotate(4deg) translateX(14px) !important;
-  }
-  #hero-illustration .floating-2d > div:nth-child(3) {
-    transform: rotate(-2deg) translateX(-7px) !important;
+  @keyframes float2d-portrait {
+    0%, 100% { transform: scale(0.5) translateY(0px)   rotate(-1deg); }
+    50%       { transform: scale(0.5) translateY(-12px) rotate(1deg);  }
   }
 }
 </style>
