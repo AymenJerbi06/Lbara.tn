@@ -135,10 +135,9 @@
   }
 }
 
-/* ── Mobile portrait hero: desktop card composition, no scaling ─────────── */
+/* ── Mobile portrait hero: scaled triangular card group ─────────────────── */
 @media screen and (max-width: 1023px) and (orientation: portrait) {
 
-  /* Remove full-viewport-height lock and vertical centering */
   #hero-section {
     min-height: 0 !important;
     align-items: flex-start !important;
@@ -146,63 +145,65 @@
     padding-bottom: 1.5rem !important;
   }
 
-  /* Tighten the gap between text block and cards block */
   #hero-grid {
     gap: 1.5rem !important;
     padding-left: 1.25rem !important;
     padding-right: 1.25rem !important;
   }
 
-  /* Container: tall enough for a clean triangular 3-card composition
-     where each card is individually visible.                              */
+  /* Container sized to the scaled group; clips nothing */
   #hero-illustration {
-    height: 540px !important;
+    height: 520px !important;
     overflow: hidden !important;
   }
 
-  /* Canvas stays 600px so absolute positions work identically to desktop.
-     margin-top: 40px gives the top card generous breathing room above it
-     and ensures the float-up animation peak (−15px) never touches the
-     container edge (40 − 15 = 25px minimum clearance).                   */
+  /* scale(0.82) with origin at top-center shrinks the 600px canvas to
+     ~492px visual height. margin-top: 20px keeps Card 3's top clear of
+     the container edge even at the animation peak (visual shift ~10px). */
   #hero-illustration .floating-2d {
     height: 600px !important;
-    margin-top: 40px !important;
+    margin-top: 20px !important;
+    transform-origin: top center !important;
+    animation: float2d-portrait 4s ease-in-out infinite !important;
   }
 
-  /* ── Triangular card composition ────────────────────────────────────────
-     Card 1  → upper-left   (container y  100 – 306)  fully visible
-     Card 2  → center-front (container y  240 – 446)  fully visible, z-20
-     Card 3  → lower-right  (container y  370 – 540)  170 px visible
+  @keyframes float2d-portrait {
+    0%, 100% { transform: scale(0.82) translateY(0px) rotate(-0.5deg); }
+    50%       { transform: scale(0.82) translateY(-12px) rotate(0.5deg); }
+  }
 
-     Card 1 and Card 3 have a 64 px vertical gap so they never touch.
-     Card 2 overlaps the bottom of Card 1 and the top of Card 3, acting
-     as the premium front layer between them.                             */
+  /* ── Diagonal stack: upper-right → center main → lower-left ────────────
+     Card 3 (Spotify)  upper-right   visual ≈  28 – 200 px
+     Card 2 (ChatGPT)  center main   visual ≈ 184 – 356 px  (z-20, front)
+     Card 1 (Netflix)  lower-left    visual ≈ 340 – 512 px
+     Each adjacent pair overlaps ≈ 16 px (rear card's top-padding only)
+     so every icon and title is clearly visible.                          */
 
-  /* Card 1 (Netflix) — upper-left rear */
-  #hero-illustration .floating-2d > div:nth-child(1) {
-    top:    60px !important;
-    left:   5px !important;
-    right:  auto !important;
+  /* Card 3 (Spotify) — upper-right */
+  #hero-illustration .floating-2d > div:nth-child(3) {
+    top:    10px !important;
+    right:  5px !important;
+    left:   auto !important;
     bottom: auto !important;
-    transform: rotate(-6deg) !important;
+    transform: rotate(5deg) !important;
   }
 
-  /* Card 2 (ChatGPT) — dominant front card, horizontally centred */
+  /* Card 2 (ChatGPT) — center main (dominant front card) */
   #hero-illustration .floating-2d > div:nth-child(2) {
     top:    200px !important;
     left:   calc(50% - 128px) !important;
     right:  auto !important;
     bottom: auto !important;
-    transform: rotate(3deg) !important;
+    transform: rotate(2deg) !important;
   }
 
-  /* Card 3 (Spotify) — lower-right rear, no vertical overlap with Card 1 */
-  #hero-illustration .floating-2d > div:nth-child(3) {
-    top:    330px !important;
-    right:  10px !important;
-    left:   auto !important;
+  /* Card 1 (Netflix) — lower-left */
+  #hero-illustration .floating-2d > div:nth-child(1) {
+    top:    390px !important;
+    left:   5px !important;
+    right:  auto !important;
     bottom: auto !important;
-    transform: rotate(-4deg) !important;
+    transform: rotate(-5deg) !important;
   }
 }
 </style>
