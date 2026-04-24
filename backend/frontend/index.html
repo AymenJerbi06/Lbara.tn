@@ -134,6 +134,66 @@
     50%       { transform: scale(0.52) translateY(-8px) rotate(1deg); }
   }
 }
+
+/* ── Mobile portrait hero: remove desktop positioning, natural stacking ─── */
+@media screen and (max-width: 1023px) and (orientation: portrait) {
+
+  /* Drop the full-viewport-height lock and vertical centering */
+  #hero-section {
+    min-height: 0 !important;
+    align-items: flex-start !important;
+    padding-top: 5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  /* Tighten the gap between text block and cards block */
+  #hero-grid {
+    gap: 1.5rem !important;
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+
+  /* Let the illustration column shrink to fit its content instead of h-[600px] */
+  #hero-illustration {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Cards wrapper: switch from absolute-positioning canvas to a flex column */
+  #hero-illustration .floating-2d {
+    position: relative !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 0 0 0.75rem !important;
+    animation: none !important;
+  }
+
+  /* Each card: restore document flow, smaller size */
+  #hero-illustration .floating-2d > div {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 215px !important;
+    padding: 0.875rem !important;
+    box-shadow: 5px 5px 0 0 #003060 !important;
+  }
+
+  /* Alternate horizontal stagger + rotation for a layered depth feel */
+  #hero-illustration .floating-2d > div:nth-child(1) {
+    transform: rotate(-4deg) translateX(-14px) !important;
+  }
+  #hero-illustration .floating-2d > div:nth-child(2) {
+    transform: rotate(4deg) translateX(14px) !important;
+  }
+  #hero-illustration .floating-2d > div:nth-child(3) {
+    transform: rotate(-2deg) translateX(-7px) !important;
+  }
+}
 </style>
 </head>
 <body class="selection:bg-primary/30 selection:text-primary">
