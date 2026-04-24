@@ -135,7 +135,7 @@
   }
 }
 
-/* ── Mobile portrait hero: scaled triangular card group ─────────────────── */
+/* ── Mobile portrait hero: stacked card composition ─────────────────────── */
 @media screen and (max-width: 1023px) and (orientation: portrait) {
 
   #hero-section {
@@ -151,59 +151,54 @@
     padding-right: 1.25rem !important;
   }
 
-  /* Container sized to the scaled group; clips nothing */
+  /* Tall enough to hold all three full-size cards; overflow:visible so the
+     float animation never collides with a hard clipping edge.            */
   #hero-illustration {
-    height: 520px !important;
-    overflow: hidden !important;
+    height: 580px !important;
+    overflow: visible !important;
   }
 
-  /* scale(0.82) with origin at top-center shrinks the 600px canvas to
-     ~492px visual height. margin-top: 20px keeps Card 3's top clear of
-     the container edge even at the animation peak (visual shift ~10px). */
+  /* Canvas stays at 600px. margin-top: 35px gives the top card 20px of
+     clearance above the container even at the animation peak (−15px):
+     35 − 15 = 20px minimum gap before the nav bar.                      */
   #hero-illustration .floating-2d {
     height: 600px !important;
-    margin-top: 20px !important;
-    transform-origin: top center !important;
-    animation: float2d-portrait 4s ease-in-out infinite !important;
+    margin-top: 35px !important;
   }
 
-  @keyframes float2d-portrait {
-    0%, 100% { transform: scale(0.82) translateY(0px) rotate(-0.5deg); }
-    50%       { transform: scale(0.82) translateY(-12px) rotate(0.5deg); }
-  }
+  /* ── Stacked composition: upper-left → center main → lower-right ───────
+     Card 1 (Netflix)   upper-left   container y   35 – 245 px
+       → icon + title fully visible; price hidden behind Card 2
+     Card 2 (ChatGPT)   center main  container y  165 – 375 px  (z-20, front)
+       → fully visible, dominant
+     Card 3 (Spotify)   lower-right  container y  325 – 535 px
+       → bottom ~half of icon + title + price visible below Card 2      */
 
-  /* ── Diagonal stack: upper-right → center main → lower-left ────────────
-     Card 3 (Spotify)  upper-right   visual ≈  28 – 200 px
-     Card 2 (ChatGPT)  center main   visual ≈ 184 – 356 px  (z-20, front)
-     Card 1 (Netflix)  lower-left    visual ≈ 340 – 512 px
-     Each adjacent pair overlaps ≈ 16 px (rear card's top-padding only)
-     so every icon and title is clearly visible.                          */
-
-  /* Card 3 (Spotify) — upper-right */
-  #hero-illustration .floating-2d > div:nth-child(3) {
-    top:    10px !important;
-    right:  5px !important;
-    left:   auto !important;
-    bottom: auto !important;
-    transform: rotate(5deg) !important;
-  }
-
-  /* Card 2 (ChatGPT) — center main (dominant front card) */
-  #hero-illustration .floating-2d > div:nth-child(2) {
-    top:    200px !important;
-    left:   calc(50% - 128px) !important;
-    right:  auto !important;
-    bottom: auto !important;
-    transform: rotate(2deg) !important;
-  }
-
-  /* Card 1 (Netflix) — lower-left */
+  /* Card 1 (Netflix) — upper-left, behind main */
   #hero-illustration .floating-2d > div:nth-child(1) {
-    top:    390px !important;
+    top:    0px !important;
     left:   5px !important;
     right:  auto !important;
     bottom: auto !important;
-    transform: rotate(-5deg) !important;
+    transform: rotate(-6deg) !important;
+  }
+
+  /* Card 2 (ChatGPT) — center main (dominant, z-20) */
+  #hero-illustration .floating-2d > div:nth-child(2) {
+    top:    130px !important;
+    left:   calc(50% - 128px) !important;
+    right:  auto !important;
+    bottom: auto !important;
+    transform: rotate(3deg) !important;
+  }
+
+  /* Card 3 (Spotify) — lower-right, behind main */
+  #hero-illustration .floating-2d > div:nth-child(3) {
+    top:    290px !important;
+    right:  5px !important;
+    left:   auto !important;
+    bottom: auto !important;
+    transform: rotate(-4deg) !important;
   }
 }
 </style>
