@@ -42,11 +42,11 @@ function renderProducts() {
     grid.innerHTML = products.map(function (p) {
       var badgeHtml = p.badge ? '<span style="position:absolute;top:10px;right:10px;background:#003060;color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:0.08em;">' + p.badge + '</span>' : '';
       var headerHtml = p.image_url
-        ? '<div style="position:relative;overflow:hidden;min-height:120px;">'
-            + '<img src="' + p.image_url + '" alt="' + p.name + '" style="width:100%;height:120px;object-fit:cover;display:block;"/>'
+        ? '<div class="shop-card-img-hdr" style="position:relative;overflow:hidden;">'
+            + '<img src="' + p.image_url + '" alt="' + p.name + '" class="shop-card-img"/>'
             + badgeHtml
           + '</div>'
-        : '<div style="position:relative;background:rgba(0,48,96,0.05);padding:24px;display:flex;align-items:center;justify-content:space-between;min-height:96px;">'
+        : '<div class="shop-card-icon-hdr" style="position:relative;background:rgba(0,48,96,0.05);display:flex;align-items:center;justify-content:space-between;">'
             + '<span class="material-symbols-outlined text-primary text-4xl">' + (CATEGORY_ICONS[p.category] || 'stars') + '</span>'
             + badgeHtml
           + '</div>';
@@ -55,7 +55,7 @@ function renderProducts() {
         + '<div class="p-6 flex flex-col flex-grow" style="flex:1;">'
         + '<p class="text-xs font-black text-secondary uppercase tracking-widest mb-1">' + p.provider + '</p>'
         + '<h3 class="font-headline font-bold text-primary text-lg leading-tight mb-2">' + p.name + '</h3>'
-        + '<p class="text-sm text-on-surface/60 font-medium flex-grow mb-4">' + (p.description || '') + '</p>'
+        + '<p class="text-sm text-on-surface/60 font-medium flex-grow mb-4 shop-card-desc">' + (p.description || '') + '</p>'
         + '<div class="flex items-center gap-2 mb-4">'
         + '<span class="text-xs font-bold bg-primary/5 text-primary px-2 py-1 rounded-lg">' + (p.account_type === 'private' ? 'Private' : 'Shared') + '</span>'
         + '<span class="text-xs font-bold bg-secondary/5 text-secondary px-2 py-1 rounded-lg">' + (p.duration_label || '1 Month') + '</span>'
@@ -148,7 +148,8 @@ document.addEventListener('DOMContentLoaded', function () {
       currentCategory = btn.dataset.category;
       currentPage = 1;
       document.querySelectorAll('[data-category]').forEach(function (b) { b.classList.remove('active'); });
-      btn.classList.add('active');
+      // Activate all elements matching this category (desktop sidebar + mobile chips)
+      document.querySelectorAll('[data-category="' + btn.dataset.category + '"]').forEach(function (b) { b.classList.add('active'); });
       renderProducts();
     });
   });
