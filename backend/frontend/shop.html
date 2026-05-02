@@ -65,35 +65,88 @@
 .shop-chip:active { transform: translate(2px, 2px); box-shadow: none; }
 
 /* ── Card image/icon header sizes (class-driven so CSS can override) */
-.shop-card-img-hdr { min-height: 120px; }
-.shop-card-img     { height: 120px; width: 100%; object-fit: cover; display: block; }
+.shop-card-img-hdr {
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+  background: linear-gradient(135deg, rgba(0,48,96,0.96), rgba(0,95,75,0.9));
+  border-bottom: 2px solid rgba(0,48,96,0.08);
+}
+/* Soft gradient fade at the bottom of every product image */
+.shop-card-img-hdr::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 28px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.72) 100%);
+  pointer-events: none;
+}
+.shop-card-img     { height: 100%; width: 100%; object-fit: cover; display: block; transition: transform 0.18s ease; }
 .shop-card-icon-hdr { padding: 24px; min-height: 96px; }
+.shop-product-card { cursor: pointer; color: inherit; }
+.shop-product-card:hover .shop-card-img { transform: scale(1.025); }
 
-/* ── Mobile compact cards ───────────────────────────────────────── */
+/* ── Mobile readable product cards ───────────────────────────────── */
 @media (max-width: 767px) {
-  .shop-card-img-hdr  { min-height: 72px; }
-  .shop-card-img      { height: 72px; }
-  .shop-card-icon-hdr { padding: 14px; min-height: 60px; }
+  #products-grid {
+    gap: 18px !important;
+  }
+  #products-grid .shop-product-card {
+    flex-direction: column !important;
+    min-height: 0;
+    border-width: 3px !important;
+    box-shadow: 5px 5px 0 #003060 !important;
+  }
+  .shop-card-img-hdr  {
+    aspect-ratio: auto;
+    width: 100%;
+    height: clamp(142px, 42vw, 176px);
+    min-height: 0;
+    flex-shrink: 0;
+    border-bottom: 2px solid rgba(0,48,96,0.08);
+    border-right: 0;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(248,250,252,0.98), rgba(0,48,96,0.08));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .shop-card-img-hdr::after { display: none; }
+  .shop-card-img      {
+    height: 100%;
+    width: 100%;
+    object-fit: contain !important;
+    border-radius: 14px;
+  }
+  .shop-card-icon-hdr {
+    width: 100%;
+    min-height: 132px;
+    flex-shrink: 0;
+    padding: 20px;
+  }
 
-  #products-grid .p-6          { padding: 12px !important; }
-  #products-grid h3            { font-size: 0.875rem !important; margin-bottom: 4px !important; }
+  #products-grid .p-6          { padding: 15px !important; min-width: 0; }
+  #products-grid h3            { font-size: 1.08rem !important; line-height: 1.16 !important; margin-bottom: 6px !important; }
   #products-grid .shop-card-desc {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     flex-grow: 0 !important;
-    font-size: 0.72rem !important;
-    margin-bottom: 8px !important;
+    font-size: 0.82rem !important;
+    line-height: 1.35 !important;
+    margin-bottom: 12px !important;
   }
-  #products-grid .text-2xl     { font-size: 1.05rem !important; }
-  #products-grid [data-action] { padding: 5px 8px !important; font-size: 11px !important; }
-  #products-grid [data-action] .material-symbols-outlined { font-size: 14px !important; }
-  #products-grid .gap-2.mb-4   { gap: 4px !important; margin-bottom: 6px !important; }
-  #products-grid .pt-4         { padding-top: 8px !important; }
-  #products-grid .text-xs.mb-1 { margin-bottom: 2px !important; }
+  #products-grid .text-xs      { font-size: 0.68rem !important; }
+  #products-grid .text-xl      { font-size: 1rem !important; line-height: 1.15 !important; }
+  #products-grid .gap-2.mb-4   { gap: 6px !important; margin-bottom: 12px !important; }
+  #products-grid .gap-2.mb-4 span { padding: 4px 8px !important; border-radius: 9px !important; }
+  #products-grid .pt-4         { padding-top: 12px !important; }
+  #products-grid .text-xs.mb-1 { margin-bottom: 4px !important; }
+  #products-grid .w-10.h-10    { width: 34px !important; height: 34px !important; }
+  #products-grid .w-10.h-10 .material-symbols-outlined { font-size: 18px !important; }
 }
 </style>
+<link href="/css/mobile.css" rel="stylesheet"/>
 </head>
 <body class="selection:bg-primary/30 selection:text-primary">
 
@@ -162,6 +215,27 @@
     <button data-category="education" class="shop-chip">
       <span class="material-symbols-outlined" style="font-size:15px;line-height:1">school</span>Education
     </button>
+    <button data-category="gift_cards" class="shop-chip">
+      <span class="material-symbols-outlined" style="font-size:15px;line-height:1">redeem</span>Gift Cards
+    </button>
+    <button data-category="social" class="shop-chip">
+      <span class="material-symbols-outlined" style="font-size:15px;line-height:1">alternate_email</span>Social
+    </button>
+    <button data-category="storage" class="shop-chip">
+      <span class="material-symbols-outlined" style="font-size:15px;line-height:1">cloud</span>Storage
+    </button>
+    <button data-category="cloud" class="shop-chip">
+      <span class="material-symbols-outlined" style="font-size:15px;line-height:1">cloud_queue</span>Cloud
+    </button>
+    <button data-category="vpn" class="shop-chip">
+      <span class="material-symbols-outlined" style="font-size:15px;line-height:1">vpn_key</span>VPN
+    </button>
+    <button data-category="books" class="shop-chip">
+      <span class="material-symbols-outlined" style="font-size:15px;line-height:1">menu_book</span>Books
+    </button>
+    <button data-category="lifestyle" class="shop-chip">
+      <span class="material-symbols-outlined" style="font-size:15px;line-height:1">favorite</span>Lifestyle
+    </button>
   </div>
 </div>
 
@@ -191,6 +265,27 @@
           <button data-category="education" class="filter-item">
             <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">school</span> Education</span>
           </button>
+          <button data-category="gift_cards" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">redeem</span> Gift Cards</span>
+          </button>
+          <button data-category="social" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">alternate_email</span> Social</span>
+          </button>
+          <button data-category="storage" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">cloud</span> Storage</span>
+          </button>
+          <button data-category="cloud" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">cloud_queue</span> Cloud</span>
+          </button>
+          <button data-category="vpn" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">vpn_key</span> VPN</span>
+          </button>
+          <button data-category="books" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">menu_book</span> Books</span>
+          </button>
+          <button data-category="lifestyle" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">favorite</span> Lifestyle</span>
+          </button>
         </div>
       </div>
     </aside>
@@ -206,7 +301,15 @@
       </div>
 
       <!-- Pagination -->
-      <div id="pagination" class="flex items-center justify-center gap-2 mt-12"></div>
+      <div id="pagination" class="flex flex-wrap items-center justify-center gap-2 mt-12"></div>
+      <div id="request-service-cta" class="hidden cartoon-card rounded-3xl p-6 md:p-8 mt-10 text-center">
+        <h2 class="font-headline text-2xl md:text-3xl font-black text-primary mb-3">Can't find what you are looking for?</h2>
+        <p class="text-primary/60 font-bold max-w-2xl mx-auto mb-6">Tell us the service, course, app, or subscription you need and we will check whether it can be added to Lbara.tn.</p>
+        <a href="/contact.html?category=request_service" class="cartoon-button inline-flex items-center justify-center gap-2 bg-primary text-white font-black px-6 py-3 rounded-2xl">
+          <span class="material-symbols-outlined">forum</span>
+          Request a service
+        </a>
+      </div>
     </div>
 
   </div>
@@ -257,44 +360,6 @@
     </div>
   </div>
 </footer>
-
-<!-- Product Details Modal -->
-<div id="details-modal" style="display:none" class="fixed inset-0 z-50 flex items-center justify-center px-4">
-  <div id="details-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-  <div class="relative cartoon-card rounded-3xl p-8 w-full max-w-lg z-10 bg-white">
-    <button id="details-close" class="absolute top-4 right-4 text-primary/50 hover:text-primary transition-colors">
-      <span class="material-symbols-outlined text-2xl">close</span>
-    </button>
-    <div class="flex items-center gap-3 mb-2">
-      <span id="modal-provider" class="text-xs font-black text-secondary uppercase tracking-widest"></span>
-      <span id="modal-badge" class="text-[10px] font-black bg-primary text-white px-3 py-1 rounded-full uppercase tracking-widest" style="display:none"></span>
-    </div>
-    <h2 id="modal-name" class="font-headline font-bold text-primary text-2xl mb-4"></h2>
-    <p id="modal-description" class="text-on-surface/70 font-medium leading-relaxed mb-6"></p>
-    <div class="grid grid-cols-2 gap-3 mb-6">
-      <div class="bg-primary/5 rounded-xl p-3">
-        <p class="text-[10px] font-black text-primary/50 uppercase tracking-widest mb-1">Account Type</p>
-        <p id="modal-account-type" class="font-bold text-primary text-sm"></p>
-      </div>
-      <div class="bg-primary/5 rounded-xl p-3">
-        <p class="text-[10px] font-black text-primary/50 uppercase tracking-widest mb-1">Duration</p>
-        <p id="modal-duration" class="font-bold text-primary text-sm"></p>
-      </div>
-      <div class="bg-primary/5 rounded-xl p-3">
-        <p class="text-[10px] font-black text-primary/50 uppercase tracking-widest mb-1">Delivery</p>
-        <p id="modal-delivery" class="font-bold text-primary text-sm"></p>
-      </div>
-      <div class="bg-primary/5 rounded-xl p-3">
-        <p class="text-[10px] font-black text-primary/50 uppercase tracking-widest mb-1">Price</p>
-        <p id="modal-price" class="font-bold text-primary text-sm"></p>
-      </div>
-    </div>
-    <button id="modal-buy-btn" class="w-full cartoon-button bg-primary text-white font-black py-3 rounded-2xl text-base flex items-center justify-center gap-2">
-      <span class="material-symbols-outlined">add_shopping_cart</span>
-      Buy Now
-    </button>
-  </div>
-</div>
 
 <script src="/js/api.js"></script>
 <script src="/js/shop.js"></script>

@@ -3,25 +3,68 @@ const audit = require('../utils/audit');
 const { generateOrderRef } = require('../utils/orderRef');
 const emailService = require('../services/emailService');
 const paymentService = require('../services/paymentService');
+const { encrypt } = require('../utils/crypto');
+const { normalizeFulfillmentForOrder } = require('../utils/fulfillment');
+const {
+  rejectUnexpectedFields,
+  cleanEmail,
+  cleanString,
+  cleanUuid,
+  cleanPhone,
+  badRequest,
+  handleValidationError,
+} = require('../utils/validation');
 
 async function create(req, res) {
-  const { product_id, delivery_email, delivery_phone, payment_method, promo_code } = req.body;
-
-  if (!product_id || !delivery_email) {
-    return res.status(400).json({ success: false, message: 'Product and delivery email are required.' });
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(delivery_email)) {
-    return res.status(400).json({ success: false, message: 'Invalid delivery email address.' });
-  }
-  if (typeof product_id !== 'string' || !/^[0-9a-f-]{36}$/.test(product_id)) {
-    return res.status(400).json({ success: false, message: 'Invalid product.' });
-  }
-
   try {
+    rejectUnexpectedFields(req.body, [
+      'product_id',
+      'variant_id',
+      'delivery_email',
+      'delivery_phone',
+      'promo_code',
+      'fulfillment_method',
+      'fulfillment_details',
+    ], 'Checkout');
+
+    const product_id = cleanUuid(req.body.product_id, { label: 'Product' });
+    const variant_id = cleanUuid(req.body.variant_id, { label: 'Product option', required: false });
+    const delivery_email = cleanEmail(req.body.delivery_email, { label: 'Delivery email' });
+    const delivery_phone = cleanPhone(req.body.delivery_phone);
+    const promo_code = cleanString(req.body.promo_code, { label: 'Promo code', required: false, max: 50 });
+    const fulfillment_method = cleanString(req.body.fulfillment_method, { label: 'Fulfillment method', required: false, max: 80 });
+    if (req.body.fulfillment_details !== undefined && (typeof req.body.fulfillment_details !== 'object' || Array.isArray(req.body.fulfillment_details))) {
+      throw badRequest('Fulfillment details must be an object.');
+    }
+    const fulfillment_details = req.body.fulfillment_details || {};
+
     // Load product
     const productResult = await pool.query('SELECT * FROM products WHERE id = $1 AND active = TRUE', [product_id]);
     const product = productResult.rows[0];
     if (!product) return res.status(404).json({ success: false, message: 'Product not found.' });
+
+    const variantCountResult = await pool.query(
+      'SELECT COUNT(*)::int AS count FROM product_variants WHERE product_id = $1 AND active = TRUE',
+      [product_id]
+    );
+    const hasVariants = variantCountResult.rows[0].count > 0;
+    let variant = null;
+
+    if (hasVariants && !variant_id) {
+      return res.status(400).json({ success: false, message: 'Please choose a product option before checkout.' });
+    }
+
+    if (variant_id) {
+      const variantResult = await pool.query(
+        'SELECT * FROM product_variants WHERE id = $1 AND product_id = $2 AND active = TRUE',
+        [variant_id, product_id]
+      );
+      variant = variantResult.rows[0];
+      if (!variant) return res.status(404).json({ success: false, message: 'Product option not found.' });
+    }
+
+    const fulfillment = normalizeFulfillmentForOrder(product, fulfillment_method, fulfillment_details || {});
+    const encryptedFulfillmentDetails = encrypt(JSON.stringify(fulfillment.fulfillment_details));
 
     // Fraud: max 5 pending orders per IP in 24h
     const fraudCheck = await pool.query(
@@ -34,6 +77,22 @@ async function create(req, res) {
     }
 
     let amount = parseFloat(product.price_tnd);
+    if (variant) {
+      if (variant.checkout_mode === 'quote') {
+        amount = variant.deposit_tnd === null || variant.deposit_tnd === undefined ? NaN : parseFloat(variant.deposit_tnd);
+      } else {
+        amount = variant.price_tnd === null || variant.price_tnd === undefined ? NaN : parseFloat(variant.price_tnd);
+      }
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      const optionName = variant ? ` for ${variant.name}` : '';
+      return res.status(409).json({
+        success: false,
+        message: `Pricing is not ready${optionName}. Please contact us before ordering this service.`,
+      });
+    }
+
     let discount = 0;
 
     // Basic promo code logic (extend as needed)
@@ -46,18 +105,22 @@ async function create(req, res) {
     const gateway = process.env.PAYMENT_GATEWAY || 'flouci';
 
     const orderResult = await pool.query(
-      `INSERT INTO orders (order_ref, user_id, product_id, amount_tnd, gateway, delivery_email, delivery_phone, promo_code, discount_tnd, ip_address, user_agent)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      `INSERT INTO orders (order_ref, user_id, product_id, variant_id, amount_tnd, gateway, delivery_email, delivery_phone, fulfillment_type, fulfillment_method, fulfillment_details, promo_code, discount_tnd, ip_address, user_agent)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING *`,
       [
         orderRef,
         req.user?.id || null,
         product_id,
-        product.price_tnd,
+        variant?.id || null,
+        amount,
         gateway,
-        delivery_email.toLowerCase(),
-        delivery_phone || null,
-        promo_code || null,
+        delivery_email,
+        delivery_phone,
+        fulfillment.fulfillment_type,
+        fulfillment.fulfillment_method,
+        encryptedFulfillmentDetails,
+        promo_code,
         discount,
         req.ip,
         req.headers['user-agent'],
@@ -83,7 +146,19 @@ async function create(req, res) {
       [order.id, gateway, paymentSession.payment_id]
     );
 
-    await audit.log({ entityType: 'order', entityId: order.id, action: 'created', actorId: req.user?.id, actorType: req.user ? 'user' : 'guest', metadata: { order_ref: orderRef, product: product.name } });
+    await audit.log({
+      entityType: 'order',
+      entityId: order.id,
+      action: 'created',
+      actorId: req.user?.id,
+      actorType: req.user ? 'user' : 'guest',
+      metadata: {
+        order_ref: orderRef,
+        product: product.name,
+        variant: variant?.name || null,
+        checkout_mode: variant?.checkout_mode || 'full_payment',
+      },
+    });
 
     res.status(201).json({
       success: true,
@@ -92,6 +167,10 @@ async function create(req, res) {
       payment_url: paymentSession.payment_url,
     });
   } catch (err) {
+    if (err.statusCode) {
+      return res.status(err.statusCode).json({ success: false, message: err.message });
+    }
+    if (handleValidationError(err, res)) return;
     console.error('[orders/create]', err);
     res.status(500).json({ success: false, message: 'Failed to create order. Please try again.' });
   }
@@ -99,23 +178,28 @@ async function create(req, res) {
 
 async function getOrder(req, res) {
   try {
+    const id = cleanUuid(req.params.id, { label: 'Order' });
     const result = await pool.query(
-      `SELECT o.*, p.name AS product_name, p.provider, p.category, p.account_type, p.duration_label
+      `SELECT o.*, p.name AS product_name, p.provider, p.category, p.account_type, p.duration_label,
+              v.name AS variant_name, v.billing_period AS variant_billing_period, v.checkout_mode AS variant_checkout_mode
        FROM orders o
        JOIN products p ON p.id = o.product_id
-       WHERE o.id = $1`,
-      [req.params.id]
+       LEFT JOIN product_variants v ON v.id = o.variant_id
+      WHERE o.id = $1`,
+      [id]
     );
     const order = result.rows[0];
     if (!order) return res.status(404).json({ success: false, message: 'Order not found.' });
 
-    // Only order owner or admin can view
-    if (req.user && !req.user.is_admin && order.user_id && order.user_id !== req.user.id) {
+    // Only order owner or admin can view full order details.
+    if (!req.user.is_admin && order.user_id !== req.user.id) {
       return res.status(403).json({ success: false, message: 'Access denied.' });
     }
 
+    delete order.fulfillment_details;
     res.json({ success: true, order });
   } catch (err) {
+    if (handleValidationError(err, res)) return;
     res.status(500).json({ success: false, message: 'Failed to fetch order.' });
   }
 }
@@ -123,14 +207,20 @@ async function getOrder(req, res) {
 async function myOrders(req, res) {
   try {
     const result = await pool.query(
-      `SELECT o.*, p.name AS product_name, p.provider, p.category
+      `SELECT o.*, p.name AS product_name, p.provider, p.category,
+              v.name AS variant_name, v.billing_period AS variant_billing_period, v.checkout_mode AS variant_checkout_mode
        FROM orders o
        JOIN products p ON p.id = o.product_id
+       LEFT JOIN product_variants v ON v.id = o.variant_id
        WHERE o.user_id = $1
        ORDER BY o.created_at DESC`,
       [req.user.id]
     );
-    res.json({ success: true, orders: result.rows });
+    const orders = result.rows.map((order) => {
+      delete order.fulfillment_details;
+      return order;
+    });
+    res.json({ success: true, orders });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to fetch orders.' });
   }

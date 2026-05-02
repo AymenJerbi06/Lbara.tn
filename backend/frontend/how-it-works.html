@@ -30,6 +30,7 @@
   .vibrant-gradient { background: linear-gradient(135deg, #001F3F 0%, #000C1A 100%); }
   .step-number { @apply w-12 h-12 rounded-full bg-primary text-white font-black text-xl flex items-center justify-center flex-shrink-0; }
 </style>
+<link href="/css/mobile.css" rel="stylesheet"/>
 </head>
 <body class="selection:bg-primary/30 selection:text-primary">
 
@@ -73,6 +74,9 @@
     How It <span class="text-accent">Works</span>
   </h1>
   <p class="text-white/60 font-bold text-lg max-w-xl mx-auto">
+    Every global service has its own activation path. The product you choose determines which checkout options are available.
+  </p>
+  <p class="hidden">
     Get your favourite digital services delivered to your inbox in as little as 2 hours — no VPN needed.
   </p>
 </section>
@@ -104,6 +108,9 @@
           <h2 class="font-headline text-2xl font-black text-primary">Checkout Securely</h2>
         </div>
         <p class="text-on-surface/70 font-medium leading-relaxed">
+          Enter your delivery email, then choose from the activation methods available for that specific product. You are not choosing between all three delivery paths every time; the service you picked determines what we can offer.
+        </p>
+        <p class="hidden">
           Enter your delivery email — this is where your credentials or activation code will be sent. Pay safely via <strong class="text-primary">Flouci</strong> or <strong class="text-primary">Paymee</strong>, Tunisia's trusted payment gateways.
         </p>
       </div>
@@ -115,9 +122,26 @@
       <div class="flex-grow">
         <div class="flex items-center gap-3 mb-3">
           <span class="material-symbols-outlined text-accent text-3xl" style="font-variation-settings:'FILL' 1;">lock_open</span>
-          <h2 class="font-headline text-2xl font-black text-primary">Receive Your Credentials</h2>
+          <h2 class="font-headline text-2xl font-black text-primary">Follow the Right Activation Steps</h2>
         </div>
         <p class="text-on-surface/70 font-medium leading-relaxed">
+          Once your payment is confirmed, our team follows the method selected for that product. Gift-card products may offer code delivery or assisted redemption. Giftable subscriptions only need the email linked to your service account. Card-only services may require existing-account access or a new account created with an email you control.
+        </p>
+        <div class="mt-5 grid grid-cols-1 gap-3">
+          <div class="bg-primary/5 border-2 border-primary/10 rounded-2xl p-4">
+            <p class="font-black text-primary text-sm uppercase">Gift card / store credit</p>
+            <p class="text-sm text-on-surface/65 font-bold mt-1">Shown only for products that support gift cards or store credit. We may send the code, redeem it for you, or guide Apple App Store / Google Play credit setup.</p>
+          </div>
+          <div class="bg-secondary/10 border-2 border-secondary/20 rounded-2xl p-4">
+            <p class="font-black text-secondary text-sm uppercase">Giftable subscription</p>
+            <p class="text-sm text-on-surface/65 font-bold mt-1">Shown only for services that allow subscriptions to be gifted. You provide the email linked to your existing service account.</p>
+          </div>
+          <div class="bg-accent/10 border-2 border-accent/20 rounded-2xl p-4">
+            <p class="font-black text-accent text-sm uppercase">Account setup</p>
+            <p class="text-sm text-on-surface/65 font-bold mt-1">Shown only when the service must be paid for directly by card. You may be asked for an existing account or an email for a new account.</p>
+          </div>
+        </div>
+        <p class="hidden">
           Once your payment is confirmed, our team manually reviews and delivers your credentials by email — usually within <strong class="text-primary">2 hours</strong>. You'll also see your order status update in real time.
         </p>
       </div>
@@ -132,6 +156,9 @@
           <h2 class="font-headline text-2xl font-black text-primary">Start Enjoying</h2>
         </div>
         <p class="text-on-surface/70 font-medium leading-relaxed">
+          Follow the instructions we send you and start streaming, creating, or gaming. If your service has region or redemption steps, they will be included with your delivery email.
+        </p>
+        <p class="hidden">
           Log in with the details we send you and start streaming, creating, or gaming — no geo-restrictions, no VPN required, all from Tunisia.
         </p>
       </div>

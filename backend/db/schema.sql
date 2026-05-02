@@ -30,17 +30,35 @@ CREATE TABLE IF NOT EXISTS products (
   account_type     VARCHAR(50) DEFAULT 'private',  -- private | shared
   duration_label   VARCHAR(100),            -- e.g. "1 Month"
   delivery_hours   INTEGER DEFAULT 2,
+  fulfillment_type VARCHAR(50) DEFAULT 'account_setup',
   active           BOOLEAN DEFAULT TRUE,
   image_url        TEXT,
   created_at       TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- ─── Orders ───────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS product_variants (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id      UUID REFERENCES products(id) ON DELETE CASCADE,
+  slug            VARCHAR(255) NOT NULL,
+  name            VARCHAR(255) NOT NULL,
+  description     TEXT,
+  billing_period  VARCHAR(80),
+  price_tnd       NUMERIC(10, 3),
+  checkout_mode   VARCHAR(30) DEFAULT 'full_payment',
+  deposit_tnd     NUMERIC(10, 3),
+  sort_order      INTEGER DEFAULT 100,
+  active          BOOLEAN DEFAULT TRUE,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(product_id, slug)
+);
+
 CREATE TABLE IF NOT EXISTS orders (
   id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_ref           VARCHAR(20) UNIQUE NOT NULL,   -- e.g. LB-82941
   user_id             UUID REFERENCES users(id),
   product_id          UUID REFERENCES products(id),
+  variant_id          UUID REFERENCES product_variants(id),
   status              VARCHAR(30) DEFAULT 'pending_payment',
   -- statuses: draft | pending_payment | payment_failed | paid | processing | fulfilled | cancelled | refunded | flagged
   amount_tnd          NUMERIC(10, 3) NOT NULL,
@@ -48,6 +66,9 @@ CREATE TABLE IF NOT EXISTS orders (
   gateway_payment_id  VARCHAR(255),
   delivery_email      VARCHAR(255) NOT NULL,
   delivery_phone      VARCHAR(30),
+  fulfillment_type    VARCHAR(50),
+  fulfillment_method  VARCHAR(80),
+  fulfillment_details TEXT,
   promo_code          VARCHAR(50),
   discount_tnd        NUMERIC(10, 3) DEFAULT 0,
   ip_address          VARCHAR(45),
@@ -112,22 +133,44 @@ CREATE INDEX IF NOT EXISTS idx_payments_order_id ON payments(order_id);
 CREATE INDEX IF NOT EXISTS idx_fulfillments_order_id ON fulfillments(order_id);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_active ON products(active);
+CREATE INDEX IF NOT EXISTS idx_product_variants_product_id ON product_variants(product_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
 
 -- ─── Password Reset Columns (safe to run on existing DB) ──
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token VARCHAR(128);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_token VARCHAR(128);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expires TIMESTAMPTZ;
 
 -- ─── Product Image URL (safe to run on existing DB) ──────
 ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS fulfillment_type VARCHAR(50) DEFAULT 'account_setup';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS variant_id UUID REFERENCES product_variants(id);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_type VARCHAR(50);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_method VARCHAR(80);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_details TEXT;
 
 -- ─── Seed Products ────────────────────────────────────────
-INSERT INTO products (slug, name, provider, category, description, price_tnd, badge, account_type, duration_label, delivery_hours)
+INSERT INTO products (slug, name, provider, category, description, price_tnd, badge, account_type, duration_label, delivery_hours, fulfillment_type)
 VALUES
-  ('netflix-premium-1m', 'Netflix Premium', 'Netflix', 'streaming', 'Ultra HD 4K streaming on 4 screens simultaneously. Private account.', 25.000, 'POPULAR', 'private', '1 Month', 2),
-  ('chatgpt-plus-1m', 'ChatGPT Plus', 'OpenAI', 'ai_tools', 'GPT-4o access with priority responses and advanced features.', 65.000, 'POPULAR', 'private', '1 Month', 2),
-  ('spotify-family-1m', 'Spotify Family', 'Spotify', 'streaming', 'Up to 6 accounts, offline listening, no ads.', 18.000, 'INSTANT', 'shared', '1 Month', 1),
-  ('canva-pro-1m', 'Canva Pro', 'Canva', 'productivity', 'Unlimited templates, brand kit, background remover and more.', 45.000, 'POPULAR', 'private', '1 Month', 2),
-  ('youtube-premium-1m', 'YouTube Premium', 'Google', 'streaming', 'Ad-free YouTube, background play, YouTube Music included.', 22.000, 'INSTANT', 'private', '1 Month', 2),
-  ('adobe-cc-1m', 'Adobe Creative Cloud', 'Adobe', 'productivity', 'Full suite: Photoshop, Illustrator, Premiere Pro and more.', 120.000, NULL, 'private', '1 Month', 4)
+  ('netflix-premium-1m', 'Netflix Premium', 'Netflix', 'streaming', 'Ultra HD 4K streaming on 4 screens simultaneously. Private account.', 25.000, 'POPULAR', 'private', '1 Month', 2, 'gift_card'),
+  ('chatgpt-plus-1m', 'ChatGPT Plus', 'OpenAI', 'ai_tools', 'GPT-4o access with priority responses and advanced features.', 65.000, 'POPULAR', 'private', '1 Month', 2, 'giftable_subscription'),
+  ('spotify-family-1m', 'Spotify Family', 'Spotify', 'streaming', 'Up to 6 accounts, offline listening, no ads.', 18.000, 'INSTANT', 'shared', '1 Month', 1, 'account_setup'),
+  ('canva-pro-1m', 'Canva Pro', 'Canva', 'productivity', 'Unlimited templates, brand kit, background remover and more.', 45.000, 'POPULAR', 'private', '1 Month', 2, 'account_setup'),
+  ('youtube-premium-1m', 'YouTube Premium', 'Google', 'streaming', 'Ad-free YouTube, background play, YouTube Music included.', 22.000, 'INSTANT', 'private', '1 Month', 2, 'gift_card'),
+  ('adobe-cc-1m', 'Adobe Creative Cloud', 'Adobe', 'productivity', 'Full suite: Photoshop, Illustrator, Premiere Pro and more.', 120.000, NULL, 'private', '1 Month', 4, 'account_setup')
 ON CONFLICT (slug) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS schema_migrations (
+  key        VARCHAR(120) PRIMARY KEY,
+  applied_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM schema_migrations WHERE key = 'fulfillment_seed_v1') THEN
+    UPDATE products SET fulfillment_type = 'gift_card' WHERE slug IN ('netflix-premium-1m', 'youtube-premium-1m') AND fulfillment_type = 'account_setup';
+    UPDATE products SET fulfillment_type = 'giftable_subscription' WHERE slug = 'chatgpt-plus-1m' AND fulfillment_type = 'account_setup';
+    INSERT INTO schema_migrations (key) VALUES ('fulfillment_seed_v1');
+  END IF;
+END $$;

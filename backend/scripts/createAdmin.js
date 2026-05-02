@@ -10,9 +10,9 @@ const PASSWORD = process.env.ADMIN_PASSWORD || 'ChangeMe123!';
 async function run() {
   const hash = await bcrypt.hash(PASSWORD, 12);
   const result = await pool.query(
-    `INSERT INTO users (email, password_hash, full_name, is_admin)
-     VALUES ($1, $2, 'Admin', TRUE)
-     ON CONFLICT (email) DO UPDATE SET is_admin = TRUE, password_hash = $2
+    `INSERT INTO users (email, password_hash, full_name, is_admin, is_verified)
+     VALUES ($1, $2, 'Admin', TRUE, TRUE)
+     ON CONFLICT (email) DO UPDATE SET is_admin = TRUE, is_verified = TRUE, password_hash = $2
      RETURNING id, email, is_admin`,
     [EMAIL.toLowerCase(), hash]
   );

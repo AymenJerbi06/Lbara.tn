@@ -11,12 +11,15 @@ const orderRoutes = require('./src/routes/orders');
 const paymentRoutes = require('./src/routes/payments');
 const contactRoutes = require('./src/routes/contact');
 const adminRoutes = require('./src/routes/admin');
+const { ensureRuntimeMigrations } = require('./src/config/migrations');
+const { apiLimiter } = require('./src/middleware/rateLimiter');
 
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
 
 // Trust Railway/Render reverse proxy so req.ip and secure cookies work correctly
 app.set('trust proxy', 1);
+app.disable('x-powered-by');
 
 // ─── Security ────────────────────────────────────────────
 app.use(helmet({
@@ -36,11 +39,18 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3007',
+  origin(origin, callback) {
+    const allowed = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || 'http://localhost:3025')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+    if (!origin || allowed.includes(origin)) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(cookieParser());
 
 // ─── Request Logger ───────────────────────────────────────
@@ -59,7 +69,7 @@ app.use((req, res, next) => {
 // ─── Serve Frontend Static Files (no-cache on HTML so browsers always get fresh pages)
 app.use(express.static(path.join(__dirname, 'frontend'), {
   setHeaders(res, filePath) {
-    if (filePath.endsWith('.html')) {
+    if (filePath.endsWith('.html') || filePath.endsWith('.js') || filePath.endsWith('.css')) {
       res.setHeader('Cache-Control', 'no-store');
     }
   },
@@ -70,6 +80,7 @@ app.get('/health', (req, res) => res.json({ status: 'ok', env: process.env.NODE_
 
 
 // ─── API Routes ───────────────────────────────────────────
+app.use('/api', apiLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
@@ -105,6 +116,12 @@ async function start() {
     } catch (e) {
       console.error('[ERROR] DB migration failed:', e.message);
     }
+  }
+
+  try {
+    await ensureRuntimeMigrations();
+  } catch (e) {
+    console.error('[ERROR] Runtime DB migration failed:', e.message);
   }
 
   app.listen(PORT, () => {

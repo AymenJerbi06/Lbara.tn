@@ -1,8 +1,10 @@
 // Gateway abstraction layer — swap gateway via PAYMENT_GATEWAY env var
 const flouci = require('./flouciService');
 const paymee = require('./paymeeService');
+const mock = require('./mockPaymentService');
 
 function getGateway(name) {
+  if (name === 'mock') return mock;
   if (name === 'paymee') return paymee;
   return flouci; // default
 }

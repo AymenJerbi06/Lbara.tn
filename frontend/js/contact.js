@@ -8,6 +8,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!form) return;
 
+  const requestedService = new URLSearchParams(window.location.search).get('service')?.trim();
+  if (requestedService) {
+    const categoryEl = document.getElementById('contact-category');
+    const subjectEl = document.getElementById('contact-subject');
+    const messageEl = document.getElementById('contact-message');
+
+    if (categoryEl) categoryEl.value = 'request_service';
+    if (subjectEl && !subjectEl.value) subjectEl.value = `Service request: ${requestedService}`;
+    if (messageEl && !messageEl.value) {
+      messageEl.value = `Hi Lbara team,\n\nI would like to request this service: ${requestedService}\n\nPlease let me know if you can add it to the store.`;
+    }
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 

@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginError = document.getElementById('login-error');
 
   if (loginForm) {
+    const verified = new URLSearchParams(window.location.search).get('verified');
+    if (verified === '1') showToast('Email verified. You can log in now.');
+    if (verified === 'invalid') showToast('Verification link is invalid or expired.', 'error');
+
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim();
@@ -60,9 +64,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (signupError) signupError.classList.add('hidden');
 
       try {
-        await api.register({ email, password });
-        showToast('Account created! Welcome to Lbara.tn');
-        setTimeout(() => { window.location.href = '/shop.html'; }, 800);
+        const result = await api.register({ email, password });
+        if (result.verification_required) {
+          showToast('Account created. Please verify your email before logging in.');
+          setTimeout(() => { window.location.href = '/login.html'; }, 1200);
+        } else {
+          showToast('Account created! Welcome to Lbara.tn');
+          setTimeout(() => { window.location.href = '/shop.html'; }, 800);
+        }
       } catch (err) {
         if (signupError) {
           signupError.textContent = err.message;

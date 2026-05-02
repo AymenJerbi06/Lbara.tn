@@ -2,6 +2,31 @@ const pool = require('../config/db');
 const emailService = require('../services/emailService');
 const audit = require('../utils/audit');
 const { encrypt, decrypt } = require('../utils/crypto');
+const {
+  normalizeFulfillmentType,
+  getFulfillmentTypeLabel,
+  getFulfillmentMethodLabel,
+} = require('../utils/fulfillment');
+
+function decodeFulfillmentDetails(order) {
+  const type = normalizeFulfillmentType(order.fulfillment_type || order.product_fulfillment_type);
+  order.fulfillment_type = type;
+  order.fulfillment_type_label = getFulfillmentTypeLabel(type);
+  order.fulfillment_method_label = getFulfillmentMethodLabel(order.fulfillment_method);
+
+  if (!order.fulfillment_details) {
+    order.fulfillment_details = {};
+    return order;
+  }
+
+  try {
+    order.fulfillment_details = JSON.parse(decrypt(order.fulfillment_details));
+  } catch (err) {
+    order.fulfillment_details = { error: 'Could not decrypt checkout details.' };
+  }
+
+  return order;
+}
 
 // ─── Orders ───────────────────────────────────────────────
 
@@ -22,9 +47,12 @@ async function listOrders(req, res) {
 
   try {
     const result = await pool.query(
-      `SELECT o.*, p.name AS product_name, p.provider, u.email AS user_email
+      `SELECT o.*, p.name AS product_name, p.provider, p.fulfillment_type AS product_fulfillment_type,
+              v.name AS variant_name, v.billing_period AS variant_billing_period, v.checkout_mode AS variant_checkout_mode,
+              u.email AS user_email
        FROM orders o
        JOIN products p ON p.id = o.product_id
+       LEFT JOIN product_variants v ON v.id = o.variant_id
        LEFT JOIN users u ON u.id = o.user_id
        ${where}
        ORDER BY o.created_at DESC
@@ -35,9 +63,10 @@ async function listOrders(req, res) {
       `SELECT COUNT(*) FROM orders o ${where}`,
       params.slice(0, -2)
     );
+    const orders = result.rows.map(decodeFulfillmentDetails);
     res.json({
       success: true,
-      orders: result.rows,
+      orders,
       total: parseInt(countResult.rows[0].count),
     });
   } catch (err) {
@@ -56,8 +85,11 @@ async function fulfillOrder(req, res) {
 
   try {
     const orderResult = await pool.query(
-      `SELECT o.*, p.name AS product_name, p.provider, p.duration_label, p.delivery_hours
-       FROM orders o JOIN products p ON p.id = o.product_id
+      `SELECT o.*, p.name AS product_name, p.provider, p.duration_label, p.delivery_hours,
+              v.name AS variant_name, v.billing_period AS variant_billing_period
+       FROM orders o
+       JOIN products p ON p.id = o.product_id
+       LEFT JOIN product_variants v ON v.id = o.variant_id
        WHERE o.id = $1`,
       [id]
     );
@@ -80,7 +112,10 @@ async function fulfillOrder(req, res) {
 
     // Send delivery email (with plain credentials — not encrypted)
     try {
-      await emailService.sendFulfillmentEmail(order, { name: order.product_name, duration_label: order.duration_label }, credentials);
+      await emailService.sendFulfillmentEmail(order, {
+        name: order.variant_name ? `${order.product_name} - ${order.variant_name}` : order.product_name,
+        duration_label: order.variant_billing_period || order.duration_label,
+      }, credentials);
     } catch (emailErr) {
       console.error('[admin/fulfill email]', emailErr.message);
     }
@@ -112,23 +147,52 @@ async function updateOrderStatus(req, res) {
 
 async function listProducts(req, res) {
   try {
-    const result = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
+    const result = await pool.query(`
+      SELECT
+        p.*,
+        COUNT(v.id)::int AS variant_count,
+        MIN(v.price_tnd) FILTER (WHERE v.price_tnd IS NOT NULL)::numeric AS min_variant_price_tnd,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', v.id,
+              'slug', v.slug,
+              'name', v.name,
+              'description', v.description,
+              'billing_period', v.billing_period,
+              'price_tnd', v.price_tnd,
+              'checkout_mode', v.checkout_mode,
+              'deposit_tnd', v.deposit_tnd,
+              'sort_order', v.sort_order,
+              'active', v.active
+            )
+            ORDER BY v.sort_order, v.name
+          ) FILTER (WHERE v.id IS NOT NULL),
+          '[]'::json
+        ) AS variants
+      FROM products p
+      LEFT JOIN product_variants v ON v.product_id = p.id
+      GROUP BY p.id
+      ORDER BY p.created_at DESC
+    `);
     res.json({ success: true, products: result.rows });
   } catch (err) {
+    console.error('[admin/listProducts]', err);
     res.status(500).json({ success: false, message: 'Failed to load products.' });
   }
 }
 
 async function createProduct(req, res) {
-  const { slug, name, provider, category, description, price_tnd, badge, account_type, duration_label, delivery_hours, image_url } = req.body;
+  const { slug, name, provider, category, description, price_tnd, badge, account_type, duration_label, delivery_hours, image_url, fulfillment_type } = req.body;
   if (!slug || !name || !provider || !category || !price_tnd) {
     return res.status(400).json({ success: false, message: 'slug, name, provider, category, and price_tnd are required.' });
   }
+  const fulfillmentType = normalizeFulfillmentType(fulfillment_type);
   try {
     const result = await pool.query(
-      `INSERT INTO products (slug, name, provider, category, description, price_tnd, badge, account_type, duration_label, delivery_hours, image_url)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
-      [slug, name, provider, category, description || null, price_tnd, badge || null, account_type || 'private', duration_label || '1 Month', delivery_hours || 2, image_url || null]
+      `INSERT INTO products (slug, name, provider, category, description, price_tnd, badge, account_type, duration_label, delivery_hours, image_url, fulfillment_type)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
+      [slug, name, provider, category, description || null, price_tnd, badge || null, account_type || 'private', duration_label || '1 Month', delivery_hours || 2, image_url || null, fulfillmentType]
     );
     res.status(201).json({ success: true, product: result.rows[0] });
   } catch (err) {
@@ -139,24 +203,70 @@ async function createProduct(req, res) {
 
 async function updateProduct(req, res) {
   const { id } = req.params;
-  const fields = ['name', 'provider', 'category', 'description', 'price_tnd', 'badge', 'account_type', 'duration_label', 'delivery_hours', 'active', 'image_url'];
+  const fields = ['name', 'provider', 'category', 'description', 'price_tnd', 'badge', 'account_type', 'duration_label', 'delivery_hours', 'active', 'image_url', 'fulfillment_type'];
   const updates = [];
   const values = [];
 
   fields.forEach((f) => {
     if (req.body[f] !== undefined) {
-      values.push(req.body[f]);
+      values.push(f === 'fulfillment_type' ? normalizeFulfillmentType(req.body[f]) : req.body[f]);
       updates.push(`${f} = $${values.length}`);
     }
   });
 
-  if (!updates.length) return res.status(400).json({ success: false, message: 'No fields to update.' });
+  if (!updates.length && !Array.isArray(req.body.variants)) {
+    return res.status(400).json({ success: false, message: 'No fields to update.' });
+  }
   values.push(id);
 
   try {
-    await pool.query(`UPDATE products SET ${updates.join(', ')} WHERE id = $${values.length}`, values);
+    if (updates.length) {
+      await pool.query(`UPDATE products SET ${updates.join(', ')} WHERE id = $${values.length}`, values);
+    }
+
+    if (Array.isArray(req.body.variants)) {
+      for (const variant of req.body.variants) {
+        if (!variant.id || typeof variant.id !== 'string' || !/^[0-9a-f-]{36}$/.test(variant.id)) continue;
+
+        const price = variant.price_tnd === '' || variant.price_tnd === null || variant.price_tnd === undefined
+          ? null
+          : Number(variant.price_tnd);
+        const deposit = variant.deposit_tnd === '' || variant.deposit_tnd === null || variant.deposit_tnd === undefined
+          ? null
+          : Number(variant.deposit_tnd);
+
+        if ((price !== null && (!Number.isFinite(price) || price < 0)) || (deposit !== null && (!Number.isFinite(deposit) || deposit < 0))) {
+          return res.status(400).json({ success: false, message: 'Variant prices must be positive numbers.' });
+        }
+
+        await pool.query(
+          `UPDATE product_variants
+           SET name = COALESCE($1, name),
+               description = $2,
+               billing_period = $3,
+               price_tnd = $4,
+               checkout_mode = $5,
+               deposit_tnd = $6,
+               active = $7
+           WHERE id = $8 AND product_id = $9`,
+          [
+            variant.name || null,
+            variant.description || null,
+            variant.billing_period || null,
+            price,
+            variant.checkout_mode === 'quote' ? 'quote' : 'full_payment',
+            deposit,
+            variant.active !== false,
+            variant.id,
+            id,
+          ]
+        );
+      }
+    }
+
     res.json({ success: true });
   } catch (err) {
+    console.error('[admin/updateProduct]', err);
     res.status(500).json({ success: false, message: 'Failed to update product.' });
   }
 }

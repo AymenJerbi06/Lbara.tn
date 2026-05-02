@@ -92,6 +92,15 @@ function addToCart(productId, productName, priceTnd) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const searchInput = document.getElementById('shop-search');
+  const initialSearch = (params.get('search') || '').trim();
+
+  if (initialSearch) {
+    currentSearch = initialSearch;
+    if (searchInput) searchInput.value = initialSearch;
+  }
+
   renderProducts();
 
   // Category filter buttons
@@ -106,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Search
-  const searchInput = document.getElementById('shop-search');
   if (searchInput) {
     let debounce;
     searchInput.addEventListener('input', (e) => {

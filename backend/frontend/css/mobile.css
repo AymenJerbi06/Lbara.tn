@@ -1,0 +1,141 @@
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .cartoon-card {
+    border-width: 3px !important;
+    box-shadow: 5px 5px 0 #003060 !important;
+  }
+
+  .cartoon-card:hover {
+    transform: none !important;
+    box-shadow: 5px 5px 0 #003060 !important;
+  }
+
+  .cartoon-button {
+    box-shadow: 3px 3px 0 #003060 !important;
+  }
+
+  main {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  main.vibrant-gradient,
+  main[class*="min-h-screen"] {
+    padding-top: 6rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  footer {
+    padding-top: 3rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  footer > .grid {
+    gap: 2rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  footer .mt-20 {
+    margin-top: 2.5rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    text-align: center;
+  }
+
+  footer .flex.gap-6 {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #hero-section {
+    min-height: auto !important;
+    padding-top: 6rem !important;
+    padding-bottom: 3rem !important;
+    overflow: visible !important;
+  }
+
+  #hero-grid {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    gap: 2rem !important;
+  }
+
+  #hero-h1 {
+    font-size: clamp(2.35rem, 11vw, 3.25rem) !important;
+    line-height: 1.05 !important;
+    margin-bottom: 1rem !important;
+  }
+
+  #hero-copy {
+    font-size: 1rem !important;
+    line-height: 1.65 !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  #hero-section .cartoon-button {
+    width: 100%;
+    justify-content: center;
+    padding: 0.9rem 1.1rem !important;
+    font-size: 1rem !important;
+  }
+
+  section {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  section[class*="py-24"],
+  section[class*="py-32"] {
+    padding-top: 3.5rem !important;
+    padding-bottom: 3.5rem !important;
+  }
+
+  .text-5xl,
+  .text-6xl,
+  .md\:text-6xl,
+  .md\:text-7xl {
+    font-size: clamp(2rem, 10vw, 3rem) !important;
+    line-height: 1.08 !important;
+  }
+
+  .text-4xl,
+  .md\:text-5xl {
+    font-size: clamp(1.75rem, 8vw, 2.35rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  table {
+    min-width: 640px;
+  }
+
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}

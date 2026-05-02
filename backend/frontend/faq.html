@@ -32,6 +32,7 @@
 <style>
   .faq-answer { display: none; }
 </style>
+<link href="/css/mobile.css" rel="stylesheet"/>
 </head>
 <body class="selection:bg-primary/30 selection:text-primary">
 
@@ -90,6 +91,16 @@
         Orders &amp; Delivery
       </h2>
       <div class="cartoon-card rounded-2xl overflow-hidden divide-y-2 divide-primary/10">
+
+        <div class="faq-item">
+          <button class="w-full flex items-center justify-between px-6 py-5 text-left">
+            <span class="font-black text-primary">Why does checkout ask different questions for different services?</span>
+            <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+          </button>
+          <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">Services are delivered in three ways: gift cards or store credit, giftable subscriptions, and guided account setup. You do not choose freely between all three paths for every service. The product you select determines which activation choices appear at checkout, and checkout only asks for the details needed for that product.</p>
+          </div>
+        </div>
 
         <div class="faq-item">
           <button class="w-full flex items-center justify-between px-6 py-5 text-left">
@@ -199,6 +210,7 @@
             <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
           </button>
           <div class="faq-answer px-6 pb-5">
+            <p class="text-on-surface/70 font-medium leading-relaxed">It depends on the specific product and activation path. Some services work through normal account setup or gifting. Others, especially gift-card or store-credit products, may require region steps or a VPN during redemption. If that applies to the product you ordered, we include the instructions with your delivery email.</p>
             <p class="text-on-surface/70 font-medium leading-relaxed">No. The accounts we provide are configured to work from Tunisia without a VPN. That is one of the key reasons Lbara.tn exists — to break down these barriers for Tunisian users.</p>
           </div>
         </div>
@@ -328,8 +340,15 @@
   </div>
 </footer>
 
+<script src="/js/api.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.faq-answer p').forEach(function (p) {
+      if (p.textContent.indexOf('No. The accounts we provide are configured') === 0) {
+        p.textContent = 'It depends on the product and redemption path. Some services work after a normal gifted subscription or account setup. Some gift-card or store-credit products may require region steps or a VPN during redemption. If that applies, we include the instructions with your order.';
+      }
+    });
+
     document.querySelectorAll('.faq-item button').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var answer = btn.parentElement.querySelector('.faq-answer');

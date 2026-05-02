@@ -202,6 +202,7 @@
   }
 }
 </style>
+<link href="/css/mobile.css" rel="stylesheet"/>
 </head>
 <body class="selection:bg-primary/30 selection:text-primary">
 <nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
@@ -316,12 +317,19 @@
 <div class="max-w-4xl mx-auto px-8 text-center">
 <h2 class="font-headline text-4xl md:text-5xl font-bold mb-4 text-on-surface">Is your service available?</h2>
 <p class="text-on-surface/60 mb-12 font-medium">Search any global service and see if we can curate it for you.</p>
-<div class="relative group max-w-2xl mx-auto">
+<div class="flex flex-col md:flex-row items-stretch justify-center gap-4 max-w-4xl mx-auto">
+<div class="relative group flex-1">
 <div class="absolute inset-y-0 left-6 flex items-center pointer-events-none">
 <span class="material-symbols-outlined text-primary text-3xl">search</span>
 </div>
-<input class="w-full bg-slate-50 border-4 border-primary rounded-2xl py-6 pl-16 pr-8 focus:ring-0 focus:border-secondary text-on-surface placeholder:text-primary/40 font-bold text-lg transition-all shadow-[6px_6px_0px_0px_#003060]" placeholder="Type a service (e.g. Canva Pro, Midjourney, Coursera)..." type="text"/>
+<input id="service-availability-search" aria-describedby="service-availability-status" autocomplete="off" class="w-full bg-slate-50 border-4 border-primary rounded-2xl py-6 pl-16 pr-20 focus:ring-0 focus:border-secondary text-on-surface placeholder:text-primary/40 font-bold text-lg transition-all shadow-[6px_6px_0px_0px_#003060]" placeholder="Type a service (e.g. Canva Pro, Midjourney, Coursera)..." type="text"/>
+<div id="service-availability-indicator" class="absolute inset-y-0 right-6 hidden items-center pointer-events-none">
+<span id="service-availability-icon" class="material-symbols-outlined text-3xl"></span>
 </div>
+</div>
+<a id="service-availability-action" class="hidden cartoon-button bg-primary text-white font-black px-8 py-5 rounded-2xl text-lg items-center justify-center whitespace-nowrap" href="/contact.html">Request a Service</a>
+</div>
+<p id="service-availability-status" aria-live="polite" class="mt-5 min-h-[1.5rem] text-sm md:text-base font-bold text-on-surface/60"></p>
 <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
 <div class="cartoon-card p-8 rounded-3xl text-center">
 <div class="w-16 h-16 rounded-2xl bg-secondary/10 border-2 border-secondary flex items-center justify-center mb-6 mx-auto">
@@ -341,8 +349,8 @@
 <div class="w-16 h-16 rounded-2xl bg-primary/10 border-2 border-primary flex items-center justify-center mb-6 mx-auto">
 <span class="material-symbols-outlined text-primary text-4xl">bolt</span>
 </div>
-<h4 class="font-headline font-bold text-xl mb-2">Instant Delivery</h4>
-<p class="text-sm text-on-surface/60 font-bold">Delivery &lt; 2 hours</p>
+<h4 class="font-headline font-bold text-xl mb-2">Guided Delivery</h4>
+<p class="text-sm text-on-surface/60 font-bold">Clear steps per service</p>
 </div>
 </div>
 </div>
@@ -385,8 +393,8 @@
 <div class="cartoon-card p-10 rounded-3xl relative overflow-hidden group">
 <div class="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-bl-full translate-x-8 -translate-y-8"></div>
 <span class="font-headline text-accent text-5xl font-bold mb-8 block">03.</span>
-<h3 class="font-headline text-2xl font-bold mb-4">Receive &amp; Enjoy</h3>
-<p class="text-on-surface/70 leading-relaxed mb-8 font-medium">Your activation code or account details arrive in your inbox in less than 2 hours.</p>
+<h3 class="font-headline text-2xl font-bold mb-4">Follow Steps &amp; Enjoy</h3>
+<p class="text-on-surface/70 leading-relaxed mb-8 font-medium">Please go to the <a class="text-primary font-black underline decoration-accent decoration-2 underline-offset-4" href="/how-it-works.html">How It Works page</a> to see the exact instructions for your service.</p>
 <div class="bg-slate-50 p-4 rounded-2xl flex items-center gap-4 border-2 border-primary/10">
 <div class="w-12 h-12 bg-white border-2 border-primary rounded-xl flex items-center justify-center">
 <span class="material-symbols-outlined text-accent text-3xl">rocket_launch</span>
@@ -531,4 +539,5 @@
 </div>
 </footer>
 <script src="/js/api.js"></script>
+<script src="/js/home.js"></script>
 </body></html>

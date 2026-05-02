@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Product Details - Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: { "primary": "#003060", "secondary": "#005F4B", "accent": "#B8860B", "on-surface": "#1A202C" },
+        fontFamily: { "headline": ["Quicksand", "sans-serif"], "body": ["Nunito", "sans-serif"] },
+        borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer base { body { @apply bg-[#F8FAFC] text-on-surface font-body; } }
+  .vibrant-gradient { background: linear-gradient(135deg, #001F3F 0%, #003B5C 100%); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .cartoon-card { @apply bg-white border-4 border-primary shadow-[8px_8px_0px_0px_#003060] transition-all; }
+  .cartoon-button { @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none; }
+  .option-card { @apply bg-white border-2 border-primary/10 rounded-2xl p-5 text-left transition-all; }
+  .option-card.active { @apply border-primary bg-primary/5 shadow-[4px_4px_0px_0px_#B8860B]; }
+</style>
+<style>
+.product-image-frame {
+  height: clamp(220px, 26vw, 330px);
+  background: linear-gradient(135deg, rgba(0,48,96,0.96), rgba(0,95,75,0.9));
+}
+.product-media-card {
+  max-width: 700px;
+}
+.product-image-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 1023px) {
+  .product-media-card {
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .product-image-frame {
+    height: clamp(170px, 38vw, 250px);
+  }
+}
+@media (max-width: 767px) {
+  .option-card { padding: 14px; }
+  .product-image-frame {
+    height: clamp(132px, 36vw, 178px);
+  }
+}
+</style>
+<link href="/css/mobile.css" rel="stylesheet"/>
+</head>
+<body class="selection:bg-primary/30 selection:text-primary">
+
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
+  <div class="flex justify-between items-center w-full px-4 lg:px-8 py-4 max-w-screen-2xl mx-auto">
+    <a href="/index.html" class="text-2xl lg:text-3xl font-bold tracking-tight text-primary font-headline flex-shrink-0">Lbara.tn</a>
+    <div class="hidden lg:flex items-center gap-8 font-headline font-bold text-sm">
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/index.html">Home</a>
+      <a class="text-primary border-b-4 border-primary" href="/shop.html">Shop</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/how-it-works.html">How It Works</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/faq.html">FAQ</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/contact.html">Contact</a>
+    </div>
+    <button id="nav-account-btn" class="hidden lg:block cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">My Account</button>
+    <div class="lg:hidden flex items-center gap-2 flex-shrink-0">
+      <button id="nav-account-btn-mobile" class="cartoon-button bg-primary text-white font-bold px-3 py-1.5 rounded-full text-xs whitespace-nowrap">Get Started</button>
+      <a href="/shop.html" class="text-primary font-bold font-headline text-xs whitespace-nowrap px-1">Shop</a>
+      <button id="hamburger-btn" class="flex-shrink-0 flex flex-col gap-1.5 p-1.5">
+        <span class="block w-5 h-0.5 bg-primary"></span>
+        <span class="block w-5 h-0.5 bg-primary"></span>
+        <span class="block w-5 h-0.5 bg-primary"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div id="mobile-menu" style="display:none" class="lg:hidden fixed top-[66px] left-0 w-full bg-white border-b-4 border-primary z-40 shadow-lg">
+  <div class="flex flex-col px-6 py-4 gap-1 font-headline font-bold text-sm">
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/index.html">Home</a>
+    <a class="text-primary py-3 border-b border-primary/10" href="/shop.html">Shop</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/how-it-works.html">How It Works</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/faq.html">FAQ</a>
+    <a class="text-on-surface/70 hover:text-primary py-3" href="/contact.html">Contact</a>
+  </div>
+</div>
+
+<main class="pt-24 md:pt-28 min-h-screen">
+  <section class="max-w-screen-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+    <div id="product-loading" class="text-center py-20 text-primary/40 font-bold">
+      <span class="material-symbols-outlined text-5xl block mb-4 animate-spin">autorenew</span>
+      Loading product...
+    </div>
+
+    <div id="product-error" class="hidden cartoon-card rounded-3xl p-8 max-w-2xl mx-auto text-center">
+      <span class="material-symbols-outlined text-red-500 text-5xl mb-3 block">error</span>
+      <h1 class="font-headline text-3xl font-black text-primary mb-3">Product not found</h1>
+      <p class="text-on-surface/60 font-bold mb-6">This service may have moved or is not available right now.</p>
+      <a class="cartoon-button inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black" href="/shop.html">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Back to Shop
+      </a>
+    </div>
+
+    <div id="product-content" class="hidden">
+      <a href="/shop.html" class="inline-flex items-center gap-2 text-primary/60 hover:text-primary font-black text-sm mb-6">
+        <span class="material-symbols-outlined text-lg">arrow_back</span>
+        All services
+      </a>
+
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] gap-8 lg:gap-10 items-start">
+        <div class="space-y-8">
+          <div class="cartoon-card product-media-card rounded-3xl overflow-hidden">
+            <div class="product-image-frame">
+              <img id="product-image" src="" alt=""/>
+            </div>
+          </div>
+
+          <section class="space-y-5">
+            <div class="flex flex-wrap items-center gap-3">
+              <span id="product-provider" class="text-xs font-black text-secondary uppercase tracking-widest"></span>
+              <span id="product-category" class="text-[10px] font-black bg-primary/5 text-primary px-3 py-1 rounded-full uppercase tracking-widest"></span>
+            </div>
+            <h1 id="product-name" class="font-headline text-4xl md:text-6xl font-black text-primary leading-tight"></h1>
+            <p id="product-description" class="text-lg text-on-surface/65 font-bold leading-relaxed max-w-3xl"></p>
+          </section>
+
+          <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-white border-2 border-primary/10 rounded-2xl p-4">
+              <p class="text-[10px] font-black text-primary/40 uppercase tracking-widest mb-1">Account</p>
+              <p id="info-account" class="font-black text-primary"></p>
+            </div>
+            <div class="bg-white border-2 border-primary/10 rounded-2xl p-4">
+              <p class="text-[10px] font-black text-primary/40 uppercase tracking-widest mb-1">Delivery</p>
+              <p id="info-delivery" class="font-black text-primary"></p>
+            </div>
+            <div class="bg-white border-2 border-primary/10 rounded-2xl p-4">
+              <p class="text-[10px] font-black text-primary/40 uppercase tracking-widest mb-1">Flow</p>
+              <p id="info-flow" class="font-black text-primary"></p>
+            </div>
+            <div class="bg-white border-2 border-primary/10 rounded-2xl p-4">
+              <p class="text-[10px] font-black text-primary/40 uppercase tracking-widest mb-1">Options</p>
+              <p id="info-options" class="font-black text-primary"></p>
+            </div>
+          </section>
+
+          <section>
+            <div class="flex items-end justify-between gap-4 mb-5">
+              <div>
+                <p class="text-xs font-black text-accent uppercase tracking-widest mb-2">Available options</p>
+                <h2 class="font-headline text-2xl md:text-3xl font-black text-primary">Choose the exact version you need</h2>
+              </div>
+            </div>
+            <div id="option-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </section>
+
+          <section class="bg-primary/5 border-2 border-primary/10 rounded-3xl p-5 md:p-6">
+            <h2 class="font-headline text-xl font-black text-primary mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-accent">vpn_key</span>
+              Activation path
+            </h2>
+            <p id="activation-copy" class="text-sm md:text-base text-primary/65 font-bold leading-relaxed"></p>
+            <p id="restriction-copy" class="hidden mt-4 bg-accent/10 border-2 border-accent/20 rounded-2xl p-4 text-sm text-primary/75 font-black leading-relaxed"></p>
+          </section>
+        </div>
+
+        <aside class="lg:sticky lg:top-28 space-y-4">
+          <div class="cartoon-card rounded-3xl p-6">
+            <p class="text-xs font-black text-primary/40 uppercase tracking-widest mb-4">Selected option</p>
+            <h2 id="selected-name" class="font-headline text-2xl font-black text-primary mb-2">Choose an option</h2>
+            <p id="selected-meta" class="text-sm font-bold text-on-surface/50 mb-6">Pick one of the options to see the checkout summary.</p>
+            <div class="bg-primary/5 rounded-2xl p-4 mb-6">
+              <p class="text-[10px] font-black text-primary/40 uppercase tracking-widest mb-1">Price</p>
+              <p id="selected-price" class="font-black text-3xl text-primary">TBD</p>
+            </div>
+            <button id="continue-btn" class="w-full cartoon-button bg-primary text-white font-black py-4 rounded-2xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <span class="material-symbols-outlined">schedule</span>
+              Pricing Soon
+            </button>
+            <a id="pricing-contact-btn" class="mt-3 w-full border-2 border-primary/20 text-primary font-black py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/5" href="/contact.html">
+              <span class="material-symbols-outlined">forum</span>
+              Ask about pricing
+            </a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="bg-primary w-full pt-16 pb-10 text-white mt-12">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-16 px-8 max-w-screen-2xl mx-auto">
+    <div class="md:col-span-1">
+      <span class="text-3xl font-bold text-accent mb-6 block font-headline">Lbara.tn</span>
+      <p class="text-sm text-white/60 leading-relaxed font-medium">Breaking the digital walls one subscription at a time.</p>
+    </div>
+    <div>
+      <h4 class="font-headline font-bold text-xl mb-8">Explore</h4>
+      <ul class="space-y-4">
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html">All Services</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/how-it-works.html">How It Works</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/faq.html">FAQ</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-headline font-bold text-xl mb-8">Support</h4>
+      <ul class="space-y-4">
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/contact.html">Contact</a></li>
+        <li><a class="text-white/60 hover:text-accent transition-colors font-bold text-sm" href="/shop.html?category=gift_cards">Gift Cards</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-headline font-bold text-xl mb-8">Contact</h4>
+      <ul class="space-y-6">
+        <li class="flex items-center gap-3 text-white/60 text-sm font-bold">
+          <span class="material-symbols-outlined text-accent">mail</span> hello@lbara.tn
+        </li>
+        <li class="flex items-center gap-3 text-white/60 text-sm font-bold">
+          <span class="material-symbols-outlined text-accent">phone</span> +216 71 000 000
+        </li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/api.js"></script>
+<script src="/js/product.js"></script>
+</body>
+</html>

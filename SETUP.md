@@ -51,8 +51,9 @@ cp .env.example .env
 Edit `.env` and fill in:
 - `DB_PASSWORD` — your PostgreSQL password
 - `JWT_SECRET` — any long random string
-- `ENCRYPTION_KEY` — exactly 32 hex characters (e.g. run `node -e "console.log(require('crypto').randomBytes(16).toString('hex'))"`)
-- `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` — your email SMTP credentials
+- `ENCRYPTION_KEY` — exactly 64 hex characters (e.g. run `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
+- `RESEND_API_KEY` — your Resend API key for sending order and support emails
+- `EMAIL_FROM` — your verified sender, for example `lbara.tn <hello@lbara.tn>`
 - `FLOUCI_APP_TOKEN` + `FLOUCI_APP_SECRET` — from https://developers.flouci.com
   OR `PAYMEE_API_KEY` + `PAYMEE_VENDOR_ID` — from https://paymee.tn
 - Set `PAYMENT_GATEWAY=flouci` (or `paymee`)
@@ -84,12 +85,13 @@ Open http://localhost:3000
 
 ## Step 5 — Create your admin account
 
-1. Go to http://localhost:3000/signup.html and create an account
-2. In your database, run:
+1. Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`
+2. Run `node db/setup.js`
+3. Or create an account at http://localhost:3000/signup.html and run:
    ```sql
    UPDATE users SET is_admin = TRUE WHERE email = 'your@email.com';
    ```
-3. Go to http://localhost:3000/admin/dashboard.html
+4. Go to http://localhost:3000/admin/dashboard.html
 
 ---
 
