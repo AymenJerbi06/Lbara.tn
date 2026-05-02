@@ -2,11 +2,18 @@ const fs = require('fs');
 const path = require('path');
 const { readSheetRows } = require('../utils/simpleXlsx');
 
-const DEFAULT_PRICE_SHEET_PATH = path.resolve(__dirname, '../../../../Assets/products/lbara-product-catalog.xlsx');
+const LOCAL_PRICE_SHEET_PATH = path.resolve(__dirname, '../../../../Assets/products/lbara-product-catalog.xlsx');
+const DEPLOYED_PRICE_SHEET_PATH = path.resolve(__dirname, '../../data/lbara-product-catalog.xlsx');
 const LEGACY_PRICE_SHEET_PATH = path.resolve(__dirname, '../../../../Assets/products/lbara-product-prices.xlsx');
-const V1_PRICING_TABLE_PATH = path.resolve(__dirname, '../../../../Assets/products/lbara_pricing_table.html');
-const V2_PRICING_TABLE_PATH = path.resolve(__dirname, '../../../../Assets/products/lbara_pricing_table_v2.html');
-const DEFAULT_PRICING_TABLE_PATH = fs.existsSync(V2_PRICING_TABLE_PATH) ? V2_PRICING_TABLE_PATH : V1_PRICING_TABLE_PATH;
+const LOCAL_V1_PRICING_TABLE_PATH = path.resolve(__dirname, '../../../../Assets/products/lbara_pricing_table.html');
+const LOCAL_V2_PRICING_TABLE_PATH = path.resolve(__dirname, '../../../../Assets/products/lbara_pricing_table_v2.html');
+const DEPLOYED_V2_PRICING_TABLE_PATH = path.resolve(__dirname, '../../data/lbara_pricing_table_v2.html');
+const DEFAULT_PRICE_SHEET_PATH = fs.existsSync(LOCAL_PRICE_SHEET_PATH) ? LOCAL_PRICE_SHEET_PATH : DEPLOYED_PRICE_SHEET_PATH;
+const DEFAULT_PRICING_TABLE_PATH = [
+  LOCAL_V2_PRICING_TABLE_PATH,
+  DEPLOYED_V2_PRICING_TABLE_PATH,
+  LOCAL_V1_PRICING_TABLE_PATH,
+].find((candidate) => fs.existsSync(candidate)) || DEPLOYED_V2_PRICING_TABLE_PATH;
 
 const CAD_PER_USD = 1.36;
 const TYPE_1_GIFT_CARD_MARGIN = 1.15;
@@ -492,6 +499,7 @@ async function syncProductPricesFromWorkbook(pool, options = {}) {
   const productIdsBySlug = new Map();
   let variantsUpdated = 0;
   let variantsDeactivated = 0;
+  let productsDeactivated = 0;
   const warnings = [];
 
   for (const [productSlug, row] of productRowsBySlug.entries()) {
@@ -665,6 +673,17 @@ async function syncProductPricesFromWorkbook(pool, options = {}) {
     variantsDeactivated += result.rowCount;
   }
 
+  if (updatedProductSlugs.size > 0) {
+    const result = await pool.query(
+      `UPDATE products
+       SET active = FALSE
+       WHERE active = TRUE
+         AND NOT (slug = ANY($1::varchar[]))`,
+      [Array.from(updatedProductSlugs)]
+    );
+    productsDeactivated = result.rowCount;
+  }
+
   return {
     skipped: false,
     workbookPath,
@@ -673,6 +692,7 @@ async function syncProductPricesFromWorkbook(pool, options = {}) {
     variationSheet: variationRead.sheetName,
     productSheet: productRead.sheetName,
     productsUpdated: updatedProductSlugs.size,
+    productsDeactivated,
     variantsUpdated,
     variantsDeactivated,
     pricingTablePath,

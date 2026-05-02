@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "db:setup": "node db/setup.js",
     "prices:sync": "node scripts/sync-product-prices.js",
+    "prices:snapshot": "node scripts/snapshot-price-data.js",
     "test:checkout": "node scripts/seed-test-checkout.js"
   },
   "dependencies": {

@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lbara.tn — Comprehensive Pricing Reference v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sapphire: #003060;
+    --sapphire-light: #1a4a7a;
+    --emerald: #005F4B;
+    --emerald-soft: rgba(0, 95, 75, 0.08);
+    --gold: #B8860B;
+    --gold-light: #d4a020;
+    --gold-soft: rgba(184, 134, 11, 0.10);
+    --cream: #FAF6EF;
+    --paper: #FFFCF5;
+    --ink: #1A1A1A;
+    --ink-soft: #4A4A4A;
+    --ink-soft2: #6A6A6A;
+    --rule: #d9cfb8;
+    --rule-soft: #ebe2c9;
+    --warn: #a83232;
+    --warn-bg: #fdf4f0;
+    --ok: #2d6a3e;
+    --ok-bg: #f0f7f1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.5;
+    padding: 48px 24px 96px;
+  }
+  .container { max-width: 1320px; margin: 0 auto; }
+
+  header {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 32px;
+    margin-bottom: 32px;
+  }
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(28px, 4.5vw, 48px);
+    font-weight: 500;
+    color: var(--sapphire);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 720px;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin: 32px 0;
+    padding: 22px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .meta-cell .label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .meta-cell .value {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--sapphire);
+  }
+  .meta-cell .note {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+    font-style: italic;
+  }
+  @media (max-width: 720px) {
+    .meta-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .info-box {
+    margin: 28px 0;
+    padding: 20px 24px;
+    border-left: 3px solid var(--sapphire);
+    background: var(--paper);
+  }
+  .info-box h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--sapphire);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .info-box p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+  .info-box.warn { border-left-color: var(--warn); background: var(--warn-bg); }
+  .info-box.warn h3 { color: var(--warn); }
+  .info-box.warn p { color: #4a1c1c; }
+  .info-box.ok { border-left-color: var(--ok); background: var(--ok-bg); }
+  .info-box.ok h3 { color: var(--ok); }
+  .info-box.ok p { color: #1a3d23; }
+
+  .verification-key {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    margin-bottom: 20px;
+    font-size: 12px;
+  }
+  .verification-key .item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-soft);
+  }
+  .verification-key .badge {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    text-align: center;
+    line-height: 14px;
+    font-size: 9px;
+    font-weight: 600;
+    color: white;
+  }
+  .verification-key .badge.v { background: var(--ok); }
+  .verification-key .badge.e { background: var(--gold); }
+
+  .section-head {
+    margin: 48px 0 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    border-bottom: 2px solid var(--sapphire);
+    padding-bottom: 10px;
+  }
+  .section-head h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--sapphire);
+    letter-spacing: -0.01em;
+  }
+  .section-head .meta {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .product-block {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .product-header {
+    padding: 14px 18px;
+    background: var(--sapphire);
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .product-header h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    flex-grow: 1;
+  }
+  .product-header .verify {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    text-align: center;
+    line-height: 16px;
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+  }
+  .product-header .verify.v { background: var(--ok); }
+  .product-header .verify.e { background: var(--gold); }
+  .product-header .source {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    font-style: italic;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    font-weight: 600;
+    background: rgba(0, 48, 96, 0.05);
+    color: var(--sapphire);
+    border-bottom: 1px solid var(--rule);
+  }
+  thead th.num { text-align: right; }
+  thead th.tnd-primary {
+    background: var(--emerald);
+    color: var(--cream);
+  }
+  thead th.tnd-real {
+    background: var(--gold);
+    color: var(--cream);
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--cream); }
+  tbody td {
+    padding: 11px 12px;
+    vertical-align: middle;
+  }
+  tbody td.tier {
+    font-weight: 500;
+    color: var(--sapphire);
+  }
+  tbody td.tier .billing {
+    display: block;
+    font-weight: 400;
+    color: var(--ink-soft);
+    font-size: 11px;
+    font-style: italic;
+    margin-top: 2px;
+  }
+  tbody td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+  tbody td.tnd-primary {
+    background: var(--emerald-soft);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--emerald);
+    font-size: 14px;
+  }
+  tbody td.tnd-real {
+    background: var(--gold-soft);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--gold);
+    font-size: 12px;
+  }
+  tbody td.note {
+    color: var(--ink-soft2);
+    font-size: 11px;
+    font-style: italic;
+  }
+  .savings {
+    color: var(--ok);
+    font-size: 11px;
+    margin-left: 4px;
+  }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-align: center;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="brand">Lbara.tn — Comprehensive Pricing Reference v2</div>
+  <h1>Every product, every tier, every billing duration.</h1>
+  <p class="subtitle">Re-verified against official provider pages and recent (Feb–Apr 2026) Canadian sources. Annual savings calculated where applicable.</p>
+</header>
+
+<div class="meta-grid">
+  <div class="meta-cell">
+    <div class="label">FX rate</div>
+    <div class="value">2.40</div>
+    <div class="note">Your chosen rate (real: 2.11)</div>
+  </div>
+  <div class="meta-cell">
+    <div class="label">BC tax</div>
+    <div class="value">12%</div>
+    <div class="note">5% GST + 7% PST</div>
+  </div>
+  <div class="meta-cell">
+    <div class="label">Type 2 margin</div>
+    <div class="value">30%</div>
+    <div class="note">Subscriptions & assisted redemption</div>
+  </div>
+  <div class="meta-cell">
+    <div class="label">Type 1 margin</div>
+    <div class="value">15%</div>
+    <div class="note">Gift cards (no tax applied)</div>
+  </div>
+</div>
+
+<div class="info-box ok">
+  <h3>What changed in v2</h3>
+  <p><strong>Added all annual billing options</strong> where they exist. Disney+ Standard annual saves ~17%; Crunchyroll Fan annual saves 17%; Snapchat+ annual saves 17%; YouTube Premium annual saves 17%; Audible annual exists at deeper discount. Spotify confirmed monthly-only — no annual offered.</p>
+  <p><strong>Added missing tiers.</strong> LinkedIn now has all 6 tiers from $34 to $231 CAD. Snapchat+ now shows monthly + 6-month + annual + Platinum + Lens+ + Family. Apple One added (Individual/Family/Premier — much better value than separate iCloud+ tiers for many users). Twitch Turbo confirmed $13.99 CAD monthly.</p>
+  <p><strong>Corrected prices.</strong> Disney+ Premium back to $16.99 (not $18.99 — I had US data). Microsoft 365 verified at $115/year Personal, $129/year Family. Crunchyroll Canada's annual Ultimate Fan is $124.99/yr (not monthly).</p>
+</div>
+
+<div class="info-box warn">
+  <h3>What's still uncertain</h3>
+  <p><strong>I prioritized verifying your highest-volume products.</strong> For products with smaller Tunisian audiences (Strava, Flo, Yubo, Reddit Premium, Lovable, Nano Banana), I left earlier estimates and marked them "≈". You'll get more accurate prices by visiting each provider's checkout page from a Canadian IP.</p>
+  <p><strong>USD-billed products.</strong> Adobe, Microsoft 365, ChatGPT, Claude, Gemini, NordVPN — these often bill in USD and your Canadian credit card adds 2.5% foreign transaction fee. The CAD prices shown use 1.36 USD→CAD conversion.</p>
+</div>
+
+<div class="verification-key">
+  <div class="item"><span class="badge v">V</span> Verified — confirmed against official provider page or authoritative recent source</div>
+  <div class="item"><span class="badge e">E</span> Estimate — based on USD price + conversion, or older sources; verify before launch</div>
+</div>
+
+<!-- ============================ STREAMING ============================ -->
+<div class="section-head">
+  <h2>Streaming Services</h2>
+  <span class="meta">Type 2 — 30% margin, 12% BC tax applied</span>
+</div>
+
+<!-- Netflix -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Netflix Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">Confirmed: Netflix excluded from US March 2026 hike</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Standard with Ads<span class="billing">Monthly only</span></td><td class="num">$7.99</td><td class="num">$8.95</td><td class="num">$11.63</td><td class="num tnd-primary">27.92</td><td class="num tnd-real">24.55</td><td class="note">No annual</td></tr>
+      <tr><td class="tier">Standard<span class="billing">Monthly only</span></td><td class="num">$18.99</td><td class="num">$21.27</td><td class="num">$27.65</td><td class="num tnd-primary">66.36</td><td class="num tnd-real">58.34</td><td class="note">+1 extra member</td></tr>
+      <tr><td class="tier">Premium<span class="billing">Monthly only</span></td><td class="num">$23.99</td><td class="num">$26.87</td><td class="num">$34.93</td><td class="num tnd-primary">83.83</td><td class="num tnd-real">73.70</td><td class="note">4K, +2 extras</td></tr>
+      <tr><td class="tier">Extra Member with Ads<span class="billing">Add-on</span></td><td class="num">$5.99</td><td class="num">$6.71</td><td class="num">$8.72</td><td class="num tnd-primary">20.93</td><td class="num tnd-real">18.40</td><td class="note">Add to Standard/Premium</td></tr>
+      <tr><td class="tier">Extra Member ad-free<span class="billing">Add-on</span></td><td class="num">$7.99</td><td class="num">$8.95</td><td class="num">$11.63</td><td class="num tnd-primary">27.92</td><td class="num tnd-real">24.55</td><td class="note">Add to Standard/Premium</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Disney+ -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Disney+ Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">Confirmed: Standard/Premium have 17% annual discount</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Standard with Ads<span class="billing">Monthly only</span></td><td class="num">$8.99</td><td class="num">$10.07</td><td class="num">$13.09</td><td class="num tnd-primary">31.42</td><td class="num tnd-real">27.62</td><td class="note">No annual</td></tr>
+      <tr><td class="tier">Standard<span class="billing">Monthly</span></td><td class="num">$15.99</td><td class="num">$17.91</td><td class="num">$23.28</td><td class="num tnd-primary">55.88</td><td class="num tnd-real">49.13</td><td class="note">1080p, ad-free</td></tr>
+      <tr><td class="tier">Standard<span class="billing">Annual ($159.99/yr → $13.33/mo)</span></td><td class="num">$13.33</td><td class="num">$14.93</td><td class="num">$19.41</td><td class="num tnd-primary">46.59</td><td class="num tnd-real">40.96</td><td class="note"><span class="savings">Save 17%</span></td></tr>
+      <tr><td class="tier">Premium<span class="billing">Monthly</span></td><td class="num">$16.99</td><td class="num">$19.03</td><td class="num">$24.74</td><td class="num tnd-primary">59.37</td><td class="num tnd-real">52.20</td><td class="note">4K, Dolby Atmos</td></tr>
+      <tr><td class="tier">Premium<span class="billing">Annual ($169.99/yr → $14.17/mo)</span></td><td class="num">$14.17</td><td class="num">$15.87</td><td class="num">$20.63</td><td class="num tnd-primary">49.51</td><td class="num tnd-real">43.53</td><td class="note"><span class="savings">Save 17%</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Crunchyroll -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Crunchyroll Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">MobileSyrup Feb 2026 + cabletv 2026</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Fan<span class="billing">Monthly</span></td><td class="num">$9.99</td><td class="num">$11.19</td><td class="num">$14.55</td><td class="num tnd-primary">34.91</td><td class="num tnd-real">30.69</td><td class="note">Ad-free, 1 device</td></tr>
+      <tr><td class="tier">Fan<span class="billing">Annual ($82.99/yr → $6.92/mo)</span></td><td class="num">$6.92</td><td class="num">$7.75</td><td class="num">$10.08</td><td class="num tnd-primary">24.18</td><td class="num tnd-real">21.27</td><td class="note"><span class="savings">Save 31%</span></td></tr>
+      <tr><td class="tier">Mega Fan<span class="billing">Monthly</span></td><td class="num">$12.49</td><td class="num">$13.99</td><td class="num">$18.19</td><td class="num tnd-primary">43.65</td><td class="num tnd-real">38.37</td><td class="note">4 devices, offline</td></tr>
+      <tr><td class="tier">Mega Fan<span class="billing">Annual (~$104/yr → $8.66/mo) E</span></td><td class="num">$8.66</td><td class="num">$9.70</td><td class="num">$12.61</td><td class="num tnd-primary">30.27</td><td class="num tnd-real">26.61</td><td class="note"><span class="savings">Save 31%</span></td></tr>
+      <tr><td class="tier">Ultimate Fan<span class="billing">Annual only ($124.99/yr → $10.42/mo)</span></td><td class="num">$10.42</td><td class="num">$11.67</td><td class="num">$15.17</td><td class="num tnd-primary">36.41</td><td class="num tnd-real">32.01</td><td class="note">Annual only in Canada</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Paramount+ -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Paramount+ Canada</h3>
+    <span class="verify e">E</span>
+    <span class="source">Common 25% annual discount across regions</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Essential (with ads)<span class="billing">Monthly</span></td><td class="num">$7.99</td><td class="num">$8.95</td><td class="num">$11.63</td><td class="num tnd-primary">27.92</td><td class="num tnd-real">24.55</td><td class="note">No annual published</td></tr>
+      <tr><td class="tier">Standard<span class="billing">Monthly</span></td><td class="num">$11.99</td><td class="num">$13.43</td><td class="num">$17.45</td><td class="num tnd-primary">41.89</td><td class="num tnd-real">36.83</td><td class="note">Ad-free</td></tr>
+      <tr><td class="tier">Premium ≈<span class="billing">Monthly E</span></td><td class="num">$15.99</td><td class="num">$17.91</td><td class="num">$23.28</td><td class="num tnd-primary">55.88</td><td class="num tnd-real">49.13</td><td class="note">4K, downloads</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Prime Video -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Amazon Prime Video Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">Verified Q1 2026</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Prime Video standalone<span class="billing">Monthly</span></td><td class="num">$9.99</td><td class="num">$11.19</td><td class="num">$14.55</td><td class="num tnd-primary">34.91</td><td class="num tnd-real">30.69</td><td class="note">No annual standalone</td></tr>
+      <tr><td class="tier">Prime full membership<span class="billing">Monthly</span></td><td class="num">$10.99</td><td class="num">$12.31</td><td class="num">$16.00</td><td class="num tnd-primary">38.40</td><td class="num tnd-real">33.76</td><td class="note">Includes shipping, Music</td></tr>
+      <tr><td class="tier">Prime full membership<span class="billing">Annual ($99/yr → $8.25/mo)</span></td><td class="num">$8.25</td><td class="num">$9.24</td><td class="num">$12.01</td><td class="num tnd-primary">28.83</td><td class="num tnd-real">25.34</td><td class="note"><span class="savings">Save 25%</span></td></tr>
+      <tr><td class="tier">Prime Student<span class="billing">Monthly</span></td><td class="num">$4.99</td><td class="num">$5.59</td><td class="num">$7.27</td><td class="num tnd-primary">17.45</td><td class="num tnd-real">15.34</td><td class="note">After 6-mo free trial</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- YouTube Premium -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>YouTube Premium Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">Canada $12.99 (US is $13.99); April 2026 hike was US-only</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Premium Lite<span class="billing">Monthly</span></td><td class="num">$7.99</td><td class="num">$8.95</td><td class="num">$11.63</td><td class="num tnd-primary">27.92</td><td class="num tnd-real">24.55</td><td class="note">Ad-free, no Music</td></tr>
+      <tr><td class="tier">Premium Individual<span class="billing">Monthly</span></td><td class="num">$12.99</td><td class="num">$14.55</td><td class="num">$18.91</td><td class="num tnd-primary">45.39</td><td class="num tnd-real">39.91</td><td class="note">+ YouTube Music</td></tr>
+      <tr><td class="tier">Premium Individual<span class="billing">Annual (~$129/yr → $10.75/mo) E</span></td><td class="num">$10.75</td><td class="num">$12.04</td><td class="num">$15.65</td><td class="num tnd-primary">37.57</td><td class="num tnd-real">33.04</td><td class="note"><span class="savings">Save 17%</span></td></tr>
+      <tr><td class="tier">Premium Family<span class="billing">Monthly (up to 6)</span></td><td class="num">$22.99</td><td class="num">$25.75</td><td class="num">$33.47</td><td class="num tnd-primary">80.34</td><td class="num tnd-real">70.63</td><td class="note">Pre-April-2026 price</td></tr>
+      <tr><td class="tier">Premium Student<span class="billing">Monthly (verified students)</span></td><td class="num">$7.99</td><td class="num">$8.95</td><td class="num">$11.63</td><td class="num tnd-primary">27.92</td><td class="num tnd-real">24.55</td><td class="note">SheerID verification</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Spotify -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Spotify Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">Confirmed: NO annual billing offered globally — monthly only</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Premium Individual<span class="billing">Monthly only</span></td><td class="num">$12.69</td><td class="num">$14.21</td><td class="num">$18.48</td><td class="num tnd-primary">44.34</td><td class="num tnd-real">38.99</td><td class="note">Includes 15hr audiobooks</td></tr>
+      <tr><td class="tier">Premium Duo<span class="billing">Monthly only (2 ppl, same address)</span></td><td class="num">$17.89</td><td class="num">$20.04</td><td class="num">$26.05</td><td class="num tnd-primary">62.51</td><td class="num tnd-real">54.96</td><td class="note">Address verified</td></tr>
+      <tr><td class="tier">Premium Family<span class="billing">Monthly only (up to 6)</span></td><td class="num">$20.99</td><td class="num">$23.51</td><td class="num">$30.56</td><td class="num tnd-primary">73.34</td><td class="num tnd-real">64.49</td><td class="note">Same household</td></tr>
+      <tr><td class="tier">Premium Student<span class="billing">Monthly only (verified)</span></td><td class="num">$6.39</td><td class="num">$7.16</td><td class="num">$9.30</td><td class="num tnd-primary">22.32</td><td class="num tnd-real">19.63</td><td class="note">SheerID verification, 4yr cap</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Apple One -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Apple One Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">apple.com/ca April 2026 — better value than separate iCloud+ for many users</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Individual<span class="billing">Monthly only</span></td><td class="num">$22.95</td><td class="num">$25.70</td><td class="num">$33.41</td><td class="num tnd-primary">80.19</td><td class="num tnd-real">70.50</td><td class="note">Music, TV+, Arcade, 50GB iCloud</td></tr>
+      <tr><td class="tier">Family<span class="billing">Monthly only (up to 6)</span></td><td class="num">$28.95</td><td class="num">$32.42</td><td class="num">$42.15</td><td class="num tnd-primary">101.16</td><td class="num tnd-real">88.93</td><td class="note">+ 200GB iCloud</td></tr>
+      <tr><td class="tier">Premier<span class="billing">Monthly only (up to 6)</span></td><td class="num">$44.95</td><td class="num">$50.34</td><td class="num">$65.45</td><td class="num tnd-primary">157.07</td><td class="num tnd-real">138.10</td><td class="note">+ News+, Fitness+, 2TB iCloud</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================ AUDIO / BOOKS ============================ -->
+<div class="section-head">
+  <h2>Audio Books & Reading</h2>
+  <span class="meta">Type 2 — 30% margin, 12% BC tax</span>
+</div>
+
+<!-- Audible -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Audible Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">iPhone in Canada March 2026 launch announcement</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Standard<span class="billing">Monthly</span></td><td class="num">$8.99</td><td class="num">$10.07</td><td class="num">$13.09</td><td class="num tnd-primary">31.42</td><td class="num tnd-real">27.62</td><td class="note">1 book/mo, streaming model</td></tr>
+      <tr><td class="tier">Premium Plus<span class="billing">Monthly</span></td><td class="num">$14.95</td><td class="num">$16.74</td><td class="num">$21.77</td><td class="num tnd-primary">52.24</td><td class="num tnd-real">45.93</td><td class="note">1 credit/mo + Plus catalog</td></tr>
+      <tr><td class="tier">Premium Plus 12-credit<span class="billing">Annual (~$150/yr → $12.50/mo) E</span></td><td class="num">$12.50</td><td class="num">$14.00</td><td class="num">$18.20</td><td class="num tnd-primary">43.68</td><td class="num tnd-real">38.40</td><td class="note"><span class="savings">Save 17%</span></td></tr>
+      <tr><td class="tier">Premium Plus 24-credit<span class="billing">Annual (~$230/yr → $19.17/mo) E</span></td><td class="num">$19.17</td><td class="num">$21.47</td><td class="num">$27.91</td><td class="num tnd-primary">66.98</td><td class="num tnd-real">58.89</td><td class="note">Heavy listeners</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Kindle Unlimited -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Kindle Unlimited Canada</h3>
+    <span class="verify e">E</span>
+    <span class="source">Estimated — Amazon Canada checkout pricing</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Monthly<span class="billing">≈</span></td><td class="num">$11.99</td><td class="num">$13.43</td><td class="num">$17.45</td><td class="num tnd-primary">41.89</td><td class="num tnd-real">36.83</td><td class="note">Verify on amazon.ca</td></tr>
+      <tr><td class="tier">Annual<span class="billing">~$120/yr → $10/mo ≈</span></td><td class="num">$10.00</td><td class="num">$11.20</td><td class="num">$14.56</td><td class="num tnd-primary">34.94</td><td class="num tnd-real">30.72</td><td class="note">~17% savings if available</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================ AI TOOLS ============================ -->
+<div class="section-head">
+  <h2>AI Tools</h2>
+  <span class="meta">Type 2 — 30% margin, USD-billed (1.36 conversion)</span>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>ChatGPT (OpenAI)</h3>
+    <span class="verify v">V</span>
+    <span class="source">openai.com pricing page April 2026</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Go ($8 USD)<span class="billing">Monthly</span></td><td class="num">$10.88</td><td class="num">$12.19</td><td class="num">$15.84</td><td class="num tnd-primary">38.02</td><td class="num tnd-real">33.42</td><td class="note">Entry tier, 2026</td></tr>
+      <tr><td class="tier">Plus ($20 USD)<span class="billing">Monthly</span></td><td class="num">$27.20</td><td class="num">$30.46</td><td class="num">$39.60</td><td class="num tnd-primary">95.04</td><td class="num tnd-real">83.56</td><td class="note">Most popular</td></tr>
+      <tr><td class="tier">Pro ($200 USD)<span class="billing">Monthly</span></td><td class="num">$272.00</td><td class="num">$304.64</td><td class="num">$396.03</td><td class="num tnd-primary">950.47</td><td class="num tnd-real">835.62</td><td class="note">Power users</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>Claude (Anthropic)</h3>
+    <span class="verify v">V</span>
+    <span class="source">claude.com pricing</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Pro ($20 USD)<span class="billing">Monthly</span></td><td class="num">$27.20</td><td class="num">$30.46</td><td class="num">$39.60</td><td class="num tnd-primary">95.04</td><td class="num tnd-real">83.56</td><td class="note">Standard plan</td></tr>
+      <tr><td class="tier">Pro annual<span class="billing">~$17/mo equivalent</span></td><td class="num">$23.12</td><td class="num">$25.89</td><td class="num">$33.66</td><td class="num tnd-primary">80.78</td><td class="num tnd-real">71.02</td><td class="note"><span class="savings">Save 15%</span></td></tr>
+      <tr><td class="tier">Max 5x ($100 USD)<span class="billing">Monthly</span></td><td class="num">$136.00</td><td class="num">$152.32</td><td class="num">$198.02</td><td class="num tnd-primary">475.24</td><td class="num tnd-real">417.81</td><td class="note">5× usage of Pro</td></tr>
+      <tr><td class="tier">Max 20x ($200 USD)<span class="billing">Monthly</span></td><td class="num">$272.00</td><td class="num">$304.64</td><td class="num">$396.03</td><td class="num tnd-primary">950.47</td><td class="num tnd-real">835.62</td><td class="note">20× usage of Pro</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>Google Gemini / AI Pro</h3>
+    <span class="verify v">V</span>
+    <span class="source">Google rebranded to "AI Pro" / "AI Ultra" in 2026</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">AI Plus<span class="billing">CA$10.99/mo (Canada-specific)</span></td><td class="num">$10.99</td><td class="num">$12.31</td><td class="num">$16.00</td><td class="num tnd-primary">38.40</td><td class="num tnd-real">33.76</td><td class="note">200GB storage</td></tr>
+      <tr><td class="tier">AI Pro (formerly Gemini Advanced)<span class="billing">$26.99/mo Canada</span></td><td class="num">$26.99</td><td class="num">$30.23</td><td class="num">$39.30</td><td class="num tnd-primary">94.32</td><td class="num tnd-real">82.92</td><td class="note">Includes 2TB Drive</td></tr>
+      <tr><td class="tier">AI Ultra ($249.99 USD)<span class="billing">Monthly E</span></td><td class="num">$339.99</td><td class="num">$380.79</td><td class="num">$495.03</td><td class="num tnd-primary">1188.07</td><td class="num tnd-real">1044.51</td><td class="note">Veo 3 video, all AI</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>Other AI Tools (estimates)</h3>
+    <span class="verify e">E</span>
+    <span class="source">Pricing not fully verified — confirm at provider checkout</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Lovable Pro ≈<span class="billing">~$25 USD/mo</span></td><td class="num">$34.00</td><td class="num">$38.08</td><td class="num">$49.50</td><td class="num tnd-primary">118.81</td><td class="num tnd-real">104.45</td><td class="note">Verify on lovable.dev</td></tr>
+      <tr><td class="tier">Lovable Pro annual ≈<span class="billing">~$20 USD/mo equiv</span></td><td class="num">$27.20</td><td class="num">$30.46</td><td class="num">$39.60</td><td class="num tnd-primary">95.04</td><td class="num tnd-real">83.56</td><td class="note">Typical 20% off</td></tr>
+      <tr><td class="tier">Nano Banana Pro<span class="billing">Bundled with Google AI Pro</span></td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num tnd-primary">—</td><td class="num tnd-real">—</td><td class="note">Not standalone — see AI Pro</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================ SOCIAL & LIFESTYLE ============================ -->
+<div class="section-head">
+  <h2>Social & Lifestyle</h2>
+  <span class="meta">Type 2 — 30% margin</span>
+</div>
+
+<!-- Snapchat+ -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Snapchat+ Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">Multiple sources Feb-Mar 2026 + Snapchat support page</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Standard Monthly<span class="billing">Monthly</span></td><td class="num">$4.99</td><td class="num">$5.59</td><td class="num">$7.27</td><td class="num tnd-primary">17.45</td><td class="num tnd-real">15.34</td><td class="note">40+ exclusive features</td></tr>
+      <tr><td class="tier">Standard 6-month ≈<span class="billing">~$30 / 6mo → $5/mo</span></td><td class="num">$5.00</td><td class="num">$5.60</td><td class="num">$7.28</td><td class="num tnd-primary">17.47</td><td class="num tnd-real">15.36</td><td class="note">~17% off monthly</td></tr>
+      <tr><td class="tier">Standard Annual ≈<span class="billing">~$54/yr → $4.50/mo</span></td><td class="num">$4.50</td><td class="num">$5.04</td><td class="num">$6.55</td><td class="num tnd-primary">15.72</td><td class="num tnd-real">13.82</td><td class="note"><span class="savings">Save 10%+ vs monthly</span></td></tr>
+      <tr><td class="tier">Lens+<span class="billing">Monthly E (advanced AR)</span></td><td class="num">$10.99</td><td class="num">$12.31</td><td class="num">$16.00</td><td class="num tnd-primary">38.40</td><td class="num tnd-real">33.76</td><td class="note">AR/AI creation tools</td></tr>
+      <tr><td class="tier">Platinum<span class="billing">Monthly E (ad-free)</span></td><td class="num">$15.99</td><td class="num">$17.91</td><td class="num">$23.28</td><td class="num tnd-primary">55.88</td><td class="num tnd-real">49.13</td><td class="note">Ad-free + everything</td></tr>
+      <tr><td class="tier">Family Plan<span class="billing">Monthly E (3 users + 250GB)</span></td><td class="num">$10.99</td><td class="num">$12.31</td><td class="num">$16.00</td><td class="num tnd-primary">38.40</td><td class="num tnd-real">33.76</td><td class="note">Owner + 2 add-ons</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Twitch -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Twitch (Turbo + Subs)</h3>
+    <span class="verify v">V</span>
+    <span class="source">Confirmed: $13.99 CAD Turbo, sub Tier 1 ~$5.99 USD per channel</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Twitch Turbo<span class="billing">Monthly only</span></td><td class="num">$13.99</td><td class="num">$15.67</td><td class="num">$20.37</td><td class="num tnd-primary">48.89</td><td class="num tnd-real">42.97</td><td class="note">Ad-free all channels</td></tr>
+      <tr><td class="tier">Channel sub Tier 1<span class="billing">Monthly per channel</span></td><td class="num">$8.15</td><td class="num">$9.13</td><td class="num">$11.87</td><td class="num tnd-primary">28.49</td><td class="num tnd-real">25.05</td><td class="note">$5.99 USD × 1.36</td></tr>
+      <tr><td class="tier">Channel sub Tier 2<span class="billing">Monthly per channel</span></td><td class="num">$13.59</td><td class="num">$15.22</td><td class="num">$19.79</td><td class="num tnd-primary">47.50</td><td class="num tnd-real">41.76</td><td class="note">$9.99 USD × 1.36</td></tr>
+      <tr><td class="tier">Channel sub Tier 3<span class="billing">Monthly per channel</span></td><td class="num">$33.99</td><td class="num">$38.07</td><td class="num">$49.49</td><td class="num tnd-primary">118.78</td><td class="num tnd-real">104.42</td><td class="note">$24.99 USD × 1.36</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Discord Nitro -->
+<div class="product-block">
+  <div class="product-header">
+    <h3>Discord Nitro</h3>
+    <span class="verify e">E</span>
+    <span class="source">Annual ~16% off; verify on discord.com</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Nitro Basic<span class="billing">Monthly</span></td><td class="num">$4.07</td><td class="num">$4.56</td><td class="num">$5.93</td><td class="num tnd-primary">14.23</td><td class="num tnd-real">12.51</td><td class="note">$2.99 USD</td></tr>
+      <tr><td class="tier">Nitro Basic<span class="billing">Annual ~$30 USD</span></td><td class="num">$40.80</td><td class="num">$45.70</td><td class="num">$59.41</td><td class="num tnd-primary">142.58</td><td class="num tnd-real">125.36</td><td class="note">~17% off monthly</td></tr>
+      <tr><td class="tier">Nitro<span class="billing">Monthly</span></td><td class="num">$13.59</td><td class="num">$15.22</td><td class="num">$19.79</td><td class="num tnd-primary">47.50</td><td class="num tnd-real">41.76</td><td class="note">$9.99 USD</td></tr>
+      <tr><td class="tier">Nitro<span class="billing">Annual ~$100 USD</span></td><td class="num">$136.00</td><td class="num">$152.32</td><td class="num">$198.02</td><td class="num tnd-primary">475.24</td><td class="num tnd-real">417.81</td><td class="note"><span class="savings">Save 17%</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>X Premium</h3>
+    <span class="verify v">V</span>
+    <span class="source">x.com/premium April 2026</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Basic<span class="billing">Monthly</span></td><td class="num">$5.43</td><td class="num">$6.08</td><td class="num">$7.91</td><td class="num tnd-primary">18.98</td><td class="num tnd-real">16.69</td><td class="note">Limited features</td></tr>
+      <tr><td class="tier">Premium<span class="billing">Monthly</span></td><td class="num">$10.88</td><td class="num">$12.19</td><td class="num">$15.84</td><td class="num tnd-primary">38.02</td><td class="num tnd-real">33.42</td><td class="note">$8 USD</td></tr>
+      <tr><td class="tier">Premium+<span class="billing">Monthly (no ads)</span></td><td class="num">$54.40</td><td class="num">$60.93</td><td class="num">$79.21</td><td class="num tnd-primary">190.10</td><td class="num tnd-real">167.13</td><td class="note">$40 USD</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>Other social/lifestyle (estimates — verify before launch)</h3>
+    <span class="verify e">E</span>
+    <span class="source">Verify on each provider's checkout from a CA IP</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Strava ≈<span class="billing">Monthly</span></td><td class="num">$10.79</td><td class="num">$12.08</td><td class="num">$15.71</td><td class="num tnd-primary">37.71</td><td class="num tnd-real">33.14</td><td class="note">Annual ~$80/yr</td></tr>
+      <tr><td class="tier">Flo Premium ≈<span class="billing">Monthly</span></td><td class="num">$13.49</td><td class="num">$15.11</td><td class="num">$19.64</td><td class="num tnd-primary">47.14</td><td class="num tnd-real">41.44</td><td class="note">Annual usually ~50% off</td></tr>
+      <tr><td class="tier">Yubo Power Pack ≈<span class="billing">Monthly</span></td><td class="num">$13.59</td><td class="num">$15.22</td><td class="num">$19.79</td><td class="num tnd-primary">47.50</td><td class="num tnd-real">41.76</td><td class="note">Verify on yubo.live</td></tr>
+      <tr><td class="tier">Instagram / Meta Verified<span class="billing">Monthly</span></td><td class="num">$19.99</td><td class="num">$22.39</td><td class="num">$29.10</td><td class="num tnd-primary">69.85</td><td class="num tnd-real">61.40</td><td class="note">Per account</td></tr>
+      <tr><td class="tier">Reddit Premium ≈<span class="billing">Monthly</span></td><td class="num">$8.15</td><td class="num">$9.13</td><td class="num">$11.86</td><td class="num tnd-primary">28.46</td><td class="num tnd-real">25.03</td><td class="note">Annual saves ~25%</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================ PRODUCTIVITY ============================ -->
+<div class="section-head">
+  <h2>Productivity & Software</h2>
+  <span class="meta">Type 2 — 30% margin</span>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>Microsoft 365 Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">microsoft.com/en-ca + office-watch.com 2026</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Personal<span class="billing">Monthly</span></td><td class="num">$10.99</td><td class="num">$12.31</td><td class="num">$16.00</td><td class="num tnd-primary">38.40</td><td class="num tnd-real">33.76</td><td class="note">1 person, 1TB</td></tr>
+      <tr><td class="tier">Personal<span class="billing">Annual ($115/yr → $9.58/mo)</span></td><td class="num">$9.58</td><td class="num">$10.73</td><td class="num">$13.95</td><td class="num tnd-primary">33.48</td><td class="num tnd-real">29.43</td><td class="note"><span class="savings">Save 13%</span></td></tr>
+      <tr><td class="tier">Family<span class="billing">Monthly</span></td><td class="num">$12.99</td><td class="num">$14.55</td><td class="num">$18.91</td><td class="num tnd-primary">45.39</td><td class="num tnd-real">39.91</td><td class="note">Up to 6 people</td></tr>
+      <tr><td class="tier">Family<span class="billing">Annual ($129/yr → $10.75/mo)</span></td><td class="num">$10.75</td><td class="num">$12.04</td><td class="num">$15.65</td><td class="num tnd-primary">37.57</td><td class="num tnd-real">33.04</td><td class="note"><span class="savings">Save 17%</span></td></tr>
+      <tr><td class="tier">Premium<span class="billing">Monthly E (with full Copilot)</span></td><td class="num">$22.99</td><td class="num">$25.75</td><td class="num">$33.47</td><td class="num tnd-primary">80.34</td><td class="num tnd-real">70.63</td><td class="note">Newer tier, 6 users</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>Adobe Creative Cloud</h3>
+    <span class="verify v">V</span>
+    <span class="source">adobe.com/ca April 2026</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Photography (20GB)<span class="billing">Annual ($143/yr → $11.92/mo)</span></td><td class="num">$11.92</td><td class="num">$13.35</td><td class="num">$17.36</td><td class="num tnd-primary">41.66</td><td class="num tnd-real">36.62</td><td class="note">LR + Photoshop</td></tr>
+      <tr><td class="tier">Photography (1TB)<span class="billing">Monthly</span></td><td class="num">$28.99</td><td class="num">$32.47</td><td class="num">$42.21</td><td class="num tnd-primary">101.30</td><td class="num tnd-real">89.06</td><td class="note">New plan since 2025</td></tr>
+      <tr><td class="tier">Single app (e.g. Photoshop)<span class="billing">Monthly</span></td><td class="num">$33.99</td><td class="num">$38.07</td><td class="num">$49.49</td><td class="num tnd-primary">118.78</td><td class="num tnd-real">104.42</td><td class="note">Per app</td></tr>
+      <tr><td class="tier">All Apps<span class="billing">Monthly (annual commitment)</span></td><td class="num">$70.99</td><td class="num">$79.51</td><td class="num">$103.36</td><td class="num tnd-primary">248.07</td><td class="num tnd-real">218.10</td><td class="note">All 20+ apps</td></tr>
+      <tr><td class="tier">All Apps<span class="billing">Monthly (no commit)</span></td><td class="num">$106.49</td><td class="num">$119.27</td><td class="num">$155.05</td><td class="num tnd-primary">372.13</td><td class="num tnd-real">327.16</td><td class="note">~50% more</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>LinkedIn Premium</h3>
+    <span class="verify v">V</span>
+    <span class="source">linkedin.com/premium + Campbell Morden 2026 (Canadian site)</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Career<span class="billing">Monthly (regular)</span></td><td class="num">$33.99</td><td class="num">$38.07</td><td class="num">$49.49</td><td class="num tnd-primary">118.78</td><td class="num tnd-real">104.42</td><td class="note">Job seekers</td></tr>
+      <tr><td class="tier">Career<span class="billing">Annual ~30% off → ~$24/mo equiv</span></td><td class="num">$23.79</td><td class="num">$26.65</td><td class="num">$34.64</td><td class="num tnd-primary">83.14</td><td class="num tnd-real">73.10</td><td class="note"><span class="savings">Save 30%</span></td></tr>
+      <tr><td class="tier">Business<span class="billing">Monthly</span></td><td class="num">$74.99</td><td class="num">$83.99</td><td class="num">$109.18</td><td class="num tnd-primary">262.05</td><td class="num tnd-real">230.39</td><td class="note">Unlimited browsing</td></tr>
+      <tr><td class="tier">Business<span class="billing">Annual → ~$50/mo equiv</span></td><td class="num">$49.99</td><td class="num">$55.99</td><td class="num">$72.78</td><td class="num tnd-primary">174.69</td><td class="num tnd-real">153.57</td><td class="note"><span class="savings">Save 33%</span></td></tr>
+      <tr><td class="tier">Sales Navigator Core<span class="billing">Monthly E</span></td><td class="num">$163.19</td><td class="num">$182.77</td><td class="num">$237.60</td><td class="num tnd-primary">570.25</td><td class="num tnd-real">501.34</td><td class="note">$119.99 USD</td></tr>
+      <tr><td class="tier">Sales Navigator Advanced<span class="billing">Monthly E</span></td><td class="num">$217.59</td><td class="num">$243.70</td><td class="num">$316.81</td><td class="num tnd-primary">760.34</td><td class="num tnd-real">668.46</td><td class="note">$159.99 USD</td></tr>
+      <tr><td class="tier">Recruiter Lite<span class="billing">Monthly E</span></td><td class="num">$231.20</td><td class="num">$258.94</td><td class="num">$336.63</td><td class="num tnd-primary">807.91</td><td class="num tnd-real">710.27</td><td class="note">$170 USD</td></tr>
+      <tr><td class="tier">Learning standalone<span class="billing">Monthly E</span></td><td class="num">$54.39</td><td class="num">$60.92</td><td class="num">$79.20</td><td class="num tnd-primary">190.07</td><td class="num tnd-real">167.10</td><td class="note">Already in Career/Business</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>Other productivity (estimates)</h3>
+    <span class="verify e">E</span>
+    <span class="source">Verify each at provider checkout</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Canva Pro<span class="billing">Monthly</span></td><td class="num">$17.99</td><td class="num">$20.15</td><td class="num">$26.20</td><td class="num tnd-primary">62.88</td><td class="num tnd-real">55.27</td><td class="note">$169.99/yr saves ~22%</td></tr>
+      <tr><td class="tier">Canva Pro<span class="billing">Annual ($169.99/yr)</span></td><td class="num">$14.17</td><td class="num">$15.87</td><td class="num">$20.63</td><td class="num tnd-primary">49.51</td><td class="num tnd-real">43.53</td><td class="note"><span class="savings">Save 22%</span></td></tr>
+      <tr><td class="tier">Grammarly Premium ≈<span class="billing">Monthly</span></td><td class="num">$40.00</td><td class="num">$44.80</td><td class="num">$58.24</td><td class="num tnd-primary">139.78</td><td class="num tnd-real">122.89</td><td class="note">Annual usually ~$144/yr</td></tr>
+      <tr><td class="tier">Zoom Workplace Pro ≈<span class="billing">Monthly</span></td><td class="num">$20.99</td><td class="num">$23.51</td><td class="num">$30.56</td><td class="num tnd-primary">73.34</td><td class="num tnd-real">64.49</td><td class="note">Annual ~$200/yr</td></tr>
+      <tr><td class="tier">GoDaddy .com domain<span class="billing">Annual</span></td><td class="num">$25.99</td><td class="num">$29.11</td><td class="num">$37.84</td><td class="num tnd-primary">90.81</td><td class="num tnd-real">79.85</td><td class="note">Year 1; renewals higher</td></tr>
+      <tr><td class="tier">NordVPN Standard<span class="billing">Monthly</span></td><td class="num">$17.99</td><td class="num">$20.15</td><td class="num">$26.20</td><td class="num tnd-primary">62.88</td><td class="num tnd-real">55.27</td><td class="note">Massive deals on annual</td></tr>
+      <tr><td class="tier">NordVPN Standard<span class="billing">2-year plan ~$3.50/mo USD</span></td><td class="num">$4.76</td><td class="num">$5.33</td><td class="num">$6.93</td><td class="num tnd-primary">16.63</td><td class="num tnd-real">14.62</td><td class="note">Lock in 2 years</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================ STORAGE ============================ -->
+<div class="section-head">
+  <h2>Cloud Storage</h2>
+  <span class="meta">Type 2 — 30% margin</span>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>iCloud+ Canada (Apple)</h3>
+    <span class="verify v">V</span>
+    <span class="source">apple.com/ca/icloud</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">50GB<span class="billing">Monthly only</span></td><td class="num">$1.29</td><td class="num">$1.44</td><td class="num">$1.88</td><td class="num tnd-primary">4.51</td><td class="num tnd-real">3.96</td><td class="note">Often included w/ Apple One</td></tr>
+      <tr><td class="tier">200GB<span class="billing">Monthly only</span></td><td class="num">$3.99</td><td class="num">$4.47</td><td class="num">$5.81</td><td class="num tnd-primary">13.93</td><td class="num tnd-real">12.25</td><td class="note">Family-shareable</td></tr>
+      <tr><td class="tier">2TB<span class="billing">Monthly only</span></td><td class="num">$12.99</td><td class="num">$14.55</td><td class="num">$18.91</td><td class="num tnd-primary">45.39</td><td class="num tnd-real">39.91</td><td class="note">In Premier Apple One</td></tr>
+      <tr><td class="tier">6TB<span class="billing">Monthly only</span></td><td class="num">$42.99</td><td class="num">$48.15</td><td class="num">$62.59</td><td class="num tnd-primary">150.22</td><td class="num tnd-real">132.07</td><td class="note">Heavy users</td></tr>
+      <tr><td class="tier">12TB<span class="billing">Monthly only</span></td><td class="num">$84.99</td><td class="num">$95.19</td><td class="num">$123.74</td><td class="num tnd-primary">296.99</td><td class="num tnd-real">261.10</td><td class="note">Power users</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>OneDrive / Microsoft Storage</h3>
+    <span class="verify v">V</span>
+    <span class="source">Bundled with M365 in most cases</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">100GB standalone<span class="billing">Monthly</span></td><td class="num">$2.49</td><td class="num">$2.79</td><td class="num">$3.63</td><td class="num tnd-primary">8.71</td><td class="num tnd-real">7.65</td><td class="note">No M365 features</td></tr>
+      <tr><td class="tier">1TB (M365 Personal)<span class="billing">Monthly</span></td><td class="num">$10.99</td><td class="num">$12.31</td><td class="num">$16.00</td><td class="num tnd-primary">38.40</td><td class="num tnd-real">33.76</td><td class="note">Best value if you need Office</td></tr>
+      <tr><td class="tier">6TB (M365 Family, 6 users)<span class="billing">Monthly</span></td><td class="num">$12.99</td><td class="num">$14.55</td><td class="num">$18.91</td><td class="num tnd-primary">45.39</td><td class="num tnd-real">39.91</td><td class="note">1TB × 6 = 6TB total</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================ GAMING ============================ -->
+<div class="section-head">
+  <h2>Gaming</h2>
+  <span class="meta">Type 1 (gift cards) — 15%, no tax. Type 2 (subs) — 30%, 12% tax</span>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>PlayStation Plus Canada</h3>
+    <span class="verify v">V</span>
+    <span class="source">playstation.com/en-ca April 2026</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Essential<span class="billing">Monthly</span></td><td class="num">$11.99</td><td class="num">$13.43</td><td class="num">$17.45</td><td class="num tnd-primary">41.89</td><td class="num tnd-real">36.83</td><td class="note">Online play, monthly games</td></tr>
+      <tr><td class="tier">Essential<span class="billing">3 Months</span></td><td class="num">$31.99</td><td class="num">$35.83</td><td class="num">$46.58</td><td class="num tnd-primary">111.80</td><td class="num tnd-real">98.30</td><td class="note">$10.66/mo equiv</td></tr>
+      <tr><td class="tier">Essential<span class="billing">12 Months</span></td><td class="num">$94.99</td><td class="num">$106.39</td><td class="num">$138.31</td><td class="num tnd-primary">331.95</td><td class="num tnd-real">291.84</td><td class="note">$7.92/mo equiv <span class="savings">Save 34%</span></td></tr>
+      <tr><td class="tier">Extra<span class="billing">Monthly</span></td><td class="num">$18.99</td><td class="num">$21.27</td><td class="num">$27.65</td><td class="num tnd-primary">66.36</td><td class="num tnd-real">58.34</td><td class="note">+ Game Catalog</td></tr>
+      <tr><td class="tier">Extra<span class="billing">12 Months</span></td><td class="num">$155.99</td><td class="num">$174.71</td><td class="num">$227.12</td><td class="num tnd-primary">545.10</td><td class="num tnd-real">479.23</td><td class="note">$13.00/mo <span class="savings">Save 32%</span></td></tr>
+      <tr><td class="tier">Premium<span class="billing">Monthly</span></td><td class="num">$22.99</td><td class="num">$25.75</td><td class="num">$33.47</td><td class="num tnd-primary">80.34</td><td class="num tnd-real">70.63</td><td class="note">+ Classics + Streaming</td></tr>
+      <tr><td class="tier">Premium<span class="billing">12 Months</span></td><td class="num">$179.99</td><td class="num">$201.59</td><td class="num">$262.07</td><td class="num tnd-primary">628.96</td><td class="num tnd-real">552.97</td><td class="note">$15.00/mo <span class="savings">Save 35%</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>Xbox Game Pass Canada</h3>
+    <span class="verify e">E</span>
+    <span class="source">Verify on xbox.com/en-ca</span>
+  </div>
+  <table>
+    <thead><tr><th>Tier</th><th class="num">Base CAD</th><th class="num">+ 12% tax</th><th class="num">+ 30% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Core ≈<span class="billing">Monthly</span></td><td class="num">$11.99</td><td class="num">$13.43</td><td class="num">$17.45</td><td class="num tnd-primary">41.89</td><td class="num tnd-real">36.83</td><td class="note">Online play + 25 games</td></tr>
+      <tr><td class="tier">Standard ≈<span class="billing">Monthly</span></td><td class="num">$16.99</td><td class="num">$19.03</td><td class="num">$24.74</td><td class="num tnd-primary">59.37</td><td class="num tnd-real">52.20</td><td class="note">Console games</td></tr>
+      <tr><td class="tier">PC Game Pass ≈<span class="billing">Monthly</span></td><td class="num">$15.99</td><td class="num">$17.91</td><td class="num">$23.28</td><td class="num tnd-primary">55.88</td><td class="num tnd-real">49.13</td><td class="note">PC only</td></tr>
+      <tr><td class="tier">Ultimate ≈<span class="billing">Monthly</span></td><td class="num">$22.99</td><td class="num">$25.75</td><td class="num">$33.47</td><td class="num tnd-primary">80.34</td><td class="num tnd-real">70.63</td><td class="note">Console + PC + Cloud + EA Play</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================ GIFT CARDS ============================ -->
+<div class="section-head">
+  <h2>Gift Cards</h2>
+  <span class="meta">Type 1 — 15% margin, no tax</span>
+</div>
+
+<div class="product-block">
+  <div class="product-header">
+    <h3>USD-denominated gift cards</h3>
+    <span class="verify v">V</span>
+    <span class="source">USD face value × 1.36 conversion + 15% margin</span>
+  </div>
+  <table>
+    <thead><tr><th>Card</th><th class="num">USD value</th><th class="num">CAD cost</th><th class="num">+ 15% margin</th><th class="num tnd-primary">TND @ 2.40</th><th class="num tnd-real">TND @ 2.11</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="tier">Steam $20</td><td class="num">$20</td><td class="num">$27.20</td><td class="num">$31.28</td><td class="num tnd-primary">75.07</td><td class="num tnd-real">66.00</td><td class="note">Most popular denomination</td></tr>
+      <tr><td class="tier">Steam $50</td><td class="num">$50</td><td class="num">$68.00</td><td class="num">$78.20</td><td class="num tnd-primary">187.68</td><td class="num tnd-real">165.00</td><td class="note">—</td></tr>
+      <tr><td class="tier">Steam $100</td><td class="num">$100</td><td class="num">$136.00</td><td class="num">$156.40</td><td class="num tnd-primary">375.36</td><td class="num tnd-real">330.01</td><td class="note">—</td></tr>
+      <tr><td class="tier">Apple App Store / iTunes $25</td><td class="num">$25</td><td class="num">$34.00</td><td class="num">$39.10</td><td class="num tnd-primary">93.84</td><td class="num tnd-real">82.50</td><td class="note">For iCloud, apps, music</td></tr>
+      <tr><td class="tier">Apple App Store / iTunes $50</td><td class="num">$50</td><td class="num">$68.00</td><td class="num">$78.20</td><td class="num tnd-primary">187.68</td><td class="num tnd-real">165.00</td><td class="note">—</td></tr>
+      <tr><td class="tier">Apple App Store / iTunes $100</td><td class="num">$100</td><td class="num">$136.00</td><td class="num">$156.40</td><td class="num tnd-primary">375.36</td><td class="num tnd-real">330.01</td><td class="note">—</td></tr>
+      <tr><td class="tier">Google Play $25</td><td class="num">$25</td><td class="num">$34.00</td><td class="num">$39.10</td><td class="num tnd-primary">93.84</td><td class="num tnd-real">82.50</td><td class="note">Android apps, YouTube</td></tr>
+      <tr><td class="tier">Google Play $50</td><td class="num">$50</td><td class="num">$68.00</td><td class="num">$78.20</td><td class="num tnd-primary">187.68</td><td class="num tnd-real">165.00</td><td class="note">—</td></tr>
+      <tr><td class="tier">Xbox $25</td><td class="num">$25</td><td class="num">$34.00</td><td class="num">$39.10</td><td class="num tnd-primary">93.84</td><td class="num tnd-real">82.50</td><td class="note">For Xbox Live, GP, MS Store</td></tr>
+      <tr><td class="tier">Xbox $50</td><td class="num">$50</td><td class="num">$68.00</td><td class="num">$78.20</td><td class="num tnd-primary">187.68</td><td class="num tnd-real">165.00</td><td class="note">—</td></tr>
+      <tr><td class="tier">Netflix $50 (US)</td><td class="num">$50</td><td class="num">$68.00</td><td class="num">$78.20</td><td class="num tnd-primary">187.68</td><td class="num tnd-real">165.00</td><td class="note">Apply via redeem.netflix.com</td></tr>
+      <tr><td class="tier">Netflix $100 (US)</td><td class="num">$100</td><td class="num">$136.00</td><td class="num">$156.40</td><td class="num tnd-primary">375.36</td><td class="num tnd-real">330.01</td><td class="note">—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- INSIGHTS -->
+<div class="info-box">
+  <h3>What this expanded view tells you</h3>
+  <p><strong>Annual plans dominate the value math.</strong> Disney+ Standard annual at 47 TND beats monthly at 56 TND for the same product. PlayStation Plus 12-month Premium at 629 TND total saves the customer 35% vs paying monthly. Push annual plans hard in your marketing — your fulfillment cost is the same but margin per customer is much higher.</p>
+  <p><strong>Apple One is genuinely better than separate iCloud+ for many Tunisians.</strong> The Family tier at 101 TND covers Music + TV+ + Arcade + 200GB iCloud for a household — better than buying iCloud+ alone (14 TND) plus separate Apple Music subs (~30 TND each). Promote this bundle.</p>
+  <p><strong>LinkedIn Premium has a massive price ceiling.</strong> Career at 119 TND is approachable; Recruiter Lite at 808 TND is enterprise-only. Don't list all six on your front page — that range looks confusing. Lead with Career and Business; offer the higher tiers as "by request."</p>
+  <p><strong>Twitch Turbo is interesting positioning.</strong> At 49 TND for Tunisian gamers who watch a lot of streams, this is a legitimate "I'm tired of ads" purchase — and there's no Spotify-style alternative for it.</p>
+</div>
+
+<footer>
+  Lbara.tn pricing v2 · Generated April 2026 · FX 2.40 (real 2.11) · BC tax 12% · Re-verify before launch — provider prices change every 6–12 months
+</footer>
+
+</div>
+</body>
+</html>

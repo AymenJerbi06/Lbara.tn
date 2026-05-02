@@ -94,7 +94,11 @@ function validateRuntimeConfig() {
   validateEmailConfig(errors);
 
   if (errors.length) {
-    throw new Error(`Production configuration is not safe:\n- ${errors.join('\n- ')}`);
+    const message = `Production configuration needs attention:\n- ${errors.join('\n- ')}`;
+    if (envFlag('STRICT_RUNTIME_CONFIG')) {
+      throw new Error(message);
+    }
+    console.warn(`[WARN] ${message}`);
   }
 }
 

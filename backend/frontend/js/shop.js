@@ -140,7 +140,7 @@ let currentPage = 1;
 let currentCategory = 'all';
 let currentSearch = '';
 const DESKTOP_PAGE_SIZE = 18;
-const MOBILE_PAGE_SIZE = 4;
+const MOBILE_PAGE_SIZE = 9;
 let lastPageSize = getPageSize();
 
 // product data keyed by id, used by click handlers.
@@ -242,7 +242,8 @@ function renderProducts() {
       }).join('');
     }
     if (requestCta) {
-      requestCta.classList.toggle('hidden', currentPage < 3 && products.length > 0);
+      var isLastPage = totalPages > 0 && currentPage >= totalPages;
+      requestCta.classList.toggle('hidden', !isLastPage);
     }
   }).catch(function (err) {
     grid.innerHTML = '<div class="col-span-3 text-center py-12 text-red-500 font-bold">' + escapeHtml(err.message || 'Failed to load products.') + '</div>';

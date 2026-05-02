@@ -58,6 +58,19 @@ async function ensureRuntimeMigrations() {
     END $$;
   `);
 
+  await pool.query(`
+    UPDATE products
+    SET active = FALSE
+    WHERE slug IN (
+      'netflix-premium-1m',
+      'chatgpt-plus-1m',
+      'spotify-family-1m',
+      'canva-pro-1m',
+      'youtube-premium-1m',
+      'adobe-cc-1m'
+    )
+  `);
+
   await seedProductCatalog(pool);
 
   try {
