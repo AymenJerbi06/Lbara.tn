@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const { validateRuntimeConfig } = require('./src/config/runtimeConfig');
 
 const authRoutes = require('./src/routes/auth');
 const productRoutes = require('./src/routes/products');
@@ -16,6 +17,8 @@ const { apiLimiter } = require('./src/middleware/rateLimiter');
 
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
+
+validateRuntimeConfig();
 
 // Trust Railway/Render reverse proxy so req.ip and secure cookies work correctly
 app.set('trust proxy', 1);

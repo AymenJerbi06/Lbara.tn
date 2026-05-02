@@ -4,8 +4,13 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const pool = require('../src/config/db');
 
-const EMAIL    = process.env.ADMIN_EMAIL    || 'jerbiaymen6@gmail.com';
-const PASSWORD = process.env.ADMIN_PASSWORD || 'ChangeMe123!';
+const EMAIL = process.env.ADMIN_EMAIL;
+const PASSWORD = process.env.ADMIN_PASSWORD;
+
+if (!EMAIL || !PASSWORD) {
+  console.error('[ERROR] ADMIN_EMAIL and ADMIN_PASSWORD must be set before creating an admin account.');
+  process.exit(1);
+}
 
 async function run() {
   const hash = await bcrypt.hash(PASSWORD, 12);
