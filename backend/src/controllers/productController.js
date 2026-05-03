@@ -10,6 +10,10 @@ const {
 const PRODUCT_SELECT = `
   SELECT
     p.*,
+    COALESCE(rs.review_count, 0)::int AS review_count,
+    COALESCE(rs.average_rating, 0)::numeric(3, 2) AS average_rating,
+    COALESCE(ws.weekly_order_count, 0)::int AS weekly_order_count,
+    COALESCE(wl.favorite_count, 0)::int AS favorite_count,
     COUNT(v.id)::int AS variant_count,
     MIN(v.price_tnd) FILTER (WHERE v.price_tnd IS NOT NULL)::numeric AS min_variant_price_tnd,
     COALESCE(
@@ -31,6 +35,23 @@ const PRODUCT_SELECT = `
     ) AS variants
   FROM products p
   LEFT JOIN product_variants v ON v.product_id = p.id AND v.active = TRUE
+  LEFT JOIN LATERAL (
+    SELECT COUNT(*)::int AS review_count, ROUND(AVG(rating)::numeric, 2) AS average_rating
+    FROM product_reviews
+    WHERE product_id = p.id
+  ) rs ON TRUE
+  LEFT JOIN LATERAL (
+    SELECT COUNT(*)::int AS weekly_order_count
+    FROM orders
+    WHERE product_id = p.id
+      AND status IN ('paid', 'processing', 'fulfilled')
+      AND created_at >= NOW() - INTERVAL '7 days'
+  ) ws ON TRUE
+  LEFT JOIN LATERAL (
+    SELECT COUNT(*)::int AS favorite_count
+    FROM wishlist_items
+    WHERE product_id = p.id
+  ) wl ON TRUE
 `;
 
 const PRODUCT_ORDER = `
@@ -51,10 +72,26 @@ const PRODUCT_ORDER = `
   p.name ASC
 `;
 
+const SPECIAL_CATEGORIES = ['hot_this_week', 'users_favorite'];
+
 function productWhereClause({ category, search }, params) {
   const conditions = ['p.active = TRUE'];
 
-  if (category && category !== 'all') {
+  if (category === 'hot_this_week') {
+    conditions.push(`EXISTS (
+      SELECT 1
+      FROM orders hot_orders
+      WHERE hot_orders.product_id = p.id
+        AND hot_orders.status IN ('paid', 'processing', 'fulfilled')
+        AND hot_orders.created_at >= NOW() - INTERVAL '7 days'
+    )`);
+  } else if (category === 'users_favorite') {
+    conditions.push(`EXISTS (
+      SELECT 1
+      FROM product_reviews favorite_reviews
+      WHERE favorite_reviews.product_id = p.id
+    )`);
+  } else if (category && category !== 'all') {
     params.push(category);
     conditions.push(`p.category = $${params.length}`);
   }
@@ -83,6 +120,30 @@ function productWhereClause({ category, search }, params) {
   return conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 }
 
+function productOrderClause(category) {
+  if (category === 'hot_this_week') {
+    return `
+      COALESCE(ws.weekly_order_count, 0) DESC,
+      COALESCE(rs.average_rating, 0) DESC,
+      COALESCE(rs.review_count, 0) DESC,
+      COALESCE(wl.favorite_count, 0) DESC,
+      ${PRODUCT_ORDER}
+    `;
+  }
+
+  if (category === 'users_favorite') {
+    return `
+      CASE WHEN COALESCE(rs.review_count, 0) > 0 THEN 0 ELSE 1 END,
+      COALESCE(rs.average_rating, 0) DESC,
+      COALESCE(rs.review_count, 0) DESC,
+      COALESCE(wl.favorite_count, 0) DESC,
+      ${PRODUCT_ORDER}
+    `;
+  }
+
+  return PRODUCT_ORDER;
+}
+
 async function list(req, res) {
   try {
     rejectUnexpectedFields(req.query, ['category', 'search', 'page', 'limit'], 'Catalog query');
@@ -98,7 +159,7 @@ async function list(req, res) {
     params.push(offset);
 
     const [rows, countResult] = await Promise.all([
-      pool.query(`${PRODUCT_SELECT} ${where} GROUP BY p.id ORDER BY ${PRODUCT_ORDER} LIMIT $${params.length - 1} OFFSET $${params.length}`, params),
+      pool.query(`${PRODUCT_SELECT} ${where} GROUP BY p.id, rs.review_count, rs.average_rating, ws.weekly_order_count, wl.favorite_count ORDER BY ${productOrderClause(category)} LIMIT $${params.length - 1} OFFSET $${params.length}`, params),
       pool.query(`SELECT COUNT(*) FROM products p ${where}`, params.slice(0, -2)),
     ]);
 
@@ -120,7 +181,7 @@ async function getOne(req, res) {
   try {
     const id = cleanUuid(req.params.id, { label: 'Product' });
     const result = await pool.query(
-      `${PRODUCT_SELECT} WHERE p.id = $1 AND p.active = TRUE GROUP BY p.id`,
+      `${PRODUCT_SELECT} WHERE p.id = $1 AND p.active = TRUE GROUP BY p.id, rs.review_count, rs.average_rating, ws.weekly_order_count, wl.favorite_count`,
       [id]
     );
     if (!result.rows[0]) return res.status(404).json({ success: false, message: 'Product not found.' });
@@ -132,4 +193,23 @@ async function getOne(req, res) {
   }
 }
 
-module.exports = { list, getOne };
+async function reviews(req, res) {
+  try {
+    const id = cleanUuid(req.params.id, { label: 'Product' });
+    const result = await pool.query(
+      `SELECT rating, comment, created_at
+       FROM product_reviews
+       WHERE product_id = $1
+       ORDER BY created_at DESC
+       LIMIT 12`,
+      [id]
+    );
+    res.json({ success: true, reviews: result.rows });
+  } catch (err) {
+    if (handleValidationError(err, res)) return;
+    console.error('[products/reviews]', err);
+    res.status(500).json({ success: false, message: 'Failed to load reviews.' });
+  }
+}
+
+module.exports = { list, getOne, reviews };

@@ -1,6 +1,8 @@
 // Shop Page
 
 const CATEGORY_ICONS = {
+  hot_this_week: 'local_fire_department',
+  users_favorite: 'hotel_class',
   streaming: 'play_circle',
   ai_tools: 'auto_awesome',
   gaming: 'sports_esports',
@@ -26,6 +28,14 @@ function escapeHtml(value) {
 
 function escapeAttr(value) {
   return escapeHtml(value);
+}
+
+function tr(value) {
+  return window.lbaraT ? window.lbaraT(value) : value;
+}
+
+function applyTranslations(root) {
+  if (window.lbaraI18n) window.lbaraI18n.apply(root || document);
 }
 
 function safeImageUrl(value) {
@@ -66,7 +76,7 @@ function canCheckoutProduct(product) {
 
 function formatMoney(value) {
   var amount = toNumber(value);
-  if (amount === null || amount <= 0) return 'Price TBD';
+  if (amount === null || amount <= 0) return tr('Price TBD');
   return amount.toFixed(3) + ' TND';
 }
 
@@ -79,15 +89,45 @@ function productPriceLabel(product) {
     var quoteOnly = variants.some(function (variant) {
       return variant.checkout_mode === 'quote' && amountForVariant(variant) === min;
     });
-    return (quoteOnly ? 'Request ticket ' : 'From ') + min.toFixed(3) + ' TND';
+    return tr(quoteOnly ? 'Request ticket' : 'From') + ' ' + min.toFixed(3) + ' TND';
   }
   return formatMoney(product.price_tnd);
 }
 
 function variantPriceLabel(variant) {
   var amount = amountForVariant(variant);
-  if (amount === null || amount <= 0) return 'Pricing TBD';
-  return (variant.checkout_mode === 'quote' ? 'Request ticket ' : '') + amount.toFixed(3) + ' TND';
+  if (amount === null || amount <= 0) return tr('Pricing TBD');
+  return (variant.checkout_mode === 'quote' ? tr('Request ticket') + ' ' : '') + amount.toFixed(3) + ' TND';
+}
+
+function reviewCount(product) {
+  var count = Number(product.review_count);
+  return Number.isFinite(count) ? count : 0;
+}
+
+function averageRating(product) {
+  var rating = Number(product.average_rating);
+  return Number.isFinite(rating) ? rating : 0;
+}
+
+function ratingStarsMarkup(rating) {
+  var value = averageRating({ average_rating: rating });
+  var rounded = Math.round(value);
+  var html = '<span class="lbara-rating-stars" aria-hidden="true">';
+  for (var i = 1; i <= 5; i++) {
+    html += '<span class="material-symbols-outlined lbara-rating-star ' + (i <= rounded ? '' : 'is-empty') + '">star</span>';
+  }
+  html += '</span>';
+  return html;
+}
+
+function productRatingPill(product) {
+  var count = reviewCount(product);
+  var rating = averageRating(product);
+  if (!count) {
+    return '<div class="lbara-rating-pill">' + ratingStarsMarkup(0) + '<strong>' + escapeHtml(tr('New')) + '</strong></div>';
+  }
+  return '<div class="lbara-rating-pill">' + ratingStarsMarkup(rating) + '<strong>' + rating.toFixed(1) + ' (' + count + ')</strong></div>';
 }
 
 // Lower number = shown first. Gift cards/prepaid forced to end.
@@ -136,6 +176,16 @@ function getImgPos(p) {
   return 'center 30%';
 }
 
+function productEngagementLine(product) {
+  var category = String(product.category || '').toLowerCase();
+  if (category === 'ai_tools') return 'Unlock premium AI tools while paying locally in TND.';
+  if (category === 'education' || category === 'books') return 'Keep learning without international-card friction.';
+  if (category === 'streaming') return 'Watch globally popular entertainment with guided activation.';
+  if (category === 'gaming' || category === 'gift_cards') return 'Top up or unlock content with clear redemption notes.';
+  if (category === 'vpn') return 'Make restricted services easier to use from Tunisia.';
+  return 'Choose the version that fits you, then get guided checkout.';
+}
+
 let currentPage = 1;
 let currentCategory = 'all';
 let currentSearch = '';
@@ -167,6 +217,32 @@ function scrollToProductsTop() {
   });
 }
 
+function updateMobileCategoryToggle(panel, toggle) {
+  if (!panel || !toggle) return;
+  var expanded = panel.classList.contains('is-expanded');
+  var icon = toggle.querySelector('[data-category-toggle-icon]');
+  var label = toggle.querySelector('[data-category-toggle-label]');
+  toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  if (icon) icon.textContent = expanded ? 'close' : 'menu';
+  if (label) label.textContent = tr(expanded ? 'Close' : 'All');
+}
+
+function initMobileCategoryPanel() {
+  var panel = document.getElementById('mobile-category-panel');
+  var toggle = document.getElementById('mobile-category-toggle');
+  if (!panel || !toggle) return;
+
+  updateMobileCategoryToggle(panel, toggle);
+  toggle.addEventListener('click', function () {
+    panel.classList.toggle('is-expanded');
+    updateMobileCategoryToggle(panel, toggle);
+  });
+
+  document.addEventListener('lbara:languagechange', function () {
+    updateMobileCategoryToggle(panel, toggle);
+  });
+}
+
 function renderProducts() {
   const grid = document.getElementById('products-grid');
   const paginationEl = document.getElementById('pagination');
@@ -174,7 +250,8 @@ function renderProducts() {
   if (!grid) return;
   const pageSize = getPageSize();
 
-  grid.innerHTML = '<div class="col-span-3 text-center py-12 text-primary/40 font-bold">Loading...</div>';
+  grid.innerHTML = '<div class="col-span-3 text-center py-12 text-primary/40 font-bold">' + escapeHtml(tr('Loading...')) + '</div>';
+  applyTranslations(grid);
 
   const params = { page: currentPage, limit: pageSize };
   if (currentCategory !== 'all') params.category = currentCategory;
@@ -185,14 +262,17 @@ function renderProducts() {
     const total = res.total || 0;
 
     if (!products.length) {
-      grid.innerHTML = '<div class="col-span-3 text-center py-12 text-primary/40 font-bold">No services found.</div>';
+      grid.innerHTML = '<div class="col-span-3 text-center py-12 text-primary/40 font-bold">' + escapeHtml(tr('No services found.')) + '</div>';
       if (paginationEl) paginationEl.innerHTML = '';
       if (requestCta) requestCta.classList.remove('hidden');
+      applyTranslations(grid);
       return;
     }
 
     products.forEach(function (p) { productMap[p.id] = p; });
-    products.sort(function (a, b) { return productSortOrder(a) - productSortOrder(b); });
+    if (!['hot_this_week', 'users_favorite'].includes(currentCategory)) {
+      products.sort(function (a, b) { return productSortOrder(a) - productSortOrder(b); });
+    }
 
     grid.innerHTML = products.map(function (p) {
       var safeId = escapeAttr(p.id);
@@ -201,14 +281,15 @@ function renderProducts() {
       var safeProvider = escapeHtml(p.provider);
       var safeDescription = escapeHtml(p.description || '');
       var safeBadge = escapeHtml(p.badge);
-      var safeDuration = escapeHtml(p.duration_label || (variantsFor(p).length ? 'Options' : '1 Month'));
+      var durationLabel = p.duration_label || (variantsFor(p).length ? 'Options' : '1 Month');
+      var safeDuration = escapeHtml(tr(durationLabel));
       var safeImg = safeImageUrl(p.image_url);
       var safeImgPos = escapeAttr(p.image_position || getImgPos(p));
       var variants = variantsFor(p);
       var hasVariants = variants.length > 0;
       var priceLabel = productPriceLabel(p);
       var badgeHtml = p.badge ? '<span style="position:absolute;top:10px;right:10px;background:#003060;color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:0.08em;">' + safeBadge + '</span>' : '';
-      var optionBadge = hasVariants ? '<span class="text-xs font-bold bg-accent/10 text-accent px-2 py-1 rounded-lg">' + variants.length + ' Options</span>' : '';
+      var optionBadge = hasVariants ? '<span class="text-xs font-bold bg-accent/10 text-accent px-2 py-1 rounded-lg">' + variants.length + ' ' + escapeHtml(tr('Options')) + '</span>' : '';
       var headerHtml = safeImg
         ? '<div class="shop-card-img-hdr" style="position:relative;overflow:hidden;">'
             + '<img src="' + safeImg + '" alt="' + escapeAttr(p.name) + '" class="shop-card-img" style="object-position:' + safeImgPos + '">'
@@ -218,22 +299,34 @@ function renderProducts() {
             + '<span class="material-symbols-outlined text-primary text-4xl">' + (CATEGORY_ICONS[p.category] || 'stars') + '</span>'
             + badgeHtml
           + '</div>';
-      return '<a href="' + safeHref + '" data-product-card="' + safeId + '" class="cartoon-card shop-product-card rounded-2xl overflow-hidden flex flex-col no-underline text-inherit focus:outline-none focus:ring-4 focus:ring-accent/30">'
+      return '<article data-product-card="' + safeId + '" data-product-href="' + safeHref + '" role="link" tabindex="0" class="cartoon-card shop-product-card rounded-2xl overflow-hidden flex flex-col no-underline text-inherit focus:outline-none focus:ring-4 focus:ring-accent/30">'
         + headerHtml
         + '<div class="p-6 flex flex-col flex-grow" style="flex:1;">'
         + '<p class="text-xs font-black text-secondary uppercase tracking-widest mb-1">' + safeProvider + '</p>'
         + '<h3 class="font-headline font-bold text-primary text-lg leading-tight mb-2">' + safeName + '</h3>'
         + '<p class="text-sm text-on-surface/60 font-medium flex-grow mb-4 shop-card-desc">' + safeDescription + '</p>'
+        + '<p class="text-xs font-black text-primary/55 bg-primary/5 rounded-xl px-3 py-2 mb-4">' + escapeHtml(tr(productEngagementLine(p))) + '</p>'
         + '<div class="flex items-center gap-2 mb-4 flex-wrap">'
-        + '<span class="text-xs font-bold bg-primary/5 text-primary px-2 py-1 rounded-lg">' + (p.account_type === 'shared' ? 'Shared' : 'Private') + '</span>'
+        + '<span class="text-xs font-bold bg-primary/5 text-primary px-2 py-1 rounded-lg">' + escapeHtml(tr(p.account_type === 'shared' ? 'Shared' : 'Private')) + '</span>'
         + '<span class="text-xs font-bold bg-secondary/5 text-secondary px-2 py-1 rounded-lg">' + safeDuration + '</span>'
         + optionBadge
+        + '</div>'
+        + '<div class="lbara-engagement-row mb-4">'
+        + '<button type="button" class="lbara-engagement-btn lbara-engagement-btn-icon" data-favorite-product="' + safeId + '" data-product-name="' + safeName + '" data-favorite-label="Save" aria-label="' + escapeAttr(tr('Save')) + ' ' + escapeAttr(p.name) + '"><span class="material-symbols-outlined">favorite</span></button>'
+        + productRatingPill(p)
         + '</div>'
         + '<div class="flex items-center justify-between pt-4 border-t-2 border-primary/5 gap-3">'
         + '<div><span class="text-xl font-black text-primary">' + escapeHtml(priceLabel) + '</span></div>'
         + '<span class="inline-flex w-10 h-10 rounded-full border-2 border-primary items-center justify-center text-primary bg-primary/5 shrink-0" aria-hidden="true"><span class="material-symbols-outlined text-xl">arrow_forward</span></span>'
-        + '</div></div></a>';
+        + '</div></div></article>';
     }).join('');
+
+    if (window.lbaraEngagement) {
+      window.lbaraEngagement.load().then(function () {
+        window.lbaraEngagement.syncButtons(grid);
+      });
+    }
+    applyTranslations(grid);
 
     if (paginationEl) {
       var totalPages = Math.ceil(total / pageSize);
@@ -244,9 +337,11 @@ function renderProducts() {
     if (requestCta) {
       var isLastPage = totalPages > 0 && currentPage >= totalPages;
       requestCta.classList.toggle('hidden', !isLastPage);
+      applyTranslations(requestCta);
     }
   }).catch(function (err) {
     grid.innerHTML = '<div class="col-span-3 text-center py-12 text-red-500 font-bold">' + escapeHtml(err.message || 'Failed to load products.') + '</div>';
+    applyTranslations(grid);
   });
 }
 
@@ -268,6 +363,31 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   renderProducts();
+  initMobileCategoryPanel();
+
+  document.addEventListener('lbara:languagechange', function () {
+    renderProducts();
+  });
+
+  var productsGrid = document.getElementById('products-grid');
+  if (productsGrid) {
+    productsGrid.addEventListener('click', function (event) {
+      if (event.target.closest('button')) return;
+      var card = event.target.closest('[data-product-card]');
+      if (!card) return;
+      var href = card.getAttribute('data-product-href');
+      if (href) window.location.href = href;
+    });
+
+    productsGrid.addEventListener('keydown', function (event) {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      var card = event.target.closest('[data-product-card]');
+      if (!card) return;
+      event.preventDefault();
+      var href = card.getAttribute('data-product-href');
+      if (href) window.location.href = href;
+    });
+  }
 
   document.getElementById('pagination').addEventListener('click', function (e) {
     var btn = e.target.closest('[data-page]');

@@ -127,6 +127,17 @@
             </div>
             <h1 id="product-name" class="font-headline text-4xl md:text-6xl font-black text-primary leading-tight"></h1>
             <p id="product-description" class="text-lg text-on-surface/65 font-bold leading-relaxed max-w-3xl"></p>
+            <div class="lbara-engagement-row pt-2">
+              <button id="product-favorite-btn" type="button" class="lbara-engagement-btn" data-favorite-product="" data-product-name="" data-favorite-label="Save to favorites">
+                <span class="material-symbols-outlined">favorite</span>
+                <span class="lbara-engagement-label">Save to favorites</span>
+              </button>
+              <button id="product-sale-btn" type="button" class="lbara-engagement-btn lbara-sale-btn" data-sale-product="" data-product-name="">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="lbara-engagement-label">Notify me if discounted</span>
+              </button>
+            </div>
+            <div id="product-rating-summary" class="pt-1"></div>
           </section>
 
           <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -165,6 +176,35 @@
             </h2>
             <p id="activation-copy" class="text-sm md:text-base text-primary/65 font-bold leading-relaxed"></p>
             <p id="restriction-copy" class="hidden mt-4 bg-accent/10 border-2 border-accent/20 rounded-2xl p-4 text-sm text-primary/75 font-black leading-relaxed"></p>
+          </section>
+
+          <section class="cartoon-card rounded-3xl p-6 md:p-7">
+            <p class="text-xs font-black text-accent uppercase tracking-widest mb-2">Why choose it here</p>
+            <h2 id="pitch-title" class="font-headline text-2xl md:text-3xl font-black text-primary mb-5">A cleaner way to unlock this service</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="bg-primary/5 border-2 border-primary/10 rounded-2xl p-4">
+                <span class="material-symbols-outlined text-secondary mb-2">payments</span>
+                <p id="pitch-one" class="text-sm font-black text-primary leading-relaxed">Pay in TND without needing your own international card.</p>
+              </div>
+              <div class="bg-primary/5 border-2 border-primary/10 rounded-2xl p-4">
+                <span class="material-symbols-outlined text-accent mb-2">checklist</span>
+                <p id="pitch-two" class="text-sm font-black text-primary leading-relaxed">Choose the exact variation and understand the delivery path first.</p>
+              </div>
+              <div class="bg-primary/5 border-2 border-primary/10 rounded-2xl p-4">
+                <span class="material-symbols-outlined text-primary mb-2">support_agent</span>
+                <p id="pitch-three" class="text-sm font-black text-primary leading-relaxed">Get guided activation notes for the account or code path.</p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <div class="flex items-end justify-between gap-4 mb-5">
+              <div>
+                <p class="text-xs font-black text-accent uppercase tracking-widest mb-2">Tester notes</p>
+                <h2 class="font-headline text-2xl md:text-3xl font-black text-primary">Why people save this product</h2>
+              </div>
+            </div>
+            <div id="product-testimonials" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
           </section>
         </div>
 

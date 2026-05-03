@@ -30,6 +30,52 @@
 </style>
 <style>
 /* ── Mobile category chips ──────────────────────────────────────── */
+.mobile-category-panel {
+  transition: padding 0.16s ease;
+}
+.mobile-category-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px 10px;
+}
+.mobile-category-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #003060;
+  font-family: Quicksand, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.mobile-category-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 2px solid #003060;
+  background: #fff;
+  color: #003060;
+  font-family: Quicksand, sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  box-shadow: 3px 3px 0 #003060;
+}
+.mobile-category-toggle:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.mobile-category-toggle .material-symbols-outlined {
+  font-size: 18px;
+  line-height: 1;
+}
 .chip-row {
   display: flex;
   gap: 8px;
@@ -63,6 +109,32 @@
   box-shadow: 3px 3px 0 #B8860B;
 }
 .shop-chip:active { transform: translate(2px, 2px); box-shadow: none; }
+.mobile-category-panel.is-expanded {
+  padding-bottom: 6px;
+}
+.mobile-category-panel.is-expanded .mobile-category-toggle {
+  background: #003060;
+  color: #fff;
+  box-shadow: 3px 3px 0 #B8860B;
+}
+.mobile-category-panel.is-expanded .chip-row {
+  flex-wrap: wrap;
+  overflow: visible;
+  padding-bottom: 2px;
+}
+.mobile-category-panel.is-expanded .shop-chip {
+  flex: 1 1 calc(50% - 8px);
+  justify-content: flex-start;
+  padding: 8px 11px;
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.15;
+}
+@media (min-width: 430px) and (max-width: 767px) {
+  .mobile-category-panel.is-expanded .shop-chip {
+    flex-basis: calc(33.333% - 8px);
+  }
+}
 
 /* ── Card image/icon header sizes (class-driven so CSS can override) */
 .shop-card-img-hdr {
@@ -195,10 +267,26 @@
 </div>
 
 <!-- Mobile category chips (hidden on md+, sticky under nav) -->
-<div class="md:hidden sticky top-[66px] z-30 bg-white border-b-2 border-primary/10 shadow-sm py-3">
-  <div class="chip-row">
+<div id="mobile-category-panel" class="mobile-category-panel md:hidden sticky top-[66px] z-30 bg-white border-b-2 border-primary/10 shadow-sm py-3">
+  <div class="mobile-category-head">
+    <div class="mobile-category-title">
+      <span class="material-symbols-outlined" style="font-size:17px;line-height:1">category</span>
+      Categories
+    </div>
+    <button id="mobile-category-toggle" class="mobile-category-toggle" type="button" aria-expanded="false" aria-controls="mobile-category-list">
+      <span data-category-toggle-icon class="material-symbols-outlined">menu</span>
+      <span data-category-toggle-label>All</span>
+    </button>
+  </div>
+  <div id="mobile-category-list" class="chip-row">
     <button data-category="all" class="shop-chip active">
       <span class="material-symbols-outlined" style="font-size:15px;line-height:1">apps</span>All
+    </button>
+    <button data-category="hot_this_week" class="shop-chip">
+      <span class="material-symbols-outlined" style="font-size:15px;line-height:1">local_fire_department</span>Hot This Week
+    </button>
+    <button data-category="users_favorite" class="shop-chip">
+      <span class="material-symbols-outlined" style="font-size:15px;line-height:1">hotel_class</span>Users' Favorite
     </button>
     <button data-category="streaming" class="shop-chip">
       <span class="material-symbols-outlined" style="font-size:15px;line-height:1">play_circle</span>Streaming
@@ -249,6 +337,12 @@
         <div class="space-y-2">
           <button data-category="all" class="filter-item active">
             <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">apps</span> All Services</span>
+          </button>
+          <button data-category="hot_this_week" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">local_fire_department</span> Hot This Week</span>
+          </button>
+          <button data-category="users_favorite" class="filter-item">
+            <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">hotel_class</span> Users' Favorite</span>
           </button>
           <button data-category="streaming" class="filter-item">
             <span class="flex items-center gap-3"><span class="material-symbols-outlined text-xl">play_circle</span> Streaming</span>
@@ -310,6 +404,39 @@
           Request a service
         </a>
       </div>
+
+      <section class="mt-12">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-6">
+          <div>
+            <p class="text-xs font-black text-accent uppercase tracking-widest mb-2">Early tester feedback</p>
+            <h2 class="font-headline text-2xl md:text-3xl font-black text-primary">What makes people feel ready to buy</h2>
+          </div>
+          <a href="/how-it-works.html" class="font-headline font-black text-primary underline decoration-accent decoration-4 underline-offset-4">See the buying steps</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          <article class="cartoon-card rounded-3xl p-6">
+            <div class="lbara-rating-stars flex items-center gap-1 text-accent mb-4">
+              <span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span>
+            </div>
+            <p class="text-primary font-black leading-relaxed mb-5">"The checkout explains what account is needed before I pay, so it feels much clearer than just sending money and waiting."</p>
+            <p class="text-xs font-black text-primary/45 uppercase tracking-widest">Beta tester - Tunis</p>
+          </article>
+          <article class="cartoon-card rounded-3xl p-6">
+            <div class="lbara-rating-stars flex items-center gap-1 text-accent mb-4">
+              <span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span>
+            </div>
+            <p class="text-primary font-black leading-relaxed mb-5">"Seeing the variations in one place makes it easier to compare monthly, annual, bundle, and request-ticket options."</p>
+            <p class="text-xs font-black text-primary/45 uppercase tracking-widest">Early user - Sousse</p>
+          </article>
+          <article class="cartoon-card rounded-3xl p-6">
+            <div class="lbara-rating-stars flex items-center gap-1 text-accent mb-4">
+              <span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span>
+            </div>
+            <p class="text-primary font-black leading-relaxed mb-5">"Favorites and sale alerts help me keep track of the services I want without deciding on the spot."</p>
+            <p class="text-xs font-black text-primary/45 uppercase tracking-widest">Beta tester - Monastir</p>
+          </article>
+        </div>
+      </section>
     </div>
 
   </div>

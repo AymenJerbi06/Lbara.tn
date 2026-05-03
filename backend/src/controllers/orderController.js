@@ -11,9 +11,12 @@ const {
   cleanString,
   cleanUuid,
   cleanPhone,
+  cleanInteger,
   badRequest,
   handleValidationError,
 } = require('../utils/validation');
+
+const REVIEWABLE_STATUSES = ['paid', 'processing', 'fulfilled'];
 
 async function create(req, res) {
   try {
@@ -208,10 +211,12 @@ async function myOrders(req, res) {
   try {
     const result = await pool.query(
       `SELECT o.*, p.name AS product_name, p.provider, p.category,
-              v.name AS variant_name, v.billing_period AS variant_billing_period, v.checkout_mode AS variant_checkout_mode
+              v.name AS variant_name, v.billing_period AS variant_billing_period, v.checkout_mode AS variant_checkout_mode,
+              r.id AS review_id, r.rating AS review_rating, r.comment AS review_comment, r.updated_at AS review_updated_at
        FROM orders o
        JOIN products p ON p.id = o.product_id
        LEFT JOIN product_variants v ON v.id = o.variant_id
+       LEFT JOIN product_reviews r ON r.order_id = o.id AND r.user_id = $1
        WHERE o.user_id = $1
        ORDER BY o.created_at DESC`,
       [req.user.id]
@@ -226,4 +231,50 @@ async function myOrders(req, res) {
   }
 }
 
-module.exports = { create, getOrder, myOrders };
+async function reviewOrder(req, res) {
+  try {
+    const orderId = cleanUuid(req.params.id, { label: 'Order' });
+    rejectUnexpectedFields(req.body, ['rating', 'comment'], 'Review');
+    const rating = cleanInteger(req.body.rating, { label: 'Rating', min: 1, max: 5 });
+    const comment = cleanString(req.body.comment, { label: 'Review comment', required: false, max: 800 });
+
+    const orderResult = await pool.query(
+      'SELECT id, user_id, product_id, status FROM orders WHERE id = $1',
+      [orderId]
+    );
+    const order = orderResult.rows[0];
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found.' });
+    if (order.user_id !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'You can only review your own purchases.' });
+    }
+    if (!REVIEWABLE_STATUSES.includes(order.status)) {
+      return res.status(409).json({ success: false, message: 'You can review this service after the order is paid.' });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO product_reviews (user_id, order_id, product_id, rating, comment)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (order_id)
+       DO UPDATE SET rating = EXCLUDED.rating, comment = EXCLUDED.comment, updated_at = NOW()
+       RETURNING id, order_id, product_id, rating, comment, created_at, updated_at`,
+      [req.user.id, order.id, order.product_id, rating, comment]
+    );
+
+    await audit.log({
+      entityType: 'order',
+      entityId: order.id,
+      action: 'reviewed',
+      actorId: req.user.id,
+      actorType: 'user',
+      metadata: { rating },
+    });
+
+    res.json({ success: true, review: result.rows[0] });
+  } catch (err) {
+    if (handleValidationError(err, res)) return;
+    console.error('[orders/reviewOrder]', err);
+    res.status(500).json({ success: false, message: 'Failed to save review.' });
+  }
+}
+
+module.exports = { create, getOrder, myOrders, reviewOrder };

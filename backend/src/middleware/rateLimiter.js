@@ -65,6 +65,15 @@ const productLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const chatLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 25,
+  keyGenerator: ipAndUserKey,
+  message: { success: false, message: 'Too many chat messages. Please wait a few minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const webhookLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 60,
@@ -74,4 +83,4 @@ const webhookLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-module.exports = { apiLimiter, authLimiter, orderLimiter, contactLimiter, verifyLimiter, productLimiter, webhookLimiter };
+module.exports = { apiLimiter, authLimiter, orderLimiter, contactLimiter, verifyLimiter, productLimiter, chatLimiter, webhookLimiter };

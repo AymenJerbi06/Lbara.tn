@@ -26,6 +26,43 @@ async function ensureRuntimeMigrations() {
 
     CREATE INDEX IF NOT EXISTS idx_product_variants_product_id ON product_variants(product_id);
 
+    CREATE TABLE IF NOT EXISTS wishlist_items (
+      user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+      product_id  UUID REFERENCES products(id) ON DELETE CASCADE,
+      created_at  TIMESTAMPTZ DEFAULT NOW(),
+      PRIMARY KEY(user_id, product_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_wishlist_items_user_id ON wishlist_items(user_id);
+    CREATE INDEX IF NOT EXISTS idx_wishlist_items_product_id ON wishlist_items(product_id);
+
+    CREATE TABLE IF NOT EXISTS sale_notifications (
+      user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+      product_id  UUID REFERENCES products(id) ON DELETE CASCADE,
+      active      BOOLEAN DEFAULT TRUE,
+      created_at  TIMESTAMPTZ DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ DEFAULT NOW(),
+      PRIMARY KEY(user_id, product_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_sale_notifications_user_id ON sale_notifications(user_id);
+    CREATE INDEX IF NOT EXISTS idx_sale_notifications_product_id ON sale_notifications(product_id);
+
+    CREATE TABLE IF NOT EXISTS product_reviews (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+      order_id    UUID REFERENCES orders(id) ON DELETE CASCADE,
+      product_id  UUID REFERENCES products(id) ON DELETE CASCADE,
+      rating      INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+      comment     TEXT,
+      created_at  TIMESTAMPTZ DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(order_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_product_reviews_product_id ON product_reviews(product_id);
+    CREATE INDEX IF NOT EXISTS idx_product_reviews_user_id ON product_reviews(user_id);
+
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS variant_id UUID REFERENCES product_variants(id);
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_type VARCHAR(50);
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_method VARCHAR(80);

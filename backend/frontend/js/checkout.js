@@ -3,6 +3,14 @@
 document.addEventListener('DOMContentLoaded', async function () {
   const cart = JSON.parse(sessionStorage.getItem('lbara_cart') || 'null');
 
+  function tr(value) {
+    return window.lbaraT ? window.lbaraT(value) : value;
+  }
+
+  function applyTranslations(root) {
+    if (window.lbaraI18n) window.lbaraI18n.apply(root || document);
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('error') === 'payment_failed') {
     showToast('Payment was not completed. Please try again.', 'error');
@@ -70,21 +78,26 @@ document.addEventListener('DOMContentLoaded', async function () {
   if (metaEl) {
     const billingLabel = selectedVariant?.billing_period || product.duration_label || '1 Month';
     const modeLabel = selectedVariant?.checkout_mode === 'quote' ? 'Special request ticket - not part of final price' : 'Full payment';
-    metaEl.textContent = (product.account_type === 'shared' ? 'Shared' : 'Private') + ' Account - ' + billingLabel + ' - ' + modeLabel;
+    metaEl.textContent = tr(product.account_type === 'shared' ? 'Shared' : 'Private') + ' ' + tr('Account') + ' - ' + tr(billingLabel) + ' - ' + tr(modeLabel);
   }
-  if (priceEl) priceEl.textContent = pricingReady ? price.toFixed(3) : 'TBD';
-  if (subtotalEl) subtotalEl.textContent = pricingReady ? price.toFixed(3) + ' TND' : 'Pricing TBD';
-  if (totalEl) totalEl.textContent = pricingReady ? price.toFixed(3) : 'TBD';
+  if (priceEl) priceEl.textContent = pricingReady ? price.toFixed(3) : tr('TBD');
+  if (subtotalEl) subtotalEl.textContent = pricingReady ? price.toFixed(3) + ' TND' : tr('Pricing TBD');
+  if (totalEl) totalEl.textContent = pricingReady ? price.toFixed(3) : tr('TBD');
 
   const placeOrderBtn = document.getElementById('place-order-btn');
   if (!pricingReady && placeOrderBtn) {
     placeOrderBtn.disabled = true;
     placeOrderBtn.classList.add('opacity-50', 'cursor-not-allowed');
-    placeOrderBtn.innerHTML = '<span class="material-symbols-outlined">schedule</span> Pricing Not Ready';
+    placeOrderBtn.innerHTML = '<span class="material-symbols-outlined">schedule</span> ' + tr('Pricing Not Ready');
     showToast('This option does not have a price yet. Please contact us first.', 'error');
   }
 
   renderFulfillmentFields(product, selectedVariant);
+  applyTranslations(document);
+
+  document.addEventListener('lbara:languagechange', function () {
+    applyTranslations(document);
+  });
 
   let discountApplied = 0;
   const promoInput = document.getElementById('promo-input');
@@ -199,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       }
 
       placeOrderBtn.disabled = true;
-      placeOrderBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">autorenew</span> Processing...';
+      placeOrderBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">autorenew</span> ' + tr('Processing...');
 
       try {
         const result = await api.createOrder({
@@ -222,7 +235,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       } catch (err) {
         showToast(err.message, 'error');
         placeOrderBtn.disabled = false;
-        placeOrderBtn.innerHTML = '<span class="material-symbols-outlined">lock_open</span> Place Order Now';
+        placeOrderBtn.innerHTML = '<span class="material-symbols-outlined">lock_open</span> ' + tr('Place Order Now');
       }
     });
   }
@@ -496,6 +509,7 @@ function renderFulfillmentFields(product, selectedVariant) {
   }
 
   container.innerHTML = html;
+  if (window.lbaraI18n) window.lbaraI18n.apply(container);
 
   container.querySelectorAll('input[name="fulfillment_method"]').forEach(function (radio) {
     radio.addEventListener('change', updateFulfillmentPanels);

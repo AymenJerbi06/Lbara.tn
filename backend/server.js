@@ -12,6 +12,8 @@ const orderRoutes = require('./src/routes/orders');
 const paymentRoutes = require('./src/routes/payments');
 const contactRoutes = require('./src/routes/contact');
 const adminRoutes = require('./src/routes/admin');
+const accountRoutes = require('./src/routes/account');
+const chatRoutes = require('./src/routes/chat');
 const { ensureRuntimeMigrations } = require('./src/config/migrations');
 const { apiLimiter } = require('./src/middleware/rateLimiter');
 
@@ -41,17 +43,31 @@ app.use(helmet({
   } : false,
 }));
 
-app.use(cors({
-  origin(origin, callback) {
-    const allowed = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || 'http://localhost:3025')
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
-    if (!origin || allowed.includes(origin)) return callback(null, true);
+function corsOptionsDelegate(req, callback) {
+  const origin = req.header('Origin');
+  const allowed = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || 'http://localhost:3025')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (!origin) return callback(null, { origin: true, credentials: true });
+
+  try {
+    const originUrl = new URL(origin);
+    const requestHost = req.get('host');
+    const sameHost = requestHost && originUrl.host === requestHost;
+    const localDev = !isProd && ['localhost', '127.0.0.1', '::1'].includes(originUrl.hostname);
+    if (sameHost || localDev || allowed.includes(origin)) {
+      return callback(null, { origin: true, credentials: true });
+    }
+  } catch {
     return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-}));
+  }
+
+  return callback(new Error('Not allowed by CORS'));
+}
+
+app.use(cors(corsOptionsDelegate));
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(cookieParser());
@@ -90,6 +106,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/account', accountRoutes);
+app.use('/api/chat', chatRoutes);
 
 // ─── Catch-all: serve frontend for any non-API route ─────
 app.get('*', (req, res) => {
