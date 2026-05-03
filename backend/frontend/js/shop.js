@@ -243,6 +243,45 @@ function initMobileCategoryPanel() {
   });
 }
 
+function syncSearchInputValues(inputs, value, source) {
+  inputs.forEach(function (input) {
+    if (input !== source && input.value !== value) input.value = value;
+  });
+}
+
+function initSearchInputs(inputs) {
+  if (!inputs.length) return;
+  var debounce;
+  inputs.forEach(function (input) {
+    input.addEventListener('input', function (e) {
+      clearTimeout(debounce);
+      var value = e.target.value;
+      syncSearchInputValues(inputs, value, input);
+      debounce = setTimeout(function () {
+        currentSearch = value.trim();
+        currentPage = 1;
+        renderProducts();
+      }, 400);
+    });
+  });
+}
+
+function initStickySearch() {
+  var stickySearch = document.getElementById('mobile-sticky-search');
+  var anchor = document.getElementById('shop-search-anchor');
+  if (!stickySearch || !anchor) return;
+
+  function updateStickySearch() {
+    var isMobile = window.matchMedia('(max-width: 767px)').matches;
+    var shouldShow = isMobile && anchor.getBoundingClientRect().bottom <= 74;
+    stickySearch.classList.toggle('hidden', !shouldShow);
+  }
+
+  window.addEventListener('scroll', updateStickySearch, { passive: true });
+  window.addEventListener('resize', updateStickySearch);
+  updateStickySearch();
+}
+
 function renderProducts() {
   const grid = document.getElementById('products-grid');
   const paginationEl = document.getElementById('pagination');
@@ -347,13 +386,13 @@ function renderProducts() {
 
 document.addEventListener('DOMContentLoaded', function () {
   var params = new URLSearchParams(window.location.search);
-  var searchInput = document.getElementById('shop-search');
+  var searchInputs = Array.from(document.querySelectorAll('[data-shop-search]'));
   var initialSearch = (params.get('search') || '').trim();
   var initialCategory = (params.get('category') || '').trim();
 
   if (initialSearch) {
     currentSearch = initialSearch;
-    if (searchInput) searchInput.value = initialSearch;
+    syncSearchInputValues(searchInputs, initialSearch);
   }
 
   if (initialCategory) {
@@ -364,6 +403,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   renderProducts();
   initMobileCategoryPanel();
+  initSearchInputs(searchInputs);
+  initStickySearch();
 
   document.addEventListener('lbara:languagechange', function () {
     renderProducts();
@@ -414,18 +455,6 @@ document.addEventListener('DOMContentLoaded', function () {
       renderProducts();
     });
   });
-
-  if (searchInput) {
-    var debounce;
-    searchInput.addEventListener('input', function (e) {
-      clearTimeout(debounce);
-      debounce = setTimeout(function () {
-        currentSearch = e.target.value.trim();
-        currentPage = 1;
-        renderProducts();
-      }, 400);
-    });
-  }
 
   var resizeDebounce;
   window.addEventListener('resize', function () {

@@ -40,7 +40,13 @@ const api = {
   removeSaleNotification: (product_id) => apiFetch(`/account/sale-notifications/${encodeURIComponent(product_id)}`, { method: 'DELETE' }),
 
   // AI assistant
-  chat: (message) => apiFetch('/chat/message', { method: 'POST', body: { message } }),
+  chat: (message) => apiFetch('/chat/message', {
+    method: 'POST',
+    body: {
+      message,
+      language: window.lbaraI18n?.language ? window.lbaraI18n.language() : (document.documentElement.lang || 'en'),
+    },
+  }),
 
   // Orders
   createOrder: (body) => apiFetch('/orders', { method: 'POST', body }),
@@ -551,7 +557,7 @@ function initChatWidget() {
   });
   close.addEventListener('click', function () { panel.classList.add('hidden'); });
   panel.querySelectorAll('[data-chat-prompt]').forEach(function (button) {
-    button.addEventListener('click', function () { send(button.getAttribute('data-chat-prompt')); });
+    button.addEventListener('click', function () { send(lbaraT(button.getAttribute('data-chat-prompt'))); });
   });
   form.addEventListener('submit', function (event) {
     event.preventDefault();

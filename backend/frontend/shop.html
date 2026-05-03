@@ -76,6 +76,43 @@
   font-size: 18px;
   line-height: 1;
 }
+.mobile-sticky-search {
+  position: fixed;
+  top: 66px;
+  left: 0;
+  right: 0;
+  z-index: 35;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 2px solid rgba(0,48,96,0.10);
+  box-shadow: 0 8px 18px rgba(0,48,96,0.08);
+  backdrop-filter: blur(12px);
+  padding: 10px 16px;
+}
+.mobile-sticky-search-inner {
+  position: relative;
+}
+.mobile-sticky-search input {
+  width: 100%;
+  background: #fff;
+  border: 3px solid rgba(0,48,96,0.10);
+  border-radius: 18px;
+  padding: 10px 14px 10px 44px;
+  color: #003060;
+  font-family: Nunito, sans-serif;
+  font-weight: 900;
+  outline: none;
+  box-shadow: 4px 4px 0 #003060;
+}
+.mobile-sticky-search input:focus {
+  border-color: #B8860B;
+}
+.mobile-sticky-search .sticky-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(0,48,96,0.42);
+}
 .chip-row {
   display: flex;
   gap: 8px;
@@ -133,6 +170,11 @@
 @media (min-width: 430px) and (max-width: 767px) {
   .mobile-category-panel.is-expanded .shop-chip {
     flex-basis: calc(33.333% - 8px);
+  }
+}
+@media (max-width: 767px) {
+  .mobile-category-panel {
+    top: 130px !important;
   }
 }
 
@@ -259,10 +301,17 @@
   <div class="max-w-screen-2xl mx-auto">
     <h1 class="font-headline text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-2 md:mb-4">All Digital Services</h1>
     <p class="text-white/70 text-sm md:text-lg font-medium mb-4 md:mb-8">Pay with your Tunisian card. Receive instantly.</p>
-    <div class="relative max-w-xl">
+    <div id="shop-search-anchor" class="relative max-w-xl">
       <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary/40">search</span>
-      <input id="shop-search" class="w-full bg-white border-4 border-white/20 rounded-2xl pl-12 pr-6 py-3 md:py-4 font-bold text-primary placeholder:text-primary/30 focus:outline-none focus:border-accent" placeholder="Search services..."/>
+      <input id="shop-search" data-shop-search class="w-full bg-white border-4 border-white/20 rounded-2xl pl-12 pr-6 py-3 md:py-4 font-bold text-primary placeholder:text-primary/30 focus:outline-none focus:border-accent" placeholder="Search services..."/>
     </div>
+  </div>
+</div>
+
+<div id="mobile-sticky-search" class="mobile-sticky-search md:hidden hidden" aria-label="Sticky service search">
+  <div class="mobile-sticky-search-inner">
+    <span class="material-symbols-outlined sticky-search-icon">search</span>
+    <input id="shop-search-sticky" data-shop-search autocomplete="off" placeholder="Search services..."/>
   </div>
 </div>
 
