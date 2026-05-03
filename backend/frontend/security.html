@@ -295,6 +295,13 @@
 <script src="/js/api.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  function tr(value) {
+    return window.lbaraT ? window.lbaraT(value) : value;
+  }
+
+  function applyTranslations(root) {
+    if (window.lbaraI18n) window.lbaraI18n.apply(root || document);
+  }
 
   // ── fetch helper ────────────────────────────────────────
   function req(path, method, body) {
@@ -306,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (body) opts.body = JSON.stringify(body);
     return fetch('/api' + path, opts).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
-        if (!r.ok) throw new Error(d.message || 'Something went wrong.');
+        if (!r.ok) throw new Error(d.message || tr('Something went wrong.'));
         return d;
       });
     });
@@ -336,22 +343,22 @@ document.addEventListener('DOMContentLoaded', function () {
   if (saveBtn) {
     saveBtn.addEventListener('click', function () {
       var name = (document.getElementById('display_name').value || '').trim();
-      if (!name) { msg('save-name-msg', 'Name cannot be empty.', false); return; }
+      if (!name) { msg('save-name-msg', tr('Name cannot be empty.'), false); return; }
       saveBtn.disabled = true;
-      saveBtn.textContent = 'Saving...';
+      saveBtn.textContent = tr('Saving...');
       req('/auth/profile', 'POST', { full_name: name }).then(function (res) {
         var updated = (res.user && res.user.full_name) || name;
         document.getElementById('display_name').value = updated;
         var sn = document.getElementById('sidebar-name'); if (sn) sn.textContent = updated;
         var sa = document.getElementById('sidebar-avatar'); if (sa) sa.textContent = updated[0].toUpperCase();
         var ha = document.getElementById('header-avatar'); if (ha) ha.textContent = updated[0].toUpperCase();
-        msg('save-name-msg', '✓ Name saved!', true);
+        msg('save-name-msg', '✓ ' + tr('Name saved!'), true);
         setTimeout(function () { clearMsg('save-name-msg'); }, 3000);
       }).catch(function (e) {
-        msg('save-name-msg', e.message || 'Failed to save name.', false);
+        msg('save-name-msg', e.message || tr('Failed to save name.'), false);
       }).finally(function () {
         saveBtn.disabled = false;
-        saveBtn.innerHTML = 'Save Name <span class="material-symbols-outlined text-sm">check</span>';
+        saveBtn.innerHTML = tr('Save Name') + ' <span class="material-symbols-outlined text-sm">check</span>';
       });
     });
   }
@@ -361,13 +368,13 @@ document.addEventListener('DOMContentLoaded', function () {
   if (codeBtn) {
     codeBtn.addEventListener('click', function () {
       codeBtn.disabled = true;
-      codeBtn.textContent = 'Sending...';
+      codeBtn.textContent = tr('Sending...');
       req('/auth/request-password-change', 'POST').then(function () {
-        msg('send-code-msg', '✓ Code sent — check your email.', true);
-        codeBtn.textContent = 'Resend Code';
+        msg('send-code-msg', '✓ ' + tr('Code sent - check your email.'), true);
+        codeBtn.textContent = tr('Resend Code');
       }).catch(function (e) {
-        msg('send-code-msg', e.message || 'Failed to send code.', false);
-        codeBtn.textContent = 'Request Verification Code';
+        msg('send-code-msg', e.message || tr('Failed to send code.'), false);
+        codeBtn.textContent = tr('Request Verification Code');
       }).finally(function () {
         codeBtn.disabled = false;
       });
@@ -382,21 +389,21 @@ document.addEventListener('DOMContentLoaded', function () {
       var newPwd = document.getElementById('new_password').value;
       var confirmPwd = document.getElementById('confirm_password').value;
       var otp = (document.getElementById('verify_code').value || '').trim();
-      if (newPwd.length < 8) { msg('change-pwd-msg', 'Password must be at least 8 characters.', false); return; }
-      if (newPwd !== confirmPwd) { msg('change-pwd-msg', 'Passwords do not match.', false); return; }
-      if (!otp) { msg('change-pwd-msg', 'Enter the verification code first.', false); return; }
+      if (newPwd.length < 8) { msg('change-pwd-msg', tr('Password must be at least 8 characters.'), false); return; }
+      if (newPwd !== confirmPwd) { msg('change-pwd-msg', tr('Passwords do not match.'), false); return; }
+      if (!otp) { msg('change-pwd-msg', tr('Enter the verification code first.'), false); return; }
       pwdBtn.disabled = true;
-      pwdBtn.textContent = 'Verifying...';
+      pwdBtn.textContent = tr('Verifying...');
       req('/auth/confirm-password-change', 'POST', { otp: otp, new_password: newPwd }).then(function () {
-        msg('change-pwd-msg', '✓ Password updated successfully!', true);
+        msg('change-pwd-msg', '✓ ' + tr('Password updated successfully!'), true);
         document.getElementById('new_password').value = '';
         document.getElementById('confirm_password').value = '';
         document.getElementById('verify_code').value = '';
       }).catch(function (e) {
-        msg('change-pwd-msg', e.message || 'Failed to update password.', false);
+        msg('change-pwd-msg', e.message || tr('Failed to update password.'), false);
       }).finally(function () {
         pwdBtn.disabled = false;
-        pwdBtn.innerHTML = 'Update Password <span class="material-symbols-outlined text-sm">shield_lock</span>';
+        pwdBtn.innerHTML = tr('Update Password') + ' <span class="material-symbols-outlined text-sm">shield_lock</span>';
       });
     });
   }
@@ -415,6 +422,14 @@ document.addEventListener('DOMContentLoaded', function () {
   }).catch(function () {
     window.location.href = '/login.html';
   });
+
+  document.addEventListener('lbara:languagechange', function () {
+    if (saveBtn && !saveBtn.disabled) saveBtn.innerHTML = tr('Save Name') + ' <span class="material-symbols-outlined text-sm">check</span>';
+    if (codeBtn && !codeBtn.disabled) codeBtn.textContent = tr('Request Verification Code');
+    if (pwdBtn && !pwdBtn.disabled) pwdBtn.innerHTML = tr('Update Password') + ' <span class="material-symbols-outlined text-sm">shield_lock</span>';
+    applyTranslations(document);
+  });
+  applyTranslations(document);
 
 });
 </script>

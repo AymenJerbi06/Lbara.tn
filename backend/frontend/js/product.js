@@ -20,6 +20,21 @@ function tr(value) {
   return window.lbaraT ? window.lbaraT(value) : value;
 }
 
+function currentLang() {
+  return window.lbaraI18n?.language ? window.lbaraI18n.language() : (localStorage.getItem('lbara_lang') || 'en');
+}
+
+function currencyUnit() {
+  var lang = currentLang();
+  if (lang === 'ar') return 'دينار';
+  if (lang === 'fr') return 'Dinar';
+  return 'TND';
+}
+
+function formatCurrency(amount) {
+  return amount.toFixed(3) + ' ' + currencyUnit();
+}
+
 function applyTranslations(root) {
   if (window.lbaraI18n) window.lbaraI18n.apply(root || document);
 }
@@ -56,11 +71,48 @@ function canCheckoutVariant(variant) {
 function variantPriceLabel(variant) {
   var amount = amountForVariant(variant);
   if (amount === null || amount <= 0) return tr('Pricing TBD');
-  return (variant.checkout_mode === 'quote' ? tr('Request ticket') + ' ' : '') + amount.toFixed(3) + ' TND';
+  return (variant.checkout_mode === 'quote' ? tr('Request ticket') + ' ' : '') + formatCurrency(amount);
+}
+
+function deliveryTimeLabel(hours) {
+  var count = Number(hours) || 2;
+  var lang = currentLang();
+  if (lang === 'ar') return count === 1 ? 'خلال ساعة واحدة' : 'خلال ' + count + ' ساعات';
+  if (lang === 'fr') return 'Sous ' + count + ' h';
+  return tr('Within') + ' ' + count + 'h';
+}
+
+function choiceCountLabel(count) {
+  var value = Number(count) || 0;
+  var lang = currentLang();
+  if (lang === 'ar') return value === 1 ? 'خيار واحد' : value + ' خيارات';
+  if (lang === 'fr') return value + ' ' + (value === 1 ? 'choix' : 'choix');
+  return value + ' ' + tr(value === 1 ? 'choice' : 'choices');
+}
+
+function waitForI18n() {
+  if (window.lbaraI18n || (localStorage.getItem('lbara_lang') || 'en') === 'en') return Promise.resolve();
+  return new Promise(function (resolve) {
+    var done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      document.removeEventListener('lbara:i18nready', finish);
+      resolve();
+    }
+    document.addEventListener('lbara:i18nready', finish);
+    setTimeout(finish, 900);
+  });
 }
 
 function categoryLabel(value) {
-  return tr(String(value || 'service').replace(/_/g, ' '));
+  var key = String(value || 'service').toLowerCase();
+  var labels = {
+    ai_tools: 'AI Tools',
+    gift_cards: 'Gift Cards',
+  };
+  var label = labels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, function (letter) { return letter.toUpperCase(); });
+  return tr(label);
 }
 
 function flowLabel(type) {
@@ -176,7 +228,7 @@ function testimonialCard(item) {
     + '<div class="lbara-rating-stars flex items-center gap-1 text-accent mb-3">'
     + ratingStarsMarkup(item.rating || 5)
     + '</div>'
-    + '<p class="text-primary font-black leading-relaxed mb-4">"' + escapeHtml(item.quote || item.comment || '') + '"</p>'
+    + '<p class="text-primary font-black leading-relaxed mb-4">"' + escapeHtml(tr(item.quote || item.comment || '')) + '"</p>'
     + '<p class="text-xs font-black text-primary/45 uppercase tracking-widest">' + escapeHtml(tr(item.by || 'Verified buyer')) + '</p>'
     + '</article>';
 }
@@ -242,10 +294,11 @@ function renderOptions() {
     var active = variant.id === selectedVariantId;
     var ready = canCheckoutVariant(variant);
     var description = variant.description || variant.billing_period || 'Selected during checkout';
+    var variantName = tr(variant.name);
     return '<button type="button" data-variant-id="' + escapeAttr(variant.id) + '" class="option-card ' + (active ? 'active' : '') + '">'
       + '<div class="flex items-start justify-between gap-4">'
       + '<div>'
-      + '<p class="font-headline text-lg font-black text-primary mb-1">' + escapeHtml(variant.name) + '</p>'
+      + '<p class="font-headline text-lg font-black text-primary mb-1">' + escapeHtml(variantName) + '</p>'
       + '<p class="text-sm font-bold text-on-surface/55 leading-relaxed">' + escapeHtml(tr(description)) + '</p>'
       + '</div>'
       + '<span class="material-symbols-outlined text-primary/35 shrink-0">' + (active ? 'radio_button_checked' : 'radio_button_unchecked') + '</span>'
@@ -275,7 +328,7 @@ function renderSelection() {
   var continueBtn = document.getElementById('continue-btn');
   var contactBtn = document.getElementById('pricing-contact-btn');
 
-  document.getElementById('selected-name').textContent = variant ? variant.name : tr('Choose an option');
+  document.getElementById('selected-name').textContent = variant ? tr(variant.name) : tr('Choose an option');
   document.getElementById('selected-meta').textContent = variant
     ? (tr(variant.billing_period || 'Option') + (isQuote ? ' - ' + tr('Special request ticket') : ' - ' + tr('Full payment')))
     : tr('Pick one of the options to see the checkout summary.');
@@ -312,20 +365,21 @@ function addSelectedToCart() {
 function renderProduct(item) {
   product = item;
   var variants = variantsFor(product);
-  document.title = product.name + ' - Lbara.tn';
+  var displayName = tr(product.name);
+  document.title = displayName + ' - Lbara.tn';
 
   var image = document.getElementById('product-image');
   image.src = safeImageUrl(product.image_url) || '';
-  image.alt = product.name;
+  image.alt = displayName;
 
-  document.getElementById('product-provider').textContent = product.provider || '';
+  document.getElementById('product-provider').textContent = tr(product.provider || '');
   document.getElementById('product-category').textContent = categoryLabel(product.category);
-  document.getElementById('product-name').textContent = product.name;
-  document.getElementById('product-description').textContent = product.description || tr('No description available yet.');
+  document.getElementById('product-name').textContent = displayName;
+  document.getElementById('product-description').textContent = product.description ? tr(product.description) : tr('No description available yet.');
   document.getElementById('info-account').textContent = tr(product.account_type === 'shared' ? 'Shared' : 'Private');
-  document.getElementById('info-delivery').textContent = tr('Within') + ' ' + (product.delivery_hours || 2) + 'h';
+  document.getElementById('info-delivery').textContent = deliveryTimeLabel(product.delivery_hours);
   document.getElementById('info-flow').textContent = flowLabel(product.fulfillment_type);
-  document.getElementById('info-options').textContent = variants.length ? variants.length + ' ' + tr('choices') : tr('Coming soon');
+  document.getElementById('info-options').textContent = variants.length ? choiceCountLabel(variants.length) : tr('Coming soon');
   document.getElementById('activation-copy').textContent = activationCopy(product.fulfillment_type);
   renderRatingSummary(product);
   var favoriteBtn = document.getElementById('product-favorite-btn');
@@ -333,7 +387,7 @@ function renderProduct(item) {
   if (favoriteBtn) {
     favoriteBtn.setAttribute('data-favorite-product', product.id);
     favoriteBtn.setAttribute('data-product-name', product.name);
-    favoriteBtn.setAttribute('aria-label', tr('Save') + ' ' + product.name);
+    favoriteBtn.setAttribute('aria-label', tr('Save') + ' ' + displayName);
   }
   if (saleBtn) {
     saleBtn.setAttribute('data-sale-product', product.id);
@@ -341,10 +395,10 @@ function renderProduct(item) {
   }
 
   var pitch = pitchCopy(product);
-  document.getElementById('pitch-title').textContent = pitch.title;
-  document.getElementById('pitch-one').textContent = pitch.one;
-  document.getElementById('pitch-two').textContent = pitch.two;
-  document.getElementById('pitch-three').textContent = pitch.three;
+  document.getElementById('pitch-title').textContent = tr(pitch.title);
+  document.getElementById('pitch-one').textContent = tr(pitch.one);
+  document.getElementById('pitch-two').textContent = tr(pitch.two);
+  document.getElementById('pitch-three').textContent = tr(pitch.three);
   renderTestimonials(product);
   loadProductReviews(product);
 
@@ -377,7 +431,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     return;
   }
 
+  document.addEventListener('lbara:languagechange', function () {
+    if (product) renderProduct(product);
+  });
+
   try {
+    await waitForI18n();
     var res = await api.getProduct(id);
     renderProduct(res.product);
     loading.classList.add('hidden');
@@ -388,8 +447,4 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 
   document.getElementById('continue-btn').addEventListener('click', addSelectedToCart);
-
-  document.addEventListener('lbara:languagechange', function () {
-    if (product) renderProduct(product);
-  });
 });

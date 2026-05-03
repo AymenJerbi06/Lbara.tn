@@ -34,6 +34,21 @@ function tr(value) {
   return window.lbaraT ? window.lbaraT(value) : value;
 }
 
+function currentLang() {
+  return window.lbaraI18n?.language ? window.lbaraI18n.language() : (localStorage.getItem('lbara_lang') || 'en');
+}
+
+function currencyUnit() {
+  var lang = currentLang();
+  if (lang === 'ar') return 'دينار';
+  if (lang === 'fr') return 'Dinar';
+  return 'TND';
+}
+
+function formatCurrencyAmount(amount) {
+  return amount.toFixed(3) + ' ' + currencyUnit();
+}
+
 function applyTranslations(root) {
   if (window.lbaraI18n) window.lbaraI18n.apply(root || document);
 }
@@ -77,19 +92,19 @@ function canCheckoutProduct(product) {
 function formatMoney(value) {
   var amount = toNumber(value);
   if (amount === null || amount <= 0) return tr('Price TBD');
-  return amount.toFixed(3) + ' TND';
+  return formatCurrencyAmount(amount);
 }
 
 function productPriceLabel(product) {
   var variants = variantsFor(product);
   if (variants.length) {
     var priced = variants.map(amountForVariant).filter(function (value) { return value !== null && value > 0; });
-    if (!priced.length) return 'Price TBD';
+    if (!priced.length) return tr('Price TBD');
     var min = Math.min.apply(null, priced);
     var quoteOnly = variants.some(function (variant) {
       return variant.checkout_mode === 'quote' && amountForVariant(variant) === min;
     });
-    return tr(quoteOnly ? 'Request ticket' : 'From') + ' ' + min.toFixed(3) + ' TND';
+    return tr(quoteOnly ? 'Request ticket' : 'From') + ' ' + formatCurrencyAmount(min);
   }
   return formatMoney(product.price_tnd);
 }
@@ -97,7 +112,7 @@ function productPriceLabel(product) {
 function variantPriceLabel(variant) {
   var amount = amountForVariant(variant);
   if (amount === null || amount <= 0) return tr('Pricing TBD');
-  return (variant.checkout_mode === 'quote' ? tr('Request ticket') + ' ' : '') + amount.toFixed(3) + ' TND';
+  return (variant.checkout_mode === 'quote' ? tr('Request ticket') + ' ' : '') + formatCurrencyAmount(amount);
 }
 
 function reviewCount(product) {
@@ -316,10 +331,13 @@ function renderProducts() {
     grid.innerHTML = products.map(function (p) {
       var safeId = escapeAttr(p.id);
       var safeHref = '/product.html?id=' + encodeURIComponent(p.id);
-      var safeName = escapeHtml(p.name);
-      var safeProvider = escapeHtml(p.provider);
-      var safeDescription = escapeHtml(p.description || '');
-      var safeBadge = escapeHtml(p.badge);
+      var displayName = tr(p.name);
+      var displayProvider = tr(p.provider);
+      var displayDescription = tr(p.description || '');
+      var safeName = escapeHtml(displayName);
+      var safeProvider = escapeHtml(displayProvider);
+      var safeDescription = escapeHtml(displayDescription);
+      var safeBadge = escapeHtml(tr(p.badge || ''));
       var durationLabel = p.duration_label || (variantsFor(p).length ? 'Options' : '1 Month');
       var safeDuration = escapeHtml(tr(durationLabel));
       var safeImg = safeImageUrl(p.image_url);
@@ -331,7 +349,7 @@ function renderProducts() {
       var optionBadge = hasVariants ? '<span class="text-xs font-bold bg-accent/10 text-accent px-2 py-1 rounded-lg">' + variants.length + ' ' + escapeHtml(tr('Options')) + '</span>' : '';
       var headerHtml = safeImg
         ? '<div class="shop-card-img-hdr" style="position:relative;overflow:hidden;">'
-            + '<img src="' + safeImg + '" alt="' + escapeAttr(p.name) + '" class="shop-card-img" style="object-position:' + safeImgPos + '">'
+            + '<img src="' + safeImg + '" alt="' + escapeAttr(displayName) + '" class="shop-card-img" style="object-position:' + safeImgPos + '">'
             + badgeHtml
           + '</div>'
         : '<div class="shop-card-icon-hdr" style="position:relative;background:rgba(0,48,96,0.05);display:flex;align-items:center;justify-content:space-between;">'
@@ -351,7 +369,7 @@ function renderProducts() {
         + optionBadge
         + '</div>'
         + '<div class="lbara-engagement-row mb-4">'
-        + '<button type="button" class="lbara-engagement-btn lbara-engagement-btn-icon" data-favorite-product="' + safeId + '" data-product-name="' + safeName + '" data-favorite-label="Save" aria-label="' + escapeAttr(tr('Save')) + ' ' + escapeAttr(p.name) + '"><span class="material-symbols-outlined">favorite</span></button>'
+        + '<button type="button" class="lbara-engagement-btn lbara-engagement-btn-icon" data-favorite-product="' + safeId + '" data-product-name="' + safeName + '" data-favorite-label="Save" aria-label="' + escapeAttr(tr('Save')) + ' ' + escapeAttr(displayName) + '"><span class="material-symbols-outlined">favorite</span></button>'
         + productRatingPill(p)
         + '</div>'
         + '<div class="flex items-center justify-between pt-4 border-t-2 border-primary/5 gap-3">'

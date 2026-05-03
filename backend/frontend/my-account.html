@@ -383,6 +383,36 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function tr(value) {
+  return window.lbaraT ? window.lbaraT(value) : value;
+}
+
+function applyTranslations(root = document) {
+  if (window.lbaraI18n) window.lbaraI18n.apply(root);
+}
+
+function activeLang() {
+  return window.lbaraI18n?.language ? window.lbaraI18n.language() : (localStorage.getItem('lbara_lang') || 'en');
+}
+
+function activeLocale() {
+  const lang = activeLang();
+  if (lang === 'ar') return 'ar-TN';
+  if (lang === 'fr') return 'fr-FR';
+  return 'en-GB';
+}
+
+function currencyUnit() {
+  const lang = activeLang();
+  if (lang === 'ar') return 'دينار';
+  if (lang === 'fr') return 'Dinar';
+  return 'TND';
+}
+
+function formatTnd(value) {
+  return `${parseFloat(value || 0).toFixed(3)} ${currencyUnit()}`;
+}
+
 function showSection(name) {
   SECTIONS.forEach(s => {
     document.getElementById('section-' + s).style.display = (s === name) ? '' : 'none';
@@ -414,11 +444,11 @@ const ordersById = {};
 
 function badge(status) {
   const s = STATUS_LABELS[status] || { label: status, bg: 'bg-surface-container', text: 'text-on-surface-variant' };
-  return `<span class="text-[10px] font-black headline-font uppercase px-2 py-0.5 rounded-full ${s.bg} ${s.text}">${escapeHtml(s.label)}</span>`;
+  return `<span class="text-[10px] font-black headline-font uppercase px-2 py-0.5 rounded-full ${s.bg} ${s.text}">${escapeHtml(tr(s.label))}</span>`;
 }
 
 function fmtDate(iso) {
-  return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  return new Date(iso).toLocaleDateString(activeLocale(), { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function reviewStars(rating) {
@@ -435,16 +465,16 @@ function reviewAction(o) {
     return `
       <div class="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-2xl bg-surface-container p-3">
         <div>
-          <p class="text-xs headline-font font-black uppercase tracking-widest text-on-surface-variant mb-1">Your review</p>
-          <div class="flex items-center gap-2">${reviewStars(o.review_rating)}<span class="text-xs font-bold text-on-surface-variant">${escapeHtml(o.review_comment || 'No written comment')}</span></div>
+          <p class="text-xs headline-font font-black uppercase tracking-widest text-on-surface-variant mb-1">${escapeHtml(tr('Your review'))}</p>
+          <div class="flex items-center gap-2">${reviewStars(o.review_rating)}<span class="text-xs font-bold text-on-surface-variant">${escapeHtml(o.review_comment || tr('No written comment'))}</span></div>
         </div>
-        <button onclick="openReview('${escapeHtml(o.id)}')" class="px-4 py-2 bg-primary-container text-on-primary rounded-full font-bold headline-font text-xs">Edit review</button>
+        <button onclick="openReview('${escapeHtml(o.id)}')" class="px-4 py-2 bg-primary-container text-on-primary rounded-full font-bold headline-font text-xs">${escapeHtml(tr('Edit review'))}</button>
       </div>`;
   }
   return `
     <div class="mt-3 rounded-2xl bg-surface-container p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-      <p class="text-sm font-semibold text-on-surface-variant">Bought this service? Share a quick review to help other users choose.</p>
-      <button onclick="openReview('${escapeHtml(o.id)}')" class="px-4 py-2 bg-secondary-container text-on-secondary-container rounded-full font-bold headline-font text-xs">Review purchase</button>
+      <p class="text-sm font-semibold text-on-surface-variant">${escapeHtml(tr('Bought this service? Share a quick review to help other users choose.'))}</p>
+      <button onclick="openReview('${escapeHtml(o.id)}')" class="px-4 py-2 bg-secondary-container text-on-secondary-container rounded-full font-bold headline-font text-xs">${escapeHtml(tr('Review purchase'))}</button>
     </div>`;
 }
 
@@ -457,12 +487,12 @@ function orderRow(o) {
             <span class="material-symbols-outlined text-primary">shopping_bag</span>
           </div>
           <div>
-            <p class="headline-font font-bold text-on-surface">${escapeHtml(o.product_name || 'Order')}${o.variant_name ? ' - ' + escapeHtml(o.variant_name) : ''}</p>
+            <p class="headline-font font-bold text-on-surface">${escapeHtml(tr(o.product_name || 'Order'))}${o.variant_name ? ' - ' + escapeHtml(tr(o.variant_name)) : ''}</p>
             <p class="text-xs text-on-surface-variant">${escapeHtml(o.order_ref)} &bull; ${fmtDate(o.created_at)}</p>
           </div>
         </div>
         <div class="text-right">
-          <p class="font-bold headline-font text-on-surface">- ${parseFloat(o.amount_tnd).toFixed(3)} TND</p>
+          <p class="font-bold headline-font text-on-surface">- ${formatTnd(o.amount_tnd)}</p>
           ${badge(o.status)}
         </div>
       </div>
@@ -475,16 +505,16 @@ function accountProductRow(p, type) {
     ? `<img src="${escapeHtml(p.image_url)}" alt="" class="w-12 h-12 rounded-2xl object-cover bg-surface-container">`
     : `<div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center"><span class="material-symbols-outlined text-primary">${type === 'sale' ? 'notifications' : 'favorite'}</span></div>`;
   const button = type === 'sale'
-    ? `<button onclick="removeSaleAlert('${escapeHtml(p.id)}')" class="text-xs font-bold text-on-surface-variant hover:text-error">Turn off</button>`
-    : `<button onclick="removeFavorite('${escapeHtml(p.id)}')" class="text-xs font-bold text-on-surface-variant hover:text-error">Remove</button>`;
+    ? `<button onclick="removeSaleAlert('${escapeHtml(p.id)}')" class="text-xs font-bold text-on-surface-variant hover:text-error">${escapeHtml(tr('Turn off'))}</button>`
+    : `<button onclick="removeFavorite('${escapeHtml(p.id)}')" class="text-xs font-bold text-on-surface-variant hover:text-error">${escapeHtml(tr('Remove'))}</button>`;
 
   return `
     <div class="flex items-center justify-between gap-3 bg-surface-container rounded-2xl p-3">
       <a href="/product.html?id=${encodeURIComponent(p.id)}" class="flex items-center gap-3 min-w-0">
         ${image}
         <div class="min-w-0">
-          <p class="headline-font font-bold text-sm text-on-surface truncate">${escapeHtml(p.name)}</p>
-          <p class="text-xs text-on-surface-variant font-semibold truncate">${escapeHtml(p.provider || 'Lbara.tn')}</p>
+          <p class="headline-font font-bold text-sm text-on-surface truncate">${escapeHtml(tr(p.name))}</p>
+          <p class="text-xs text-on-surface-variant font-semibold truncate">${escapeHtml(tr(p.provider || 'Lbara.tn'))}</p>
         </div>
       </a>
       ${button}
@@ -504,6 +534,7 @@ function renderAccountProductList(prefix, products, type) {
   empty.classList.add('hidden');
   list.classList.remove('hidden');
   list.innerHTML = products.map(p => accountProductRow(p, type)).join('');
+  applyTranslations(list);
 }
 
 async function loadFavoriteServices() {
@@ -515,8 +546,8 @@ async function loadFavoriteServices() {
     renderAccountProductList('wishlist', wishlist.products || [], 'wishlist');
     renderAccountProductList('sale-alerts', saleAlerts.products || [], 'sale');
   } catch {
-    document.getElementById('wishlist-loading').textContent = 'Could not load favorites.';
-    document.getElementById('sale-alerts-loading').textContent = 'Could not load sale alerts.';
+    document.getElementById('wishlist-loading').textContent = tr('Could not load favorites.');
+    document.getElementById('sale-alerts-loading').textContent = tr('Could not load sale alerts.');
   }
 }
 
@@ -525,7 +556,7 @@ async function removeFavorite(productId) {
     await api.removeWishlist(productId);
     await loadFavoriteServices();
   } catch (err) {
-    alert(err.message || 'Failed to remove favorite.');
+    alert(err.message || tr('Failed to remove favorite.'));
   }
 }
 
@@ -534,7 +565,7 @@ async function removeSaleAlert(productId) {
     await api.removeSaleNotification(productId);
     await loadFavoriteServices();
   } catch (err) {
-    alert(err.message || 'Failed to turn off sale alert.');
+    alert(err.message || tr('Failed to turn off sale alert.'));
   }
 }
 
@@ -549,22 +580,23 @@ function ensureReviewModal() {
     <div class="w-full max-w-lg rounded-[2rem] bg-surface-container-lowest p-6 shadow-[0_24px_60px_rgba(0,27,59,.24)]">
       <div class="flex items-start justify-between gap-4 mb-5">
         <div>
-          <p class="text-xs headline-font font-black uppercase tracking-widest text-secondary mb-2">Verified purchase review</p>
-          <h2 id="review-modal-title" class="headline-font text-2xl font-black text-primary">Review service</h2>
+          <p class="text-xs headline-font font-black uppercase tracking-widest text-secondary mb-2">${escapeHtml(tr('Verified purchase review'))}</p>
+          <h2 id="review-modal-title" class="headline-font text-2xl font-black text-primary">${escapeHtml(tr('Review service'))}</h2>
         </div>
         <button onclick="closeReview()" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
       <div id="review-stars-input" class="flex gap-2 mb-5"></div>
-      <textarea id="review-comment-input" maxlength="800" rows="4" class="w-full rounded-2xl border-0 bg-surface-container p-4 font-medium focus:ring-2 focus:ring-primary-fixed" placeholder="Tell other users what was clear, smooth, or useful..."></textarea>
+      <textarea id="review-comment-input" maxlength="800" rows="4" class="w-full rounded-2xl border-0 bg-surface-container p-4 font-medium focus:ring-2 focus:ring-primary-fixed" placeholder="${escapeHtml(tr('Tell other users what was clear, smooth, or useful...'))}"></textarea>
       <p id="review-modal-msg" class="hidden mt-3 text-sm font-semibold"></p>
       <div class="flex justify-end gap-3 mt-5">
-        <button onclick="closeReview()" class="px-5 py-3 rounded-full bg-surface-container text-on-surface-variant font-bold headline-font text-sm">Cancel</button>
-        <button onclick="submitReview()" id="review-submit-btn" class="px-5 py-3 rounded-full bg-primary-container text-on-primary font-bold headline-font text-sm">Save review</button>
+        <button onclick="closeReview()" class="px-5 py-3 rounded-full bg-surface-container text-on-surface-variant font-bold headline-font text-sm">${escapeHtml(tr('Cancel'))}</button>
+        <button onclick="submitReview()" id="review-submit-btn" class="px-5 py-3 rounded-full bg-primary-container text-on-primary font-bold headline-font text-sm">${escapeHtml(tr('Save review'))}</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
+  applyTranslations(modal);
   return modal;
 }
 
@@ -593,7 +625,7 @@ function openReview(orderId) {
   activeReviewOrderId = orderId;
   selectedReviewRating = Number(order.review_rating) || 5;
   const modal = ensureReviewModal();
-  document.getElementById('review-modal-title').textContent = order.product_name || 'Review service';
+  document.getElementById('review-modal-title').textContent = tr(order.product_name || 'Review service');
   document.getElementById('review-comment-input').value = order.review_comment || '';
   document.getElementById('review-modal-msg').className = 'hidden';
   renderReviewStarInput();
@@ -613,22 +645,22 @@ async function submitReview() {
   const btn = document.getElementById('review-submit-btn');
   const msg = document.getElementById('review-modal-msg');
   btn.disabled = true;
-  btn.textContent = 'Saving...';
+  btn.textContent = tr('Saving...');
   try {
     await api.reviewOrder(activeReviewOrderId, {
       rating: selectedReviewRating,
       comment: document.getElementById('review-comment-input').value.trim(),
     });
-    msg.textContent = 'Review saved. Thank you!';
+    msg.textContent = tr('Review saved. Thank you!');
     msg.className = 'mt-3 text-sm font-semibold text-green-700';
     closeReview();
     await init();
   } catch (err) {
-    msg.textContent = err.message || 'Failed to save review.';
+    msg.textContent = err.message || tr('Failed to save review.');
     msg.className = 'mt-3 text-sm font-semibold text-red-600';
   }
   btn.disabled = false;
-  btn.textContent = 'Save review';
+  btn.textContent = tr('Save review');
 }
 
 // ── Password change ───────────────────────────────────────
@@ -643,18 +675,18 @@ async function sendCode() {
   const btn = document.getElementById('send-code-btn');
   const msg = document.getElementById('send-code-msg');
   btn.disabled = true;
-  btn.textContent = 'Sending...';
+  btn.textContent = tr('Sending...');
   try {
     await api.requestPasswordChange();
-    msg.textContent = '✓ Code sent! Check your inbox.';
+    msg.textContent = '✓ ' + tr('Code sent! Check your inbox.');
     msg.className = 'mt-4 text-sm font-semibold text-green-700';
     document.getElementById('sec-step2').style.display = '';
   } catch (err) {
-    msg.textContent = err.message || 'Failed to send code.';
+    msg.textContent = err.message || tr('Failed to send code.');
     msg.className = 'mt-4 text-sm font-semibold text-red-600';
   }
   btn.disabled = false;
-  btn.innerHTML = '<span class="material-symbols-outlined text-sm">mail</span> Resend Code';
+  btn.innerHTML = '<span class="material-symbols-outlined text-sm">mail</span> ' + tr('Resend Code');
 }
 
 async function changePassword() {
@@ -665,15 +697,15 @@ async function changePassword() {
   const msg = document.getElementById('change-pwd-msg');
 
   if (newPwd !== confirmPwd) {
-    msg.textContent = 'Passwords do not match.';
+    msg.textContent = tr('Passwords do not match.');
     msg.className = 'mt-4 text-sm font-semibold text-red-600';
     return;
   }
   btn.disabled = true;
-  btn.textContent = 'Verifying...';
+  btn.textContent = tr('Verifying...');
   try {
     await api.confirmPasswordChange({ otp, new_password: newPwd });
-    msg.textContent = '✓ Password changed successfully!';
+    msg.textContent = '✓ ' + tr('Password changed successfully!');
     msg.className = 'mt-4 text-sm font-semibold text-green-700';
     document.getElementById('otp-input').value = '';
     document.getElementById('new-password-input').value = '';
@@ -683,11 +715,11 @@ async function changePassword() {
       msg.className = 'hidden';
     }, 3000);
   } catch (err) {
-    msg.textContent = err.message || 'Failed to change password.';
+    msg.textContent = err.message || tr('Failed to change password.');
     msg.className = 'mt-4 text-sm font-semibold text-red-600';
   }
   btn.disabled = false;
-  btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Confirm Change';
+  btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> ' + tr('Confirm Change');
 }
 
 function cancelSecurityChange() {
@@ -716,7 +748,7 @@ async function init() {
 
   const name = user.full_name || user.email.split('@')[0];
   const initial = name[0].toUpperCase();
-  document.getElementById('welcome-title').textContent = `Hello, ${name}`;
+  document.getElementById('welcome-title').textContent = `${tr('Hello')}, ${name}`;
   document.getElementById('sidebar-name').textContent = name;
   document.getElementById('sidebar-email').textContent = user.email;
   document.getElementById('sidebar-avatar').textContent = initial;
@@ -746,6 +778,7 @@ async function init() {
       const dl = document.getElementById('dashboard-orders-list');
       dl.classList.remove('hidden');
       dl.innerHTML = recent.map(orderRow).join('');
+      applyTranslations(dl);
     }
 
     // Full orders list
@@ -756,13 +789,16 @@ async function init() {
       const fl = document.getElementById('orders-full-list');
       fl.classList.remove('hidden');
       fl.innerHTML = orders.map(orderRow).join('');
+      applyTranslations(fl);
     }
   } catch {
     document.getElementById('dashboard-orders-loading').innerHTML =
-      '<p class="text-sm text-red-500 font-semibold text-center py-4">Failed to load orders.</p>';
+      `<p class="text-sm text-red-500 font-semibold text-center py-4">${escapeHtml(tr('Failed to load orders.'))}</p>`;
   }
+  applyTranslations(document);
 }
 
+document.addEventListener('lbara:languagechange', () => init());
 init();
 </script>
 </body></html>

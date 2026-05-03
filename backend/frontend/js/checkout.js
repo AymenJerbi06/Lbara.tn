@@ -7,6 +7,21 @@ document.addEventListener('DOMContentLoaded', async function () {
     return window.lbaraT ? window.lbaraT(value) : value;
   }
 
+  function currentLang() {
+    return window.lbaraI18n?.language ? window.lbaraI18n.language() : (localStorage.getItem('lbara_lang') || 'en');
+  }
+
+  function currencyUnit() {
+    var lang = currentLang();
+    if (lang === 'ar') return 'دينار';
+    if (lang === 'fr') return 'Dinar';
+    return 'TND';
+  }
+
+  function formatCurrency(amount) {
+    return amount.toFixed(3) + ' ' + currencyUnit();
+  }
+
   function applyTranslations(root) {
     if (window.lbaraI18n) window.lbaraI18n.apply(root || document);
   }
@@ -74,14 +89,14 @@ document.addEventListener('DOMContentLoaded', async function () {
   const price = amountForSelection();
   const pricingReady = price !== null && price > 0;
 
-  if (nameEl) nameEl.textContent = selectedVariant ? product.name + ' - ' + selectedVariant.name : product.name;
+  if (nameEl) nameEl.textContent = selectedVariant ? tr(product.name) + ' - ' + tr(selectedVariant.name) : tr(product.name);
   if (metaEl) {
     const billingLabel = selectedVariant?.billing_period || product.duration_label || '1 Month';
     const modeLabel = selectedVariant?.checkout_mode === 'quote' ? 'Special request ticket - not part of final price' : 'Full payment';
     metaEl.textContent = tr(product.account_type === 'shared' ? 'Shared' : 'Private') + ' ' + tr('Account') + ' - ' + tr(billingLabel) + ' - ' + tr(modeLabel);
   }
   if (priceEl) priceEl.textContent = pricingReady ? price.toFixed(3) : tr('TBD');
-  if (subtotalEl) subtotalEl.textContent = pricingReady ? price.toFixed(3) + ' TND' : tr('Pricing TBD');
+  if (subtotalEl) subtotalEl.textContent = pricingReady ? formatCurrency(price) : tr('Pricing TBD');
   if (totalEl) totalEl.textContent = pricingReady ? price.toFixed(3) : tr('TBD');
 
   const placeOrderBtn = document.getElementById('place-order-btn');
@@ -119,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (totalEl) totalEl.textContent = newTotal.toFixed(3);
         if (discountRow) {
           discountRow.classList.remove('hidden');
-          discountRow.querySelector('.discount-amount').textContent = '-' + discountApplied.toFixed(3) + ' TND';
+          discountRow.querySelector('.discount-amount').textContent = '-' + formatCurrency(discountApplied);
         }
         showToast('Promo code applied! 10% discount.');
       } else {

@@ -287,8 +287,15 @@ function initFooterSocials() {
 }
 
 function initLanguageSystem() {
+  function dispatchLanguageReady() {
+    if (!window.lbaraI18n) return;
+    document.dispatchEvent(new CustomEvent('lbara:i18nready', { detail: { lang: window.lbaraI18n.language() } }));
+    document.dispatchEvent(new CustomEvent('lbara:languagechange', { detail: { lang: window.lbaraI18n.language() } }));
+  }
+
   if (window.lbaraI18n) {
     window.lbaraI18n.init();
+    dispatchLanguageReady();
     return;
   }
 
@@ -298,7 +305,10 @@ function initLanguageSystem() {
   script.id = 'lbara-i18n-script';
   script.src = '/js/i18n.js';
   script.onload = function () {
-    if (window.lbaraI18n) window.lbaraI18n.init();
+    if (window.lbaraI18n) {
+      window.lbaraI18n.init();
+      dispatchLanguageReady();
+    }
   };
   document.head.appendChild(script);
 }
