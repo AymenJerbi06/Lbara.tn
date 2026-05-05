@@ -91,7 +91,7 @@
   </div>
 </div>
 <main class="vibrant-gradient min-h-screen pt-32 pb-24 flex items-center justify-center px-6">
-<div class="w-full max-w-lg">
+<div class="w-full max-w-2xl">
 <div class="cartoon-card rounded-3xl p-8 md:p-12 relative">
 <div class="absolute -top-12 left-1/2 -translate-x-1/2">
 <div class="w-24 h-24 bg-white border-4 border-primary rounded-full flex items-center justify-center shadow-lg">
@@ -105,8 +105,22 @@
 </div>
 <form id="signup-form" class="space-y-6">
 <div>
+<label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Full Name *</label>
+<input id="signup-full-name" class="w-full cartoon-input" placeholder="e.g. Aymen Jerbi" type="text" autocomplete="name" required/>
+</div>
+<div>
 <label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Email</label>
-<input id="signup-email" class="w-full cartoon-input" placeholder="e.g. hello@curator.tn" type="email"/>
+<input id="signup-email" class="w-full cartoon-input" placeholder="e.g. hello@curator.tn" type="email" autocomplete="email" required/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Phone Number</label>
+<input id="signup-phone" class="w-full cartoon-input" placeholder="+216 00 000 000" type="tel" autocomplete="tel"/>
+</div>
+<div>
+<label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">City</label>
+<input id="signup-city" class="w-full cartoon-input" placeholder="e.g. Tunis" type="text" autocomplete="address-level2"/>
+</div>
 </div>
 <div>
 <label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Password</label>
@@ -125,6 +139,25 @@
   <span class="material-symbols-outlined text-xl">visibility</span>
 </button>
 </div>
+</div>
+<div>
+<label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Address</label>
+<input id="signup-address-line1" class="w-full cartoon-input" placeholder="Street address, neighborhood, or delivery note" type="text" autocomplete="address-line1"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Address Details</label>
+<input id="signup-address-line2" class="w-full cartoon-input" placeholder="Apartment, floor, landmark" type="text" autocomplete="address-line2"/>
+</div>
+<div>
+<label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Postal Code</label>
+<input id="signup-postal-code" class="w-full cartoon-input" placeholder="Optional" type="text" autocomplete="postal-code"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Country</label>
+<input id="signup-country" class="w-full cartoon-input bg-primary/5" value="Tunisia" type="text" autocomplete="country-name"/>
+<p class="text-xs font-bold text-primary/50 mt-2 px-1">You can update these details later from your account security page.</p>
 </div>
 <div class="flex items-start gap-3 px-1 mt-4">
 <input class="mt-1 w-5 h-5 border-2 border-primary rounded text-primary focus:ring-0 cursor-pointer" id="signup-terms" type="checkbox"/>

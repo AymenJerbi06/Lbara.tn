@@ -1,0 +1,109 @@
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Verify Email - Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#003060",
+          "secondary": "#005F4B",
+          "accent": "#B8860B",
+          "on-surface": "#1A202C",
+        },
+        fontFamily: {
+          "headline": ["Quicksand", "sans-serif"],
+          "body": ["Nunito", "sans-serif"],
+        },
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer base {
+    body { @apply bg-white text-on-surface font-body; }
+  }
+  .vibrant-gradient { background: linear-gradient(135deg, #001F3F 0%, #000C1A 100%); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .cartoon-card { @apply bg-white border-4 border-primary shadow-[8px_8px_0px_0px_#003060] transition-all; }
+  .cartoon-button { @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none; }
+  .cartoon-input { @apply border-2 border-primary rounded-xl px-4 py-3 focus:ring-0 focus:border-accent transition-colors font-bold text-primary placeholder:text-primary/30; }
+</style>
+<link href="/css/mobile.css" rel="stylesheet"/>
+</head>
+<body class="selection:bg-primary/30 selection:text-primary">
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
+  <div class="flex justify-between items-center w-full px-4 lg:px-8 py-4 max-w-screen-2xl mx-auto">
+    <a href="/shop.html" class="text-2xl lg:text-3xl font-bold tracking-tight text-primary font-headline flex-shrink-0">Lbara.tn</a>
+    <div class="hidden lg:flex items-center gap-8 font-headline font-bold text-sm">
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/index.html">Home</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/shop.html">Shop</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/how-it-works.html">How It Works</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/faq.html">FAQ</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/contact.html">Contact</a>
+    </div>
+    <button id="nav-account-btn" class="hidden lg:block cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">Login / Sign Up</button>
+    <div class="lg:hidden flex items-center gap-2 flex-shrink-0">
+      <button id="nav-account-btn-mobile" class="cartoon-button bg-primary text-white font-bold px-3 py-1.5 rounded-full text-xs whitespace-nowrap">Login / Sign Up</button>
+      <a href="/shop.html" class="text-primary font-bold font-headline text-xs whitespace-nowrap px-1">Shop</a>
+      <button id="hamburger-btn" class="flex-shrink-0 flex flex-col gap-1.5 p-1.5">
+        <span class="block w-5 h-0.5 bg-primary"></span>
+        <span class="block w-5 h-0.5 bg-primary"></span>
+        <span class="block w-5 h-0.5 bg-primary"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div id="mobile-menu" style="display:none" class="lg:hidden fixed top-[66px] left-0 w-full bg-white border-b-4 border-primary z-40 shadow-lg">
+  <div class="flex flex-col px-6 py-4 gap-1 font-headline font-bold text-sm">
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/index.html">Home</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/shop.html">Shop</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/how-it-works.html">How It Works</a>
+    <a class="text-on-surface/70 hover:text-primary py-3 border-b border-primary/10" href="/faq.html">FAQ</a>
+    <a class="text-on-surface/70 hover:text-primary py-3" href="/contact.html">Contact</a>
+  </div>
+</div>
+<main class="vibrant-gradient min-h-screen pt-32 pb-24 flex items-center justify-center px-6">
+  <div class="w-full max-w-lg">
+    <div class="cartoon-card rounded-3xl p-8 md:p-12 relative">
+      <div class="absolute -top-12 left-1/2 -translate-x-1/2">
+        <div class="w-24 h-24 bg-white border-4 border-primary rounded-full flex items-center justify-center shadow-lg">
+          <span class="material-symbols-outlined text-primary text-6xl" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
+        </div>
+      </div>
+      <div class="text-center mt-8 mb-10">
+        <h1 class="font-headline text-3xl font-black text-primary uppercase tracking-tight">Verify Your Email</h1>
+        <p class="text-primary/60 font-bold">Enter the 6-digit code we sent to your inbox.</p>
+        <div id="verify-email-error" class="hidden mt-4 bg-red-50 border-2 border-red-400 text-red-700 px-4 py-3 rounded-xl font-bold text-sm"></div>
+      </div>
+      <form id="verify-email-form" class="space-y-6">
+        <div>
+          <label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Email</label>
+          <input id="verify-email" class="w-full cartoon-input" placeholder="you@example.com" type="email" autocomplete="email"/>
+        </div>
+        <div>
+          <label class="block text-sm font-black text-primary uppercase tracking-widest mb-2 px-1">Verification Code</label>
+          <input id="verify-code" class="w-full cartoon-input text-center tracking-[0.55em]" inputmode="numeric" maxlength="6" placeholder="000000" type="text" autocomplete="one-time-code"/>
+        </div>
+        <button id="verify-email-btn" class="w-full cartoon-button bg-primary text-white font-black py-4 rounded-2xl text-xl flex items-center justify-center gap-3 mt-4" type="submit">
+          <span class="material-symbols-outlined">verified</span>
+          VERIFY EMAIL
+        </button>
+      </form>
+      <div class="mt-8 pt-6 border-t-4 border-dashed border-primary/10 text-center">
+        <p class="text-on-surface/60 font-bold mb-4">Did not receive a code?</p>
+        <button id="resend-verification-btn" class="inline-flex items-center gap-2 text-primary font-black text-lg hover:text-accent transition-colors" type="button">
+          Resend Code
+          <span class="material-symbols-outlined">forward_to_inbox</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+</body></html>

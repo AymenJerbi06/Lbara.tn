@@ -6,15 +6,28 @@ const audit = require('../utils/audit');
 const emailService = require('../services/emailService');
 const { publicAuthEnabled, emailVerificationRequired } = require('../config/previewMode');
 const {
+  badRequest,
   rejectUnexpectedFields,
   cleanString,
   cleanEmail,
+  cleanEnum,
   cleanPassword,
+  cleanPhone,
   handleValidationError,
 } = require('../utils/validation');
 
 const PREVIEW_AUTH_MESSAGE = 'Customer accounts are currently closed during this preview. Only the admin account can log in.';
 const GENERIC_RESET_MESSAGE = 'If that email exists, a reset link has been sent.';
+const PROFILE_FIELDS = [
+  'full_name',
+  'phone',
+  'city',
+  'address_line1',
+  'address_line2',
+  'postal_code',
+  'country',
+  'preferred_language',
+];
 
 function frontendUrl(path) {
   return `${process.env.FRONTEND_URL || 'http://localhost:3025'}${path}`;
@@ -37,6 +50,32 @@ async function createEmailVerification(userId, email) {
   await emailService.sendEmailVerificationLink(email, frontendUrl(`/api/auth/verify-email?token=${rawToken}`));
 }
 
+async function createEmailVerificationCode(userId, email) {
+  const code = crypto.randomInt(100000, 1000000).toString();
+  const hashedCode = await bcrypt.hash(code, 10);
+  const expires = new Date(Date.now() + 20 * 60 * 1000);
+
+  await pool.query(
+    'UPDATE users SET email_verification_token = $1, email_verification_expires = $2, updated_at = NOW() WHERE id = $3',
+    [`otp:${hashedCode}`, expires, userId]
+  );
+
+  await emailService.sendEmailVerificationOTP(email, code);
+}
+
+function cleanProfileFields(body, { requireName = false } = {}) {
+  return {
+    full_name: cleanString(body.full_name, { label: 'Full name', required: requireName, max: 100 }),
+    phone: cleanPhone(body.phone),
+    city: cleanString(body.city, { label: 'City', required: false, max: 100 }),
+    address_line1: cleanString(body.address_line1, { label: 'Address', required: false, max: 255 }),
+    address_line2: cleanString(body.address_line2, { label: 'Address details', required: false, max: 255 }),
+    postal_code: cleanString(body.postal_code, { label: 'Postal code', required: false, max: 30 }),
+    country: cleanString(body.country, { label: 'Country', required: false, max: 100 }) || 'Tunisia',
+    preferred_language: cleanEnum(body.preferred_language || 'en', ['en', 'fr', 'ar'], { label: 'Preferred language', required: false }) || 'en',
+  };
+}
+
 function issueToken(user, res) {
   const payload = { id: user.id, email: user.email, is_admin: user.is_admin, is_verified: user.is_verified };
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
@@ -55,10 +94,11 @@ async function register(req, res) {
   }
 
   try {
-    rejectUnexpectedFields(req.body, ['email', 'password', 'full_name'], 'Registration');
+    rejectUnexpectedFields(req.body, ['email', 'password', ...PROFILE_FIELDS], 'Registration');
     const email = cleanEmail(req.body.email);
     const password = cleanPassword(req.body.password);
-    const fullName = cleanString(req.body.full_name, { label: 'Full name', required: false, max: 100 });
+    const profile = cleanProfileFields(req.body, { requireName: false });
+    const verificationRequired = emailVerificationRequired();
 
     const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
     if (existing.rows.length > 0) {
@@ -67,20 +107,35 @@ async function register(req, res) {
 
     const password_hash = await bcrypt.hash(password, 12);
     const result = await pool.query(
-      `INSERT INTO users (email, password_hash, full_name, is_verified)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, email, full_name, is_admin, is_verified`,
-      [email, password_hash, fullName, !emailVerificationRequired()]
+      `INSERT INTO users (
+         email, password_hash, full_name, phone, city, address_line1, address_line2,
+         postal_code, country, preferred_language, is_verified
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+       RETURNING id, email, full_name, phone, city, address_line1, address_line2, postal_code, country, preferred_language, is_admin, is_verified`,
+      [
+        email,
+        password_hash,
+        profile.full_name,
+        profile.phone,
+        profile.city,
+        profile.address_line1,
+        profile.address_line2,
+        profile.postal_code,
+        profile.country,
+        profile.preferred_language,
+        !verificationRequired,
+      ]
     );
     const user = result.rows[0];
+    let emailDeliveryFailed = false;
 
-    if (emailVerificationRequired()) {
+    if (verificationRequired) {
       try {
-        await createEmailVerification(user.id, user.email);
+        await createEmailVerificationCode(user.id, user.email);
       } catch (emailErr) {
         console.error('[register verification email]', emailErr.message);
-        await pool.query('DELETE FROM users WHERE id = $1', [user.id]);
-        return res.status(503).json({ success: false, message: 'Email verification is not available right now. Please try again later.' });
+        emailDeliveryFailed = true;
       }
     } else {
       issueToken(user, res);
@@ -90,11 +145,14 @@ async function register(req, res) {
 
     res.status(201).json({
       success: true,
-      verification_required: emailVerificationRequired(),
-      message: emailVerificationRequired()
-        ? 'Account created. Please verify your email before logging in.'
+      verification_required: verificationRequired,
+      email_delivery_failed: emailDeliveryFailed,
+      message: verificationRequired
+        ? (emailDeliveryFailed
+          ? 'Account created, but the verification email could not be sent. Please try resending the code in a moment.'
+          : 'Account created. Please verify your email before logging in.')
         : 'Account created.',
-      user: { id: user.id, email: user.email, full_name: user.full_name },
+      user,
     });
   } catch (err) {
     if (handleValidationError(err, res)) return;
@@ -120,12 +178,17 @@ async function login(req, res) {
       return res.status(403).json({ success: false, message: PREVIEW_AUTH_MESSAGE });
     }
     if (emailVerificationRequired() && !user.is_admin && !user.is_verified) {
-      return res.status(403).json({ success: false, message: 'Please verify your email before logging in.' });
+      return res.status(403).json({
+        success: false,
+        verification_required: true,
+        email: user.email,
+        message: 'Please verify your email before logging in.',
+      });
     }
 
     issueToken(user, res);
     console.info(`[auth] Login success for ${user.email} from ${req.ip}`);
-    res.json({ success: true, user: { id: user.id, email: user.email, full_name: user.full_name, is_admin: user.is_admin } });
+    res.json({ success: true, user: { id: user.id, email: user.email, full_name: user.full_name, phone: user.phone, city: user.city, address_line1: user.address_line1, address_line2: user.address_line2, postal_code: user.postal_code, country: user.country, preferred_language: user.preferred_language, is_admin: user.is_admin } });
   } catch (err) {
     if (handleValidationError(err, res)) return;
     console.error('[login]', err);
@@ -141,7 +204,10 @@ function logout(req, res) {
 async function me(req, res) {
   try {
     const result = await pool.query(
-      'SELECT id, email, full_name, phone, is_admin, is_verified, created_at FROM users WHERE id = $1',
+      `SELECT id, email, full_name, phone, city, address_line1, address_line2,
+              postal_code, country, preferred_language, is_admin, is_verified, created_at
+       FROM users
+       WHERE id = $1`,
       [req.user.id]
     );
     if (!result.rows[0]) return res.status(404).json({ success: false, message: 'User not found.' });
@@ -304,13 +370,105 @@ async function verifyEmail(req, res) {
   }
 }
 
+async function verifyEmailCode(req, res) {
+  try {
+    rejectUnexpectedFields(req.body, ['email', 'code'], 'Email verification');
+    const email = cleanEmail(req.body.email);
+    const code = cleanString(req.body.code, { label: 'Verification code', required: true, min: 6, max: 6 });
+    if (!/^[0-9]{6}$/.test(code)) {
+      return res.status(400).json({ success: false, message: 'Invalid verification code.' });
+    }
+
+    const result = await pool.query(
+      'SELECT id, is_verified, email_verification_token, email_verification_expires FROM users WHERE email = $1',
+      [email]
+    );
+    const user = result.rows[0];
+    if (!user) return res.status(400).json({ success: false, message: 'Invalid or expired verification code.' });
+    if (user.is_verified) return res.json({ success: true, message: 'Email already verified.' });
+    if (!user.email_verification_token || !user.email_verification_expires || new Date() > new Date(user.email_verification_expires)) {
+      return res.status(400).json({ success: false, message: 'Verification code expired. Request a new one.' });
+    }
+    if (!user.email_verification_token.startsWith('otp:')) {
+      return res.status(400).json({ success: false, message: 'This account needs a new verification code.' });
+    }
+
+    const valid = await bcrypt.compare(code, user.email_verification_token.slice(4));
+    if (!valid) {
+      return res.status(400).json({ success: false, message: 'Invalid verification code.' });
+    }
+
+    await pool.query(
+      `UPDATE users
+       SET is_verified = TRUE,
+           email_verification_token = NULL,
+           email_verification_expires = NULL,
+           updated_at = NOW()
+       WHERE id = $1`,
+      [user.id]
+    );
+
+    await audit.log({ entityType: 'user', entityId: user.id, action: 'email_verified', actorId: user.id, actorType: 'user' });
+    return res.json({ success: true, message: 'Email verified. You can log in now.' });
+  } catch (err) {
+    if (handleValidationError(err, res)) return;
+    console.error('[verifyEmailCode]', err);
+    return res.status(500).json({ success: false, message: 'Failed to verify email.' });
+  }
+}
+
+async function resendVerificationCode(req, res) {
+  try {
+    rejectUnexpectedFields(req.body, ['email'], 'Resend verification');
+    const email = cleanEmail(req.body.email);
+    const result = await pool.query('SELECT id, email, is_verified FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.json({ success: true, message: 'If this account exists, a verification code has been sent.' });
+    }
+    if (user.is_verified) {
+      return res.json({ success: true, message: 'This email is already verified.' });
+    }
+
+    await createEmailVerificationCode(user.id, user.email);
+    res.json({ success: true, message: 'Verification code sent. Check your email.' });
+  } catch (err) {
+    if (handleValidationError(err, res)) return;
+    console.error('[resendVerificationCode]', err);
+    res.status(503).json({ success: false, message: 'Could not send a verification code right now.' });
+  }
+}
+
 async function updateProfile(req, res) {
   try {
-    rejectUnexpectedFields(req.body, ['full_name'], 'Profile update');
-    const fullName = cleanString(req.body.full_name, { label: 'Display name', required: true, max: 100 });
+    rejectUnexpectedFields(req.body, PROFILE_FIELDS, 'Profile update');
+    const body = req.body || {};
+    const setters = [];
+    const values = [];
+    const add = (field, value) => {
+      values.push(value);
+      setters.push(`${field} = $${values.length}`);
+    };
+
+    if (Object.prototype.hasOwnProperty.call(body, 'full_name')) add('full_name', cleanString(body.full_name, { label: 'Display name', required: true, max: 100 }));
+    if (Object.prototype.hasOwnProperty.call(body, 'phone')) add('phone', cleanPhone(body.phone));
+    if (Object.prototype.hasOwnProperty.call(body, 'city')) add('city', cleanString(body.city, { label: 'City', required: false, max: 100 }));
+    if (Object.prototype.hasOwnProperty.call(body, 'address_line1')) add('address_line1', cleanString(body.address_line1, { label: 'Address', required: false, max: 255 }));
+    if (Object.prototype.hasOwnProperty.call(body, 'address_line2')) add('address_line2', cleanString(body.address_line2, { label: 'Address details', required: false, max: 255 }));
+    if (Object.prototype.hasOwnProperty.call(body, 'postal_code')) add('postal_code', cleanString(body.postal_code, { label: 'Postal code', required: false, max: 30 }));
+    if (Object.prototype.hasOwnProperty.call(body, 'country')) add('country', cleanString(body.country, { label: 'Country', required: false, max: 100 }) || 'Tunisia');
+    if (Object.prototype.hasOwnProperty.call(body, 'preferred_language')) add('preferred_language', cleanEnum(body.preferred_language, ['en', 'fr', 'ar'], { label: 'Preferred language', required: false }));
+
+    if (!setters.length) throw badRequest('Profile update contains no editable fields.');
+
+    values.push(req.user.id);
     const result = await pool.query(
-      'UPDATE users SET full_name = $1 WHERE id = $2 RETURNING id, email, full_name',
-      [fullName, req.user.id]
+      `UPDATE users
+       SET ${setters.join(', ')}, updated_at = NOW()
+       WHERE id = $${values.length}
+       RETURNING id, email, full_name, phone, city, address_line1, address_line2, postal_code, country, preferred_language, is_admin, is_verified`,
+      values
     );
     res.json({ success: true, user: result.rows[0] });
   } catch (err) {
@@ -320,4 +478,17 @@ async function updateProfile(req, res) {
   }
 }
 
-module.exports = { register, login, logout, me, updateProfile, requestPasswordChange, confirmPasswordChange, forgotPassword, resetPassword, verifyEmail };
+module.exports = {
+  register,
+  login,
+  logout,
+  me,
+  updateProfile,
+  requestPasswordChange,
+  confirmPasswordChange,
+  forgotPassword,
+  resetPassword,
+  verifyEmail,
+  verifyEmailCode,
+  resendVerificationCode,
+};

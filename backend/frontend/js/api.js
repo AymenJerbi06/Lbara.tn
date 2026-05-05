@@ -12,7 +12,7 @@ async function apiFetch(path, options = {}) {
   });
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw { status: res.status, message: data.message || 'Something went wrong.' };
+  if (!res.ok) throw { status: res.status, message: data.message || 'Something went wrong.', ...data };
   return data;
 }
 
@@ -22,6 +22,8 @@ const api = {
   login: (body) => apiFetch('/auth/login', { method: 'POST', body }),
   logout: () => apiFetch('/auth/logout', { method: 'POST' }),
   me: () => apiFetch('/auth/me'),
+  verifyEmailCode: (body) => apiFetch('/auth/verify-email-code', { method: 'POST', body }),
+  resendVerification: (body) => apiFetch('/auth/resend-verification', { method: 'POST', body }),
 
   // Products
   getProducts: (params = {}) => {

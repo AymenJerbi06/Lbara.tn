@@ -158,7 +158,7 @@
 
     <div class="space-y-12">
 
-      <!-- Step 1: Display Name -->
+      <!-- Step 1: Account Details -->
       <section class="stepper-item relative flex gap-6">
         <div class="stepper-line relative flex-shrink-0">
           <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold headline-font z-10 relative">1</div>
@@ -167,17 +167,47 @@
           <div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)] border border-outline-variant/10">
             <div class="flex items-center gap-3 mb-6">
               <span class="material-symbols-outlined text-primary">badge</span>
-              <h2 class="headline-font font-bold text-xl">Update Your Display Name</h2>
+              <h2 class="headline-font font-bold text-xl">Update Your Account Details</h2>
             </div>
-            <p class="text-on-surface-variant mb-6">This is the name that will be visible on your account.</p>
-            <div class="max-w-md">
+            <p class="text-on-surface-variant mb-6">Keep your customer details ready so checkout and support are faster.</p>
+            <div class="max-w-3xl">
               <div class="flex flex-col gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="display_name">Full Name</label>
+                    <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="display_name" placeholder="e.g. Aymen Jerbi" type="text"/>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_phone">Phone Number</label>
+                    <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_phone" placeholder="+216 00 000 000" type="tel"/>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_city">City</label>
+                    <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_city" placeholder="e.g. Tunis" type="text"/>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_country">Country</label>
+                    <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_country" placeholder="Tunisia" type="text"/>
+                  </div>
+                </div>
                 <div>
-                  <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="display_name">New Display Name</label>
-                  <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="display_name" placeholder="e.g. Alex J." type="text"/>
+                  <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_address_line1">Address</label>
+                  <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_address_line1" placeholder="Street address, neighborhood, or delivery note" type="text"/>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_address_line2">Address Details</label>
+                    <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_address_line2" placeholder="Apartment, floor, landmark" type="text"/>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_postal_code">Postal Code</label>
+                    <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_postal_code" placeholder="Optional" type="text"/>
+                  </div>
                 </div>
                 <button type="button" id="save-name-btn" class="w-fit bg-primary text-on-primary px-8 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2">
-                  Save Name
+                  Save Details
                   <span class="material-symbols-outlined text-sm">check</span>
                 </button>
                 <p id="save-name-msg" style="display:none"></p>
@@ -344,21 +374,31 @@ document.addEventListener('DOMContentLoaded', function () {
     saveBtn.addEventListener('click', function () {
       var name = (document.getElementById('display_name').value || '').trim();
       if (!name) { msg('save-name-msg', tr('Name cannot be empty.'), false); return; }
+      var payload = {
+        full_name: name,
+        phone: (document.getElementById('profile_phone').value || '').trim(),
+        city: (document.getElementById('profile_city').value || '').trim(),
+        address_line1: (document.getElementById('profile_address_line1').value || '').trim(),
+        address_line2: (document.getElementById('profile_address_line2').value || '').trim(),
+        postal_code: (document.getElementById('profile_postal_code').value || '').trim(),
+        country: (document.getElementById('profile_country').value || '').trim() || 'Tunisia',
+        preferred_language: window.lbaraI18n && window.lbaraI18n.language ? window.lbaraI18n.language() : 'en'
+      };
       saveBtn.disabled = true;
       saveBtn.textContent = tr('Saving...');
-      req('/auth/profile', 'POST', { full_name: name }).then(function (res) {
+      req('/auth/profile', 'POST', payload).then(function (res) {
         var updated = (res.user && res.user.full_name) || name;
         document.getElementById('display_name').value = updated;
         var sn = document.getElementById('sidebar-name'); if (sn) sn.textContent = updated;
         var sa = document.getElementById('sidebar-avatar'); if (sa) sa.textContent = updated[0].toUpperCase();
         var ha = document.getElementById('header-avatar'); if (ha) ha.textContent = updated[0].toUpperCase();
-        msg('save-name-msg', '✓ ' + tr('Name saved!'), true);
+        msg('save-name-msg', '✓ ' + tr('Details saved!'), true);
         setTimeout(function () { clearMsg('save-name-msg'); }, 3000);
       }).catch(function (e) {
-        msg('save-name-msg', e.message || tr('Failed to save name.'), false);
+        msg('save-name-msg', e.message || tr('Failed to save details.'), false);
       }).finally(function () {
         saveBtn.disabled = false;
-        saveBtn.innerHTML = tr('Save Name') + ' <span class="material-symbols-outlined text-sm">check</span>';
+        saveBtn.innerHTML = tr('Save Details') + ' <span class="material-symbols-outlined text-sm">check</span>';
       });
     });
   }
@@ -419,12 +459,18 @@ document.addEventListener('DOMContentLoaded', function () {
     var sa = document.getElementById('sidebar-avatar'); if (sa) sa.textContent = initial;
     var ha = document.getElementById('header-avatar'); if (ha) ha.textContent = initial;
     var dn = document.getElementById('display_name'); if (dn) dn.value = user.full_name || '';
+    var pp = document.getElementById('profile_phone'); if (pp) pp.value = user.phone || '';
+    var pc = document.getElementById('profile_city'); if (pc) pc.value = user.city || '';
+    var pa1 = document.getElementById('profile_address_line1'); if (pa1) pa1.value = user.address_line1 || '';
+    var pa2 = document.getElementById('profile_address_line2'); if (pa2) pa2.value = user.address_line2 || '';
+    var ppc = document.getElementById('profile_postal_code'); if (ppc) ppc.value = user.postal_code || '';
+    var pct = document.getElementById('profile_country'); if (pct) pct.value = user.country || 'Tunisia';
   }).catch(function () {
     window.location.href = '/login.html';
   });
 
   document.addEventListener('lbara:languagechange', function () {
-    if (saveBtn && !saveBtn.disabled) saveBtn.innerHTML = tr('Save Name') + ' <span class="material-symbols-outlined text-sm">check</span>';
+    if (saveBtn && !saveBtn.disabled) saveBtn.innerHTML = tr('Save Details') + ' <span class="material-symbols-outlined text-sm">check</span>';
     if (codeBtn && !codeBtn.disabled) codeBtn.textContent = tr('Request Verification Code');
     if (pwdBtn && !pwdBtn.disabled) pwdBtn.innerHTML = tr('Update Password') + ' <span class="material-symbols-outlined text-sm">shield_lock</span>';
     applyTranslations(document);
