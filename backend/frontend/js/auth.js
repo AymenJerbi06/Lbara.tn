@@ -62,10 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const terms = document.getElementById('signup-terms')?.checked;
       const phone = document.getElementById('signup-phone')?.value.trim();
       const city = document.getElementById('signup-city')?.value.trim();
-      const addressLine1 = document.getElementById('signup-address-line1')?.value.trim();
-      const addressLine2 = document.getElementById('signup-address-line2')?.value.trim();
-      const postalCode = document.getElementById('signup-postal-code')?.value.trim();
-      const country = document.getElementById('signup-country')?.value.trim() || 'Tunisia';
 
       if (!fullName) {
         if (signupError) { signupError.textContent = tr('Please enter your full name.'); signupError.classList.remove('hidden'); }
@@ -91,16 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
           full_name: fullName,
           phone,
           city,
-          address_line1: addressLine1,
-          address_line2: addressLine2,
-          postal_code: postalCode,
-          country,
           preferred_language: window.lbaraI18n?.language ? window.lbaraI18n.language() : (document.documentElement.lang || 'en'),
         });
         if (result.verification_required) {
           sessionStorage.setItem('lbara_verify_email', email);
           showToast(result.email_delivery_failed
-            ? tr('Account created, but the verification email could not be sent. Please try resending the code in a moment.')
+            ? (result.email_delivery_message || tr('Account created, but the verification email could not be sent. Please try resending the code in a moment.'))
             : tr('Account created. Please verify your email before logging in.'));
           setTimeout(() => { window.location.href = `/verify-email.html?email=${encodeURIComponent(email)}`; }, 1200);
         } else {

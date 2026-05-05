@@ -22,10 +22,6 @@ const PROFILE_FIELDS = [
   'full_name',
   'phone',
   'city',
-  'address_line1',
-  'address_line2',
-  'postal_code',
-  'country',
   'preferred_language',
 ];
 
@@ -68,10 +64,6 @@ function cleanProfileFields(body, { requireName = false } = {}) {
     full_name: cleanString(body.full_name, { label: 'Full name', required: requireName, max: 100 }),
     phone: cleanPhone(body.phone),
     city: cleanString(body.city, { label: 'City', required: false, max: 100 }),
-    address_line1: cleanString(body.address_line1, { label: 'Address', required: false, max: 255 }),
-    address_line2: cleanString(body.address_line2, { label: 'Address details', required: false, max: 255 }),
-    postal_code: cleanString(body.postal_code, { label: 'Postal code', required: false, max: 30 }),
-    country: cleanString(body.country, { label: 'Country', required: false, max: 100 }) || 'Tunisia',
     preferred_language: cleanEnum(body.preferred_language || 'en', ['en', 'fr', 'ar'], { label: 'Preferred language', required: false }) || 'en',
   };
 }
@@ -108,27 +100,23 @@ async function register(req, res) {
     const password_hash = await bcrypt.hash(password, 12);
     const result = await pool.query(
       `INSERT INTO users (
-         email, password_hash, full_name, phone, city, address_line1, address_line2,
-         postal_code, country, preferred_language, is_verified
+         email, password_hash, full_name, phone, city, preferred_language, is_verified
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       RETURNING id, email, full_name, phone, city, address_line1, address_line2, postal_code, country, preferred_language, is_admin, is_verified`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, email, full_name, phone, city, preferred_language, is_admin, is_verified`,
       [
         email,
         password_hash,
         profile.full_name,
         profile.phone,
         profile.city,
-        profile.address_line1,
-        profile.address_line2,
-        profile.postal_code,
-        profile.country,
         profile.preferred_language,
         !verificationRequired,
       ]
     );
     const user = result.rows[0];
     let emailDeliveryFailed = false;
+    let emailDeliveryMessage = null;
 
     if (verificationRequired) {
       try {
@@ -136,6 +124,7 @@ async function register(req, res) {
       } catch (emailErr) {
         console.error('[register verification email]', emailErr.message);
         emailDeliveryFailed = true;
+        emailDeliveryMessage = emailErr.message;
       }
     } else {
       issueToken(user, res);
@@ -147,6 +136,7 @@ async function register(req, res) {
       success: true,
       verification_required: verificationRequired,
       email_delivery_failed: emailDeliveryFailed,
+      email_delivery_message: process.env.NODE_ENV === 'production' ? undefined : emailDeliveryMessage,
       message: verificationRequired
         ? (emailDeliveryFailed
           ? 'Account created, but the verification email could not be sent. Please try resending the code in a moment.'
@@ -188,7 +178,7 @@ async function login(req, res) {
 
     issueToken(user, res);
     console.info(`[auth] Login success for ${user.email} from ${req.ip}`);
-    res.json({ success: true, user: { id: user.id, email: user.email, full_name: user.full_name, phone: user.phone, city: user.city, address_line1: user.address_line1, address_line2: user.address_line2, postal_code: user.postal_code, country: user.country, preferred_language: user.preferred_language, is_admin: user.is_admin } });
+    res.json({ success: true, user: { id: user.id, email: user.email, full_name: user.full_name, phone: user.phone, city: user.city, preferred_language: user.preferred_language, is_admin: user.is_admin } });
   } catch (err) {
     if (handleValidationError(err, res)) return;
     console.error('[login]', err);
@@ -204,8 +194,7 @@ function logout(req, res) {
 async function me(req, res) {
   try {
     const result = await pool.query(
-      `SELECT id, email, full_name, phone, city, address_line1, address_line2,
-              postal_code, country, preferred_language, is_admin, is_verified, created_at
+      `SELECT id, email, full_name, phone, city, preferred_language, is_admin, is_verified, created_at
        FROM users
        WHERE id = $1`,
       [req.user.id]
@@ -436,7 +425,12 @@ async function resendVerificationCode(req, res) {
   } catch (err) {
     if (handleValidationError(err, res)) return;
     console.error('[resendVerificationCode]', err);
-    res.status(503).json({ success: false, message: 'Could not send a verification code right now.' });
+    res.status(503).json({
+      success: false,
+      message: process.env.NODE_ENV === 'production'
+        ? 'Could not send a verification code right now.'
+        : `Could not send a verification code right now: ${err.message}`,
+    });
   }
 }
 
@@ -454,10 +448,6 @@ async function updateProfile(req, res) {
     if (Object.prototype.hasOwnProperty.call(body, 'full_name')) add('full_name', cleanString(body.full_name, { label: 'Display name', required: true, max: 100 }));
     if (Object.prototype.hasOwnProperty.call(body, 'phone')) add('phone', cleanPhone(body.phone));
     if (Object.prototype.hasOwnProperty.call(body, 'city')) add('city', cleanString(body.city, { label: 'City', required: false, max: 100 }));
-    if (Object.prototype.hasOwnProperty.call(body, 'address_line1')) add('address_line1', cleanString(body.address_line1, { label: 'Address', required: false, max: 255 }));
-    if (Object.prototype.hasOwnProperty.call(body, 'address_line2')) add('address_line2', cleanString(body.address_line2, { label: 'Address details', required: false, max: 255 }));
-    if (Object.prototype.hasOwnProperty.call(body, 'postal_code')) add('postal_code', cleanString(body.postal_code, { label: 'Postal code', required: false, max: 30 }));
-    if (Object.prototype.hasOwnProperty.call(body, 'country')) add('country', cleanString(body.country, { label: 'Country', required: false, max: 100 }) || 'Tunisia');
     if (Object.prototype.hasOwnProperty.call(body, 'preferred_language')) add('preferred_language', cleanEnum(body.preferred_language, ['en', 'fr', 'ar'], { label: 'Preferred language', required: false }));
 
     if (!setters.length) throw badRequest('Profile update contains no editable fields.');
@@ -467,7 +457,7 @@ async function updateProfile(req, res) {
       `UPDATE users
        SET ${setters.join(', ')}, updated_at = NOW()
        WHERE id = $${values.length}
-       RETURNING id, email, full_name, phone, city, address_line1, address_line2, postal_code, country, preferred_language, is_admin, is_verified`,
+       RETURNING id, email, full_name, phone, city, preferred_language, is_admin, is_verified`,
       values
     );
     res.json({ success: true, user: result.rows[0] });

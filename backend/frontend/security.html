@@ -182,29 +182,9 @@
                     <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_phone" placeholder="+216 00 000 000" type="tel"/>
                   </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_city">City</label>
-                    <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_city" placeholder="e.g. Tunis" type="text"/>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_country">Country</label>
-                    <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_country" placeholder="Tunisia" type="text"/>
-                  </div>
-                </div>
                 <div>
-                  <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_address_line1">Address</label>
-                  <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_address_line1" placeholder="Street address, neighborhood, or delivery note" type="text"/>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_address_line2">Address Details</label>
-                    <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_address_line2" placeholder="Apartment, floor, landmark" type="text"/>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_postal_code">Postal Code</label>
-                    <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_postal_code" placeholder="Optional" type="text"/>
-                  </div>
+                  <label class="block text-xs font-bold headline-font text-on-surface-variant uppercase tracking-wider mb-2 px-1" for="profile_city">City</label>
+                  <input class="w-full px-4 py-3 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium" id="profile_city" placeholder="e.g. Tunis" type="text"/>
                 </div>
                 <button type="button" id="save-name-btn" class="w-fit bg-primary text-on-primary px-8 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-all flex items-center gap-2">
                   Save Details
@@ -378,10 +358,6 @@ document.addEventListener('DOMContentLoaded', function () {
         full_name: name,
         phone: (document.getElementById('profile_phone').value || '').trim(),
         city: (document.getElementById('profile_city').value || '').trim(),
-        address_line1: (document.getElementById('profile_address_line1').value || '').trim(),
-        address_line2: (document.getElementById('profile_address_line2').value || '').trim(),
-        postal_code: (document.getElementById('profile_postal_code').value || '').trim(),
-        country: (document.getElementById('profile_country').value || '').trim() || 'Tunisia',
         preferred_language: window.lbaraI18n && window.lbaraI18n.language ? window.lbaraI18n.language() : 'en'
       };
       saveBtn.disabled = true;
@@ -461,10 +437,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var dn = document.getElementById('display_name'); if (dn) dn.value = user.full_name || '';
     var pp = document.getElementById('profile_phone'); if (pp) pp.value = user.phone || '';
     var pc = document.getElementById('profile_city'); if (pc) pc.value = user.city || '';
-    var pa1 = document.getElementById('profile_address_line1'); if (pa1) pa1.value = user.address_line1 || '';
-    var pa2 = document.getElementById('profile_address_line2'); if (pa2) pa2.value = user.address_line2 || '';
-    var ppc = document.getElementById('profile_postal_code'); if (ppc) ppc.value = user.postal_code || '';
-    var pct = document.getElementById('profile_country'); if (pct) pct.value = user.country || 'Tunisia';
   }).catch(function () {
     window.location.href = '/login.html';
   });

@@ -73,10 +73,6 @@ async function ensureRuntimeMigrations() {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expires TIMESTAMPTZ;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(30);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(100);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS address_line1 VARCHAR(255);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS address_line2 VARCHAR(255);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS postal_code VARCHAR(30);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS country VARCHAR(100) DEFAULT 'Tunisia';
     ALTER TABLE users ADD COLUMN IF NOT EXISTS preferred_language VARCHAR(10) DEFAULT 'en';
 
     CREATE TABLE IF NOT EXISTS schema_migrations (

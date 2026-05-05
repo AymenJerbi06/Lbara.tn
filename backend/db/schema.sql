@@ -12,10 +12,6 @@ CREATE TABLE IF NOT EXISTS users (
   full_name     VARCHAR(255),
   phone         VARCHAR(30),
   city          VARCHAR(100),
-  address_line1 VARCHAR(255),
-  address_line2 VARCHAR(255),
-  postal_code   VARCHAR(30),
-  country       VARCHAR(100) DEFAULT 'Tunisia',
   preferred_language VARCHAR(10) DEFAULT 'en',
   is_admin      BOOLEAN DEFAULT FALSE,
   is_verified   BOOLEAN DEFAULT FALSE,
@@ -186,10 +182,6 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_token VARCHAR(128)
 ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expires TIMESTAMPTZ;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(30);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(100);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS address_line1 VARCHAR(255);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS address_line2 VARCHAR(255);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS postal_code VARCHAR(30);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS country VARCHAR(100) DEFAULT 'Tunisia';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS preferred_language VARCHAR(10) DEFAULT 'en';
 
 -- ─── Product Image URL (safe to run on existing DB) ──────

@@ -9,7 +9,7 @@ function sanitizeHeader(value) {
 
 async function send({ to, subject, html }) {
   if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.includes('your_')) {
-    throw new Error('Email delivery is not configured.');
+    throw new Error('Email delivery is not configured. Set RESEND_API_KEY and EMAIL_FROM in your environment.');
   }
 
   try {
