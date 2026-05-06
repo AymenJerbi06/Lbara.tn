@@ -33,6 +33,22 @@ function hashToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
 
+function publicEmailStatus() {
+  const resendKey = process.env.RESEND_API_KEY || '';
+  const from = process.env.EMAIL_FROM || 'Lbara.tn <onboarding@resend.dev>';
+  const sandboxSender = /@resend\.dev>?$/i.test(from.trim());
+  return {
+    verification_required: emailVerificationRequired(),
+    resend_configured: Boolean(resendKey && !resendKey.includes('your_') && resendKey.length > 20),
+    email_from: from,
+    sandbox_sender: sandboxSender,
+    frontend_url: process.env.FRONTEND_URL || 'http://localhost:3025',
+    hint: sandboxSender
+      ? 'Resend sandbox sender can only deliver to the email address attached to your Resend account.'
+      : 'Sender domain must be verified in Resend before it can deliver verification codes.',
+  };
+}
+
 async function createEmailVerification(userId, email) {
   const rawToken = crypto.randomBytes(32).toString('hex');
   const hashedToken = hashToken(rawToken);
@@ -189,6 +205,10 @@ async function login(req, res) {
 function logout(req, res) {
   res.clearCookie('token');
   res.json({ success: true, message: 'Logged out.' });
+}
+
+function emailStatus(req, res) {
+  res.json({ success: true, email: publicEmailStatus() });
 }
 
 async function me(req, res) {
@@ -481,4 +501,5 @@ module.exports = {
   verifyEmail,
   verifyEmailCode,
   resendVerificationCode,
+  emailStatus,
 };

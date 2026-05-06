@@ -15,8 +15,10 @@ const {
   verifyEmail,
   verifyEmailCode,
   resendVerificationCode,
+  emailStatus,
 } = require('../controllers/authController');
 
+router.get('/email-status', emailStatus);
 router.post('/register', authLimiter, register);
 router.post('/login', authLimiter, login);
 router.post('/logout', logout);
