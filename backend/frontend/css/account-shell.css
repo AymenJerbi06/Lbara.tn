@@ -214,6 +214,43 @@
   box-shadow: 4px 4px 0 #003060;
 }
 
+.account-mobile-nav {
+  min-height: 76px;
+  padding: 0.65rem 0.55rem 0.75rem;
+}
+
+.account-mobile-nav-item {
+  position: relative;
+  min-width: 46px;
+  min-height: 54px;
+  padding: 0.35rem 0.25rem;
+  border-radius: 18px;
+  color: #6b7280;
+  transition: color .14s ease, background .14s ease, transform .14s ease;
+}
+
+.account-mobile-nav-item .material-symbols-outlined {
+  font-size: 1.55rem;
+}
+
+.account-mobile-nav-item.is-active {
+  color: #003060;
+  background: rgba(0, 48, 96, .07);
+  transform: translateY(-2px);
+}
+
+.account-mobile-nav-item.is-active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0.18rem;
+  width: 1.65rem;
+  height: 0.22rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #B8860B;
+}
+
 @media (max-width: 640px) {
   .account-topbar {
     min-height: 68px;
@@ -244,5 +281,20 @@
   .account-language-menu {
     min-width: 190px;
     right: -42px;
+  }
+
+  .account-mobile-nav {
+    gap: 0.15rem;
+  }
+
+  body .lbara-chat-toggle {
+    bottom: 92px !important;
+    right: 14px !important;
+  }
+
+  body .lbara-chat-panel {
+    bottom: 154px !important;
+    right: 14px !important;
+    max-height: calc(100vh - 180px) !important;
   }
 }

@@ -388,29 +388,29 @@
 </main>
 
 <!-- Mobile Bottom Nav -->
-<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl flex justify-around items-center py-4 px-6 z-50 border-t border-outline-variant/10">
-  <button onclick="showSection('dashboard')" class="flex flex-col items-center gap-1 text-primary">
+<nav class="account-mobile-nav md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl flex justify-around items-center z-50 border-t border-outline-variant/10">
+  <button onclick="showSection('dashboard')" class="account-mobile-nav-item is-active flex flex-col items-center gap-1">
     <span class="material-symbols-outlined">dashboard</span>
     <span class="text-[10px] font-bold headline-font">Home</span>
   </button>
-  <a href="/shop.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+  <a href="/shop.html" class="account-mobile-nav-item flex flex-col items-center gap-1">
     <span class="material-symbols-outlined">storefront</span>
     <span class="text-[10px] font-bold headline-font">Shop</span>
   </a>
-  <a href="/cart.html" class="relative flex flex-col items-center gap-1 text-on-surface-variant">
+  <a href="/cart.html" class="account-mobile-nav-item relative flex flex-col items-center gap-1">
     <span class="material-symbols-outlined">shopping_cart</span>
     <span data-cart-count class="hidden absolute -top-2 right-2 min-w-5 h-5 px-1 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-black flex items-center justify-center">0</span>
     <span class="text-[10px] font-bold headline-font">Cart</span>
   </a>
-  <a href="/order-history.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+  <a href="/order-history.html" class="account-mobile-nav-item flex flex-col items-center gap-1">
     <span class="material-symbols-outlined">inventory_2</span>
     <span class="text-[10px] font-bold headline-font">Orders</span>
   </a>
-  <button onclick="window.location.href='/security.html'" class="flex flex-col items-center gap-1 text-on-surface-variant">
+  <a href="/security.html" class="account-mobile-nav-item flex flex-col items-center gap-1">
     <span class="material-symbols-outlined">lock</span>
     <span class="text-[10px] font-bold headline-font">Security</span>
-  </button>
-  <a href="/api/auth/logout" class="flex flex-col items-center gap-1 text-on-surface-variant">
+  </a>
+  <a href="/api/auth/logout" class="account-mobile-nav-item flex flex-col items-center gap-1">
     <span class="material-symbols-outlined">logout</span>
     <span class="text-[10px] font-bold headline-font">Sign Out</span>
   </a>
