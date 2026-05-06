@@ -111,6 +111,14 @@
       <span class="material-symbols-outlined">dashboard</span>
       <span class="font-label">Dashboard</span>
     </button>
+    <a href="/cart.html" id="nav-cart"
+      class="flex items-center justify-between gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200">
+      <span class="flex items-center gap-3">
+        <span class="material-symbols-outlined">shopping_cart</span>
+        <span class="font-label">My Cart</span>
+      </span>
+      <span data-cart-count class="hidden min-w-6 h-6 px-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-black flex items-center justify-center">0</span>
+    </a>
     <a href="/order-history.html" id="nav-orders"
       class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200">
       <span class="material-symbols-outlined">inventory_2</span>
@@ -152,6 +160,11 @@
     <a href="/shop.html" class="account-shop-shortcut hidden lg:inline-flex">
       <span class="material-symbols-outlined text-lg">storefront</span>
       <span>Back to Shop</span>
+    </a>
+    <a href="/cart.html" class="account-cart-shortcut">
+      <span class="material-symbols-outlined text-lg">shopping_cart</span>
+      <span class="hidden sm:inline">Cart</span>
+      <span data-cart-count class="account-cart-badge hidden">0</span>
     </a>
     <div data-account-language></div>
     <div class="h-8 w-[1px] bg-outline-variant mx-2 opacity-30"></div>
@@ -212,6 +225,25 @@
               <p class="headline-font font-bold">No orders yet</p>
             </div>
             <div id="dashboard-orders-list" class="hidden space-y-6"></div>
+          </section>
+
+          <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
+            <div class="flex justify-between items-start gap-4 mb-6">
+              <div>
+                <h3 class="headline-font font-bold text-2xl">My Cart</h3>
+                <p class="text-sm text-on-surface-variant mt-1">Saved services you can checkout later.</p>
+              </div>
+              <a href="/cart.html" class="text-primary font-bold text-sm underline underline-offset-4">Open Cart</a>
+            </div>
+            <div id="account-cart-empty" class="hidden text-sm font-semibold text-on-surface-variant bg-surface-container rounded-2xl p-4">Your cart is empty.</div>
+            <div id="account-cart-list" class="space-y-3"></div>
+            <div id="account-cart-summary" class="hidden mt-5 pt-5 border-t-2 border-primary/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <p class="text-sm font-black text-primary"><span id="account-cart-count">0</span> saved item(s) - <span id="account-cart-total">0.000 TND</span></p>
+              <a href="/cart.html" class="inline-flex items-center justify-center gap-2 bg-primary-container text-on-primary px-5 py-3 rounded-2xl font-black text-sm headline-font">
+                <span class="material-symbols-outlined text-base">shopping_cart_checkout</span>
+                Review Cart
+              </a>
+            </div>
           </section>
         </div>
 
@@ -365,6 +397,11 @@
     <span class="material-symbols-outlined">storefront</span>
     <span class="text-[10px] font-bold headline-font">Shop</span>
   </a>
+  <a href="/cart.html" class="relative flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">shopping_cart</span>
+    <span data-cart-count class="hidden absolute -top-2 right-2 min-w-5 h-5 px-1 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-black flex items-center justify-center">0</span>
+    <span class="text-[10px] font-bold headline-font">Cart</span>
+  </a>
   <a href="/order-history.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
     <span class="material-symbols-outlined">inventory_2</span>
     <span class="text-[10px] font-bold headline-font">Orders</span>
@@ -380,6 +417,7 @@
 </nav>
 
 <script src="/js/api.js"></script>
+<script src="/js/cart-store.js"></script>
 <script src="/js/account-shell.js"></script>
 <script>
 // ── Section switching ──────────────────────────────────────
@@ -546,6 +584,59 @@ function renderAccountProductList(prefix, products, type) {
   list.classList.remove('hidden');
   list.innerHTML = products.map(p => accountProductRow(p, type)).join('');
   applyTranslations(list);
+}
+
+function accountCartRow(item) {
+  const image = item.image_url
+    ? `<img src="${escapeHtml(item.image_url)}" alt="" class="w-12 h-12 rounded-2xl object-contain bg-white border border-primary/10">`
+    : `<div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center"><span class="material-symbols-outlined text-primary">shopping_cart</span></div>`;
+  return `
+    <div class="flex items-center justify-between gap-3 bg-surface-container rounded-2xl p-3">
+      <a href="/product.html?id=${encodeURIComponent(item.product_id)}" class="flex items-center gap-3 min-w-0">
+        ${image}
+        <div class="min-w-0">
+          <p class="headline-font font-bold text-sm text-on-surface truncate">${escapeHtml(tr(item.product_name))}</p>
+          <p class="text-xs text-on-surface-variant font-semibold truncate">${escapeHtml(tr(item.variant_name || 'Selected option'))}</p>
+        </div>
+      </a>
+      <div class="flex items-center gap-2 shrink-0">
+        <p class="hidden sm:block text-xs font-black text-primary">${formatTnd(item.price_tnd)}</p>
+        <button onclick="checkoutCartItem('${escapeHtml(item.cart_item_id)}')" class="text-xs font-black text-primary hover:text-secondary">${escapeHtml(tr('Checkout'))}</button>
+        <button onclick="removeCartItem('${escapeHtml(item.cart_item_id)}')" class="text-xs font-bold text-on-surface-variant hover:text-error">${escapeHtml(tr('Remove'))}</button>
+      </div>
+    </div>`;
+}
+
+function renderAccountCart() {
+  const store = window.lbaraCartStore;
+  const list = document.getElementById('account-cart-list');
+  const empty = document.getElementById('account-cart-empty');
+  const summary = document.getElementById('account-cart-summary');
+  if (!store || !list || !empty || !summary) return;
+  const items = store.items();
+  if (!items.length) {
+    empty.classList.remove('hidden');
+    list.innerHTML = '';
+    summary.classList.add('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  list.innerHTML = items.slice(0, 3).map(accountCartRow).join('');
+  summary.classList.remove('hidden');
+  document.getElementById('account-cart-count').textContent = String(items.length);
+  document.getElementById('account-cart-total').textContent = formatTnd(store.subtotal());
+  applyTranslations(list);
+}
+
+function checkoutCartItem(cartItemId) {
+  if (window.lbaraCartStore) window.lbaraCartStore.checkoutItem(cartItemId);
+}
+
+function removeCartItem(cartItemId) {
+  if (!window.lbaraCartStore) return;
+  window.lbaraCartStore.remove(cartItemId);
+  renderAccountCart();
+  if (window.showToast) window.showToast(tr('Removed from cart.'));
 }
 
 async function loadFavoriteServices() {
@@ -768,6 +859,7 @@ async function init() {
   document.getElementById('sidebar-email').textContent = user.email;
   document.getElementById('sidebar-avatar').textContent = initial;
   document.getElementById('header-avatar').textContent = initial;
+  renderAccountCart();
   loadFavoriteServices();
 
   try {
@@ -816,6 +908,7 @@ async function init() {
 document.addEventListener('lbara:languagechange', () => {
   init();
 });
+document.addEventListener('lbara:cartchange', renderAccountCart);
 init();
 </script>
 </body></html>

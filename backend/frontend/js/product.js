@@ -326,6 +326,7 @@ function renderSelection() {
   var ready = canCheckoutVariant(variant);
   var isQuote = variant?.checkout_mode === 'quote';
   var continueBtn = document.getElementById('continue-btn');
+  var addCartBtn = document.getElementById('add-cart-btn');
   var contactBtn = document.getElementById('pricing-contact-btn');
 
   document.getElementById('selected-name').textContent = variant ? tr(variant.name) : tr('Choose an option');
@@ -336,30 +337,53 @@ function renderSelection() {
 
   continueBtn.disabled = !ready;
   continueBtn.innerHTML = ready
-    ? '<span class="material-symbols-outlined">add_shopping_cart</span> ' + escapeHtml(tr(isQuote ? 'Pay Request Ticket' : 'Continue to Checkout'))
+    ? '<span class="material-symbols-outlined">shopping_cart_checkout</span> ' + escapeHtml(tr(isQuote ? 'Pay Request Ticket' : 'Checkout Now'))
     : '<span class="material-symbols-outlined">schedule</span> ' + escapeHtml(tr('Pricing Soon'));
+  if (addCartBtn) {
+    addCartBtn.disabled = !ready;
+    addCartBtn.innerHTML = ready
+      ? '<span class="material-symbols-outlined">add_shopping_cart</span> ' + escapeHtml(tr('Add to Cart'))
+      : '<span class="material-symbols-outlined">schedule</span> ' + escapeHtml(tr('Pricing Soon'));
+  }
   contactBtn.href = '/contact.html?service=' + encodeURIComponent(product.name + (variant ? ' - ' + variant.name : ''));
   applyTranslations(document.getElementById('selection-panel') || document);
 }
 
-function addSelectedToCart() {
+function selectedCartItem(variant) {
+  return {
+    product_id: product.id,
+    variant_id: variant.id,
+    product_name: product.name,
+    variant_name: variant.name,
+    provider: product.provider || 'Lbara.tn',
+    image_url: product.image_url || '',
+    price_tnd: amountForVariant(variant),
+    checkout_mode: variant.checkout_mode || 'full_payment',
+    billing_period: variant.billing_period || product.duration_label || null,
+  };
+}
+
+function addSelectedToCart(options) {
+  var shouldCheckout = Boolean(options && options.checkout);
   var variant = selectedVariant();
   if (!variant || !canCheckoutVariant(variant)) {
     showToast('Pricing for this option is not ready yet. Please contact us first.', 'error');
     return;
   }
 
-  sessionStorage.setItem('lbara_cart', JSON.stringify({
-    product_id: product.id,
-    variant_id: variant.id,
-    product_name: product.name,
-    variant_name: variant.name,
-    price_tnd: amountForVariant(variant),
-    checkout_mode: variant.checkout_mode || 'full_payment',
-    billing_period: variant.billing_period || product.duration_label || null,
-  }));
-  showToast('Option selected! Heading to checkout...');
-  setTimeout(function () { window.location.href = '/checkout.html'; }, 700);
+  var item = selectedCartItem(variant);
+  if (window.lbaraCartStore) {
+    item = window.lbaraCartStore.add(item).item;
+  }
+
+  if (shouldCheckout) {
+    sessionStorage.setItem('lbara_cart', JSON.stringify(item));
+    showToast('Option selected! Heading to checkout...');
+    setTimeout(function () { window.location.href = '/checkout.html'; }, 600);
+    return;
+  }
+
+  showToast('Added to cart. You can checkout whenever you are ready.');
 }
 
 function renderProduct(item) {
@@ -446,5 +470,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     error.classList.remove('hidden');
   }
 
-  document.getElementById('continue-btn').addEventListener('click', addSelectedToCart);
+  document.getElementById('continue-btn').addEventListener('click', function () {
+    addSelectedToCart({ checkout: true });
+  });
+  var addCartBtn = document.getElementById('add-cart-btn');
+  if (addCartBtn) addCartBtn.addEventListener('click', function () {
+    addSelectedToCart({ checkout: false });
+  });
 });

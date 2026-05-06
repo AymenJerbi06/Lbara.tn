@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Your Cart - Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: { "primary": "#003060", "secondary": "#005F4B", "accent": "#B8860B", "on-surface": "#1A202C" },
+        fontFamily: { "headline": ["Quicksand", "sans-serif"], "body": ["Nunito", "sans-serif"] },
+        borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer base { body { @apply bg-[#F8FAFC] text-on-surface font-body; } }
+  .vibrant-gradient { background: linear-gradient(135deg, #001F3F 0%, #003B5C 100%); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .cartoon-card { @apply bg-white border-4 border-primary shadow-[8px_8px_0px_0px_#003060] transition-all; }
+  .cartoon-button { @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none; }
+</style>
+<link href="/css/mobile.css" rel="stylesheet"/>
+</head>
+<body class="selection:bg-primary/30 selection:text-primary">
+
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
+  <div class="flex justify-between items-center w-full px-4 lg:px-8 py-4 max-w-screen-2xl mx-auto">
+    <a href="/index.html" class="text-2xl lg:text-3xl font-bold tracking-tight text-primary font-headline flex-shrink-0">Lbara.tn</a>
+    <div class="hidden lg:flex items-center gap-8 font-headline font-bold text-sm">
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/index.html">Home</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/shop.html">Shop</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/how-it-works.html">How It Works</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/faq.html">FAQ</a>
+      <a class="text-on-surface/70 hover:text-primary transition-colors" href="/contact.html">Contact</a>
+    </div>
+    <div class="hidden lg:flex items-center gap-3">
+      <a href="/cart.html" class="relative cartoon-button bg-white text-primary font-black px-4 py-2 rounded-full flex items-center gap-2">
+        <span class="material-symbols-outlined text-lg">shopping_cart</span>
+        <span>Cart</span>
+        <span data-cart-count class="hidden absolute -top-2 -right-2 min-w-6 h-6 px-1 rounded-full bg-accent text-white text-xs flex items-center justify-center border-2 border-primary">0</span>
+      </a>
+      <button id="nav-account-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">My Account</button>
+    </div>
+    <div class="lg:hidden flex items-center gap-2 flex-shrink-0">
+      <button id="nav-account-btn-mobile" class="cartoon-button bg-primary text-white font-bold px-3 py-1.5 rounded-full text-xs whitespace-nowrap">Get Started</button>
+      <a href="/cart.html" class="relative text-primary font-bold font-headline text-xs whitespace-nowrap px-1">
+        <span class="material-symbols-outlined text-xl align-middle">shopping_cart</span>
+        <span data-cart-count class="hidden absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-accent text-white text-[10px] flex items-center justify-center border-2 border-primary">0</span>
+      </a>
+      <a href="/shop.html" class="text-primary font-bold font-headline text-xs whitespace-nowrap px-1">Shop</a>
+    </div>
+  </div>
+</nav>
+
+<main class="pt-28 min-h-screen">
+  <section class="vibrant-gradient text-white px-4 md:px-8 py-12 md:py-16">
+    <div class="max-w-screen-xl mx-auto">
+      <p class="text-accent font-headline font-black uppercase tracking-[0.22em] text-sm mb-4">Saved for later</p>
+      <h1 class="font-headline text-4xl md:text-6xl font-black mb-4">Your Cart</h1>
+      <p class="text-white/70 font-bold text-lg max-w-2xl">Keep the subscriptions you are considering, then checkout the exact service when you are ready.</p>
+    </div>
+  </section>
+
+  <section class="max-w-screen-xl mx-auto px-4 md:px-8 py-10 md:py-14">
+    <div id="cart-empty" class="hidden cartoon-card rounded-3xl p-8 md:p-12 text-center">
+      <span class="material-symbols-outlined text-primary text-6xl block mb-4">shopping_cart</span>
+      <h2 class="font-headline text-3xl font-black text-primary mb-3">Your cart is empty</h2>
+      <p class="font-bold text-on-surface/60 mb-8">Add a service from the shop and come back whenever you are ready.</p>
+      <a href="/shop.html" class="cartoon-button inline-flex items-center gap-2 bg-primary text-white font-black px-8 py-4 rounded-2xl">
+        <span class="material-symbols-outlined">storefront</span>
+        Browse Services
+      </a>
+    </div>
+
+    <div id="cart-content" class="hidden grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-8 items-start">
+      <div class="space-y-5">
+        <div class="flex items-end justify-between gap-4">
+          <div>
+            <p class="text-xs font-black text-accent uppercase tracking-widest mb-2">Cart Items</p>
+            <h2 class="font-headline text-3xl font-black text-primary">Choose what to checkout</h2>
+          </div>
+          <button id="clear-cart-btn" class="hidden text-sm font-black text-primary/50 underline underline-offset-4">Clear cart</button>
+        </div>
+        <div id="cart-list" class="space-y-5"></div>
+      </div>
+
+      <aside class="lg:sticky lg:top-28 cartoon-card rounded-3xl p-6">
+        <p class="text-xs font-black text-primary/40 uppercase tracking-widest mb-4">Summary</p>
+        <div class="space-y-4 mb-6">
+          <div class="flex items-center justify-between font-black text-primary">
+            <span>Items</span>
+            <span id="cart-summary-count">0</span>
+          </div>
+          <div class="flex items-center justify-between font-black text-primary">
+            <span>Saved subtotal</span>
+            <span id="cart-summary-total">0.000 TND</span>
+          </div>
+        </div>
+        <div class="bg-primary/5 border-2 border-primary/10 rounded-2xl p-4 mb-6">
+          <p class="text-xs font-bold text-primary/60 leading-relaxed">Checkout opens one selected service at a time because each service can require different activation details.</p>
+        </div>
+        <a href="/shop.html" class="w-full border-2 border-primary text-primary font-black py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/5">
+          <span class="material-symbols-outlined">add</span>
+          Add More Services
+        </a>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<footer class="bg-primary w-full pt-12 pb-8 text-white">
+  <div class="text-center">
+    <p class="text-sm text-white/40 font-bold">© 2024 Lbara.tn</p>
+  </div>
+</footer>
+
+<script src="/js/api.js"></script>
+<script src="/js/cart-store.js"></script>
+<script src="/js/cart-page.js"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 // Checkout Page
 
 document.addEventListener('DOMContentLoaded', async function () {
-  const cart = JSON.parse(sessionStorage.getItem('lbara_cart') || 'null');
+  let cart = JSON.parse(sessionStorage.getItem('lbara_cart') || 'null');
 
   function tr(value) {
     return window.lbaraT ? window.lbaraT(value) : value;
@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 
   if (!cart) {
+    const savedItems = window.lbaraCartStore ? window.lbaraCartStore.items() : [];
+    if (savedItems.length) {
+      showToast('Choose an item from your cart to checkout.', 'error');
+      setTimeout(function () { window.location.href = '/cart.html'; }, 900);
+      return;
+    }
     showToast('No item selected. Redirecting to shop...', 'error');
     setTimeout(function () { window.location.href = '/shop.html'; }, 1500);
     return;
@@ -304,6 +310,7 @@ document.addEventListener('DOMContentLoaded', async function () {
           throw new Error('Payment gateway not configured. Please contact support.');
         }
         sessionStorage.setItem('lbara_pending_order', result.order_id);
+        if (window.lbaraCartStore) window.lbaraCartStore.removeCheckoutItem(cart);
         sessionStorage.removeItem('lbara_cart');
         window.location.href = result.payment_url;
       } catch (err) {
