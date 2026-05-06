@@ -28,6 +28,35 @@
   .input-cartoon { @apply w-full border-2 border-primary/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 transition-all font-bold text-primary placeholder:text-primary/30; }
   .input-gold { @apply w-full border-2 border-accent rounded-xl px-4 py-3 focus:border-accent focus:ring-0 transition-all font-bold text-primary placeholder:text-accent/40 bg-accent/5; }
   .payment-option { @apply relative flex items-center p-4 border-2 rounded-2xl cursor-pointer transition-all; }
+  .checkout-sticky-cta {
+    position: fixed;
+    left: 50%;
+    bottom: 1rem;
+    z-index: 70;
+    display: none;
+    width: min(calc(100% - 2rem), 34rem);
+    transform: translateX(-50%);
+    border: 3px solid #003060;
+    border-radius: 1.6rem;
+    background: #fff;
+    box-shadow: 7px 7px 0 #003060;
+    padding: 0.65rem;
+  }
+  .checkout-sticky-cta.visible {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  @media (min-width: 768px) {
+    .checkout-summary-sticky {
+      position: sticky;
+      top: 6.5rem;
+      align-self: start;
+    }
+    .checkout-sticky-cta.visible {
+      display: none;
+    }
+  }
 </style>
 <link href="/css/mobile.css" rel="stylesheet"/>
 </head>
@@ -153,7 +182,7 @@
           </div>
 
           <!-- Right: Order Summary -->
-          <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border-4 border-primary/5 flex flex-col">
+          <div class="checkout-summary-sticky bg-slate-50 p-6 md:p-8 rounded-2xl border-4 border-primary/5 flex flex-col">
             <h3 class="font-headline font-bold text-primary text-xl mb-6 flex items-center gap-2">
               <span class="material-symbols-outlined">shopping_basket</span>
               4. Order Summary
@@ -236,6 +265,20 @@
     </div>
   </div>
 </main>
+
+<div id="checkout-sticky-cta" class="checkout-sticky-cta" aria-live="polite">
+  <div class="min-w-0 flex-1 px-2">
+    <p class="text-[10px] font-black text-primary/45 uppercase tracking-widest">Total to Pay</p>
+    <p class="font-headline font-black text-primary leading-tight">
+      <span id="sticky-summary-total">—</span>
+      <span id="sticky-summary-currency" class="text-xs uppercase">TND</span>
+    </p>
+  </div>
+  <button id="sticky-place-order-btn" class="cartoon-button bg-primary text-white font-bold px-4 py-3 rounded-2xl flex items-center justify-center gap-2 shrink-0">
+    <span class="material-symbols-outlined text-base">lock_open</span>
+    <span id="sticky-place-order-text">Place Order</span>
+  </button>
+</div>
 
 <footer class="bg-primary w-full pt-12 pb-8 text-white">
   <div class="text-center">

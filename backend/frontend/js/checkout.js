@@ -100,6 +100,62 @@ document.addEventListener('DOMContentLoaded', async function () {
   if (totalEl) totalEl.textContent = pricingReady ? price.toFixed(3) : tr('TBD');
 
   const placeOrderBtn = document.getElementById('place-order-btn');
+  const stickyCta = document.getElementById('checkout-sticky-cta');
+  const stickyTotalEl = document.getElementById('sticky-summary-total');
+  const stickyCurrencyEl = document.getElementById('sticky-summary-currency');
+  const stickyPlaceOrderBtn = document.getElementById('sticky-place-order-btn');
+  const stickyPlaceOrderText = document.getElementById('sticky-place-order-text');
+
+  function syncStickySummary() {
+    if (stickyTotalEl && totalEl) stickyTotalEl.textContent = totalEl.textContent || '—';
+    if (stickyCurrencyEl) stickyCurrencyEl.textContent = currencyUnit();
+  }
+
+  function syncStickyButtonState() {
+    if (!stickyPlaceOrderBtn || !placeOrderBtn) return;
+    stickyPlaceOrderBtn.disabled = placeOrderBtn.disabled;
+    stickyPlaceOrderBtn.classList.toggle('opacity-60', placeOrderBtn.disabled);
+    stickyPlaceOrderBtn.classList.toggle('cursor-not-allowed', placeOrderBtn.disabled);
+    if (stickyPlaceOrderText) {
+      stickyPlaceOrderText.textContent = !pricingReady
+        ? tr('Pricing Not Ready')
+        : placeOrderBtn.disabled
+          ? tr('Processing...')
+          : tr('Place Order Now');
+    }
+  }
+
+  function updateStickyCta() {
+    if (!stickyCta || !placeOrderBtn) return;
+    if (window.matchMedia('(min-width: 768px)').matches) {
+      stickyCta.classList.remove('visible');
+      return;
+    }
+    const rect = placeOrderBtn.getBoundingClientRect();
+    const buttonIsVisible = rect.top < window.innerHeight && rect.bottom > 0;
+    stickyCta.classList.toggle('visible', !buttonIsVisible && window.scrollY > 180);
+  }
+
+  if (stickyPlaceOrderBtn && placeOrderBtn) {
+    stickyPlaceOrderBtn.addEventListener('click', function () {
+      placeOrderBtn.click();
+    });
+  }
+  if (totalEl && window.MutationObserver) {
+    new MutationObserver(syncStickySummary).observe(totalEl, { childList: true, characterData: true, subtree: true });
+  }
+  if (placeOrderBtn && window.MutationObserver) {
+    new MutationObserver(function () {
+      syncStickyButtonState();
+      updateStickyCta();
+    }).observe(placeOrderBtn, { attributes: true, attributeFilter: ['disabled'], childList: true, subtree: true });
+  }
+  window.addEventListener('scroll', updateStickyCta, { passive: true });
+  window.addEventListener('resize', updateStickyCta);
+  syncStickySummary();
+  syncStickyButtonState();
+  updateStickyCta();
+
   if (!pricingReady && placeOrderBtn) {
     placeOrderBtn.disabled = true;
     placeOrderBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -112,6 +168,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   document.addEventListener('lbara:languagechange', function () {
     applyTranslations(document);
+    syncStickySummary();
+    syncStickyButtonState();
   });
 
   let discountApplied = 0;
@@ -228,6 +286,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
       placeOrderBtn.disabled = true;
       placeOrderBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">autorenew</span> ' + tr('Processing...');
+      syncStickyButtonState();
 
       try {
         const result = await api.createOrder({
@@ -251,6 +310,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         showToast(err.message, 'error');
         placeOrderBtn.disabled = false;
         placeOrderBtn.innerHTML = '<span class="material-symbols-outlined">lock_open</span> ' + tr('Place Order Now');
+        syncStickyButtonState();
       }
     });
   }

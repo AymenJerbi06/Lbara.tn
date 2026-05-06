@@ -1,0 +1,199 @@
+.account-topbar {
+  min-height: 76px;
+}
+
+.account-shop-shortcut {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.15rem;
+  border-radius: 999px;
+  background: #003060;
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 900;
+  font-size: 0.85rem;
+  box-shadow: 4px 4px 0 #001b3b;
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+}
+
+.account-shop-shortcut:hover {
+  background: #001b3b;
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 #B8860B;
+}
+
+.account-language {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.account-language-toggle {
+  min-width: 142px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0 1rem;
+  border: 3px solid #003060;
+  border-radius: 999px;
+  background: #fff;
+  color: #003060;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 900;
+  box-shadow: 4px 4px 0 #003060;
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+}
+
+.account-language-toggle:hover,
+.account-language.open .account-language-toggle {
+  background: #fffdf7;
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 #B8860B;
+}
+
+.account-language-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px);
+  min-width: 220px;
+  z-index: 10000;
+  display: none;
+  padding: 0.55rem;
+  border: 3px solid #003060;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 7px 7px 0 #003060;
+}
+
+.account-language.open .account-language-menu {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.account-language-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 16px;
+  color: #003060;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 900;
+  text-align: left;
+  transition: background .14s ease, color .14s ease, transform .14s ease;
+}
+
+.account-language-option:hover {
+  background: #e8eeff;
+  transform: translateX(1px);
+}
+
+.account-language-option.active {
+  background: #003060;
+  color: #fff;
+}
+
+.account-language-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(184, 134, 11, .16);
+  color: inherit;
+  font-size: 0.72rem;
+}
+
+.account-user-card {
+  margin-top: auto;
+  border: 2px solid rgba(0, 48, 96, .1);
+  border-radius: 1.5rem;
+  background: #fff;
+  padding: 1rem;
+  box-shadow: 6px 6px 0 rgba(0, 48, 96, .08);
+}
+
+.account-user-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  margin-bottom: 1rem;
+}
+
+.account-user-card #sidebar-avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: #003060;
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 900;
+  box-shadow: 3px 3px 0 #B8860B;
+}
+
+.account-user-meta {
+  min-width: 0;
+}
+
+.account-user-meta #sidebar-name,
+.account-user-meta #sidebar-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-signout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  background: #fdc34d;
+  color: #5d4200;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 900;
+  font-size: 0.9rem;
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+
+.account-signout:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #003060;
+}
+
+@media (max-width: 640px) {
+  .account-topbar {
+    min-height: 68px;
+  }
+
+  .account-shop-shortcut {
+    padding: 0.55rem 0.9rem;
+    font-size: 0.75rem;
+  }
+
+  .account-language-toggle {
+    min-width: 82px;
+    height: 40px;
+    padding: 0 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .account-language-toggle .account-language-label {
+    display: none;
+  }
+
+  .account-language-menu {
+    min-width: 190px;
+    right: -42px;
+  }
+}
