@@ -83,7 +83,18 @@
     });
   }
 
+  function initAccountSocials() {
+    document.querySelectorAll('[data-account-social]').forEach((slot, index) => {
+      if (slot.dataset.accountSocialReady === '1') return;
+      if (!window.lbaraCreateSocialLinks) return;
+      slot.dataset.accountSocialReady = '1';
+      const row = window.lbaraCreateSocialLinks(`lbara-account-social-${index}`, 'account-social-row');
+      slot.appendChild(row);
+    });
+  }
+
   function init() {
+    initAccountSocials();
     document.querySelectorAll('[data-account-language]').forEach(buildLanguageMenu);
     syncLanguageMenus();
   }
@@ -93,5 +104,5 @@
   document.addEventListener('lbara:languagechange', syncLanguageMenus);
   document.addEventListener('click', closeMenus);
 
-  window.lbaraAccountShell = { init, syncLanguageMenus, setLanguage };
+  window.lbaraAccountShell = { init, syncLanguageMenus, setLanguage, initAccountSocials };
 })();

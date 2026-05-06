@@ -67,6 +67,20 @@
   line-height: 1;
 }
 
+.account-social-slot {
+  align-items: center;
+}
+
+.account-social-slot .lbara-social-row {
+  gap: 0.55rem;
+}
+
+.account-social-slot .lbara-social-icon {
+  width: 40px;
+  height: 40px;
+  box-shadow: 3px 3px 0 #B8860B;
+}
+
 .account-language {
   position: relative;
   flex-shrink: 0;
@@ -212,6 +226,29 @@
 .account-signout:hover {
   transform: translate(-1px, -1px);
   box-shadow: 4px 4px 0 #003060;
+}
+
+.account-dashboard-footer {
+  border: 2px solid rgba(0, 48, 96, .1);
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(22, 28, 39, .05);
+}
+
+.account-dashboard-footer .lbara-social-icon-footer {
+  border-color: #003060;
+  background: #fff;
+  color: #003060;
+  box-shadow: 3px 3px 0 #B8860B;
+}
+
+.account-dashboard-footer .lbara-social-icon-footer:hover {
+  background: #003060;
+  color: #fff;
+  box-shadow: 4px 4px 0 #B8860B;
+}
+
+.account-dashboard-footer #lbara-social-footer {
+  margin-top: 14px;
 }
 
 .account-mobile-nav {

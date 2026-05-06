@@ -238,7 +238,7 @@ function updateMobileCategoryToggle(panel, toggle) {
   var icon = toggle.querySelector('[data-category-toggle-icon]');
   var label = toggle.querySelector('[data-category-toggle-label]');
   toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-  if (icon) icon.textContent = expanded ? 'close' : 'menu';
+  if (icon) icon.textContent = expanded ? 'expand_less' : 'expand_more';
   if (label) label.textContent = tr(expanded ? 'Close' : 'All');
 }
 

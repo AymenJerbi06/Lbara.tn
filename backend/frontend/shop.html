@@ -133,9 +133,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 7px;
   height: 34px;
-  padding: 0 11px;
+  min-width: 74px;
+  padding: 0 10px 0 13px;
   border-radius: 999px;
   border: 2px solid #003060;
   background: #fff;
@@ -150,7 +151,7 @@
   box-shadow: none;
 }
 .mobile-category-toggle .material-symbols-outlined {
-  font-size: 18px;
+  font-size: 19px;
   line-height: 1;
 }
 .mobile-sticky-search {
@@ -420,8 +421,8 @@
       Categories
     </div>
     <button id="mobile-category-toggle" class="mobile-category-toggle" type="button" aria-expanded="false" aria-controls="mobile-category-list">
-      <span data-category-toggle-icon class="material-symbols-outlined">menu</span>
       <span data-category-toggle-label>All</span>
+      <span data-category-toggle-icon class="material-symbols-outlined">expand_more</span>
     </button>
   </div>
   <div id="mobile-category-list" class="chip-row">

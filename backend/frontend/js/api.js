@@ -618,3 +618,4 @@ window.api = api;
 window.showToast = showToast;
 window.lbaraEngagement = lbaraEngagement;
 window.lbaraT = lbaraT;
+window.lbaraCreateSocialLinks = createSocialLinks;
