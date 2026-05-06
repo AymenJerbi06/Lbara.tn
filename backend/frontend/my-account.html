@@ -80,6 +80,20 @@
     color: #161c27;
   }
   .headline-font { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .account-dashboard-footer .lbara-social-icon-footer {
+    border-color: #003060;
+    background: #ffffff;
+    color: #003060;
+    box-shadow: 3px 3px 0 #B8860B;
+  }
+  .account-dashboard-footer .lbara-social-icon-footer:hover {
+    background: #003060;
+    color: #ffffff;
+    box-shadow: 4px 4px 0 #B8860B;
+  }
+  .account-dashboard-footer #lbara-social-footer {
+    margin-top: 14px;
+  }
 </style>
 <link href="/css/mobile.css" rel="stylesheet"/>
 </head>
@@ -91,6 +105,11 @@
     <a href="/index.html" class="text-2xl font-black text-blue-900 dark:text-blue-100 tracking-tight headline-font">Lbara</a>
   </div>
   <nav class="flex-1 space-y-2">
+    <a href="/shop.html"
+      class="flex items-center gap-3 px-4 py-3 text-blue-900 font-bold bg-white rounded-2xl shadow-[3px_3px_0_#003060] border-2 border-blue-900 hover:-translate-y-0.5 transition-all duration-150">
+      <span class="material-symbols-outlined">storefront</span>
+      <span class="font-label">Back to Shop</span>
+    </a>
     <button onclick="showSection('dashboard')" id="nav-dashboard"
       class="w-full flex items-center gap-3 px-4 py-3 text-blue-900 font-bold border-r-4 border-blue-900 bg-white/50 translate-x-1 transition-transform duration-150">
       <span class="material-symbols-outlined">dashboard</span>
@@ -112,23 +131,41 @@
       <span class="font-label">Support</span>
     </a>
   </nav>
-  <div class="mt-auto px-4 py-6 bg-surface-container-low rounded-xl">
-    <div class="flex items-center gap-3 mb-4">
-      <div id="sidebar-avatar" class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold headline-font text-lg">?</div>
-      <div>
-        <p class="headline-font font-bold text-sm text-primary" id="sidebar-name">Loading...</p>
-        <p class="text-xs text-on-surface-variant" id="sidebar-email"></p>
+  <div class="mt-auto rounded-[1.5rem] border-2 border-primary/10 bg-white p-4 shadow-[6px_6px_0_rgba(0,48,96,0.08)]">
+    <div class="flex items-center gap-3 mb-4 min-w-0">
+      <div id="sidebar-avatar" class="w-11 h-11 shrink-0 rounded-2xl bg-primary-container flex items-center justify-center text-white font-black headline-font text-lg shadow-[3px_3px_0_#B8860B]">?</div>
+      <div class="min-w-0">
+        <p class="headline-font font-black text-sm text-primary truncate" id="sidebar-name">Loading...</p>
+        <p class="text-xs text-on-surface-variant truncate" id="sidebar-email"></p>
       </div>
     </div>
-    <a href="/api/auth/logout" class="block w-full py-2 bg-secondary-container text-on-secondary-container font-bold rounded-full text-sm hover:opacity-90 transition-opacity text-center">
-      Sign Out
+    <a href="/api/auth/logout" class="flex items-center justify-center gap-2 w-full py-3 bg-secondary-container text-on-secondary-container font-black rounded-2xl text-sm hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#003060] transition-all headline-font">
+      <span class="material-symbols-outlined text-base">logout</span>
+      <span>Sign Out</span>
     </a>
   </div>
 </aside>
 
 <!-- Top AppBar -->
-<header class="flex justify-end items-center w-full px-6 py-4 md:pl-72 sticky top-0 z-40 bg-white/70 backdrop-blur-xl shadow-sm">
-  <div class="flex items-center gap-4">
+<header class="flex justify-between md:justify-end items-center w-full px-4 sm:px-6 py-4 md:pl-72 sticky top-0 z-40 bg-white/70 backdrop-blur-xl shadow-sm">
+  <a href="/shop.html" class="inline-flex lg:hidden items-center gap-2 px-4 py-2 rounded-full bg-primary-container text-on-primary font-black headline-font text-xs shadow-[3px_3px_0_#001b3b] hover:-translate-y-0.5 transition-all">
+    <span class="material-symbols-outlined text-base">storefront</span>
+    <span>Shop</span>
+  </a>
+  <div class="flex items-center gap-3 sm:gap-4">
+    <a href="/shop.html" class="hidden lg:inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary-container text-on-primary font-black headline-font text-sm shadow-[3px_3px_0_#001b3b] hover:-translate-y-0.5 transition-all">
+      <span class="material-symbols-outlined text-lg">storefront</span>
+      <span>Back to Shop</span>
+    </a>
+    <div class="relative inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white border-2 border-primary shadow-[3px_3px_0_#003060]">
+      <span class="material-symbols-outlined text-primary text-lg">language</span>
+      <label for="dashboard-language-select" class="sr-only">Dashboard language</label>
+      <select id="dashboard-language-select" class="border-0 bg-transparent p-0 pr-7 text-xs sm:text-sm headline-font font-black text-primary focus:ring-0 cursor-pointer">
+        <option value="en">English</option>
+        <option value="fr">French</option>
+        <option value="ar">Arabic</option>
+      </select>
+    </div>
     <div class="h-8 w-[1px] bg-outline-variant mx-2 opacity-30"></div>
     <div id="header-avatar" class="w-8 h-8 rounded-full border-2 border-primary-fixed bg-primary-container flex items-center justify-center text-white font-bold text-sm headline-font">?</div>
   </div>
@@ -147,21 +184,21 @@
         <p class="text-on-surface-variant text-lg">Your digital world is up to date and active.</p>
       </header>
 
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
         <!-- Left column -->
-        <div class="md:col-span-4 flex flex-col gap-8">
+        <div class="xl:col-span-4 flex flex-col gap-8">
           <!-- Stats card -->
-          <section class="bg-primary-container text-on-primary p-8 rounded-[2rem] relative overflow-hidden flex flex-col justify-between h-64 shadow-[0_20px_40px_rgba(0,48,96,0.15)]">
+          <section class="bg-primary-container text-on-primary p-8 rounded-[2rem] relative overflow-hidden flex flex-col justify-between min-h-[320px] shadow-[0_20px_40px_rgba(0,48,96,0.15)]">
             <div class="relative z-10">
               <p class="headline-font font-semibold opacity-70 text-sm uppercase tracking-widest">Total Orders</p>
-              <h2 class="text-4xl font-black mt-2" id="stat-total">—</h2>
+              <h2 class="text-6xl font-black mt-3" id="stat-total">—</h2>
             </div>
-            <div class="relative z-10 flex justify-between items-end">
+            <div class="relative z-10 flex flex-col gap-5">
               <div>
                 <p class="text-xs opacity-70 font-semibold">Fulfilled: <span id="stat-fulfilled" class="font-black">—</span></p>
                 <p class="text-xs opacity-70 font-semibold">Spent: <span id="stat-spent" class="font-black">—</span> TND</p>
               </div>
-              <a href="/shop.html" class="bg-surface-container-lowest text-primary px-6 py-2 rounded-full font-bold text-sm hover:scale-105 transition-transform headline-font">
+              <a href="/shop.html" class="inline-flex items-center justify-center bg-surface-container-lowest text-primary px-6 py-3 rounded-2xl font-black text-sm hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#B8860B] transition-all headline-font">
                 Shop Now
               </a>
             </div>
@@ -169,33 +206,11 @@
             <div class="absolute -left-10 -bottom-10 w-60 h-60 bg-secondary-container opacity-5 rounded-full blur-3xl"></div>
           </section>
 
-          <!-- Quick Actions -->
-          <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
-            <h3 class="headline-font font-bold text-xl mb-6">Quick Actions</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <a href="/shop.html" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
-                <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">add_shopping_cart</span>
-                <span class="text-xs font-bold headline-font">Buy New</span>
-              </a>
-              <a href="/order-history.html" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
-                <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">receipt_long</span>
-                <span class="text-xs font-bold headline-font">My Orders</span>
-              </a>
-              <button onclick="window.location.href='/security.html'" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
-                <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">lock</span>
-                <span class="text-xs font-bold headline-font">Security</span>
-              </button>
-              <a href="/contact.html" class="flex flex-col items-center justify-center p-4 rounded-2xl bg-surface-container hover:bg-primary-container hover:text-on-primary transition-all group">
-                <span class="material-symbols-outlined text-3xl mb-2 text-primary group-hover:text-on-primary">support_agent</span>
-                <span class="text-xs font-bold headline-font">Support</span>
-              </a>
-            </div>
-          </section>
         </div>
 
         <!-- Right column: recent orders -->
-        <div class="md:col-span-8">
-          <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
+        <div class="xl:col-span-8 grid gap-8">
+          <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)] min-h-[320px]">
             <div class="flex justify-between items-center mb-8">
               <h3 class="headline-font font-bold text-2xl">Recent Orders</h3>
               <a href="/order-history.html" class="text-primary font-bold text-sm underline underline-offset-4">View All</a>
@@ -210,8 +225,9 @@
             </div>
             <div id="dashboard-orders-list" class="hidden space-y-6"></div>
           </section>
+        </div>
 
-          <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)] mt-8">
+        <section class="xl:col-span-12 bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
             <div class="flex justify-between items-center mb-8">
               <div>
                 <h3 class="headline-font font-bold text-2xl">Favorite Services</h3>
@@ -234,16 +250,18 @@
               </div>
             </div>
           </section>
-        </div>
       </div>
 
       <!-- Footer -->
-      <footer class="mt-20 py-10 flex flex-col md:flex-row justify-between items-center gap-6 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
-        <span class="headline-font font-black text-2xl tracking-tighter">Lbara.tn</span>
-        <div class="flex gap-8 text-xs font-bold uppercase tracking-widest headline-font">
-          <a class="hover:text-primary" href="#">Privacy</a>
-          <a class="hover:text-primary" href="#">Terms</a>
-          <a class="hover:text-primary" href="#">Help</a>
+      <footer class="account-dashboard-footer mt-20 mb-20 md:mb-0 rounded-[2rem] border-2 border-primary/10 bg-white px-6 py-5 shadow-[0_16px_40px_rgba(22,28,39,0.05)] flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div>
+          <span class="headline-font font-black text-2xl tracking-tighter text-primary">Lbara.tn</span>
+          <p class="text-xs font-semibold text-on-surface-variant mt-1">Digital access, managed from one place.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 text-xs font-black uppercase tracking-widest headline-font">
+          <a class="px-4 py-2 rounded-full bg-surface-container text-primary hover:bg-primary-container hover:text-on-primary transition-colors" href="#">Privacy</a>
+          <a class="px-4 py-2 rounded-full bg-surface-container text-primary hover:bg-primary-container hover:text-on-primary transition-colors" href="#">Terms</a>
+          <a class="px-4 py-2 rounded-full bg-surface-container text-primary hover:bg-primary-container hover:text-on-primary transition-colors" href="/contact.html">Help</a>
         </div>
       </footer>
     </div>
@@ -355,6 +373,10 @@
     <span class="material-symbols-outlined">dashboard</span>
     <span class="text-[10px] font-bold headline-font">Home</span>
   </button>
+  <a href="/shop.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+    <span class="material-symbols-outlined">storefront</span>
+    <span class="text-[10px] font-bold headline-font">Shop</span>
+  </a>
   <a href="/order-history.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
     <span class="material-symbols-outlined">inventory_2</span>
     <span class="text-[10px] font-bold headline-font">Orders</span>
@@ -400,6 +422,25 @@ function activeLocale() {
   if (lang === 'ar') return 'ar-TN';
   if (lang === 'fr') return 'fr-FR';
   return 'en-GB';
+}
+
+function syncDashboardLanguageControls() {
+  document.querySelectorAll('#dashboard-language-select').forEach((select) => {
+    select.value = activeLang();
+  });
+}
+
+async function setDashboardLanguage(lang) {
+  if (!['en', 'fr', 'ar'].includes(lang)) return;
+  localStorage.setItem('lbara_lang', lang);
+  syncDashboardLanguageControls();
+  if (window.lbaraI18n) window.lbaraI18n.apply(document);
+  document.dispatchEvent(new CustomEvent('lbara:languagechange', { detail: { lang } }));
+  try {
+    await api.updateProfile({ preferred_language: lang });
+  } catch {
+    if (window.showToast) window.showToast(tr('Could not save language preference.'), 'error');
+  }
 }
 
 function currencyUnit() {
@@ -746,6 +787,11 @@ async function init() {
     return;
   }
 
+  if (user.preferred_language && !localStorage.getItem('lbara_lang')) {
+    localStorage.setItem('lbara_lang', user.preferred_language);
+  }
+  syncDashboardLanguageControls();
+
   const name = user.full_name || user.email.split('@')[0];
   const initial = name[0].toUpperCase();
   document.getElementById('welcome-title').textContent = `${tr('Hello')}, ${name}`;
@@ -798,7 +844,15 @@ async function init() {
   applyTranslations(document);
 }
 
-document.addEventListener('lbara:languagechange', () => init());
+const dashboardLanguageSelect = document.getElementById('dashboard-language-select');
+if (dashboardLanguageSelect) {
+  dashboardLanguageSelect.addEventListener('change', (event) => setDashboardLanguage(event.target.value));
+}
+
+document.addEventListener('lbara:languagechange', () => {
+  syncDashboardLanguageControls();
+  init();
+});
 init();
 </script>
 </body></html>
