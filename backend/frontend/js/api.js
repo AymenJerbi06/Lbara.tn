@@ -42,11 +42,13 @@ const api = {
   removeSaleNotification: (product_id) => apiFetch(`/account/sale-notifications/${encodeURIComponent(product_id)}`, { method: 'DELETE' }),
 
   // AI assistant
-  chat: (message) => apiFetch('/chat/message', {
+  chat: (message, options = {}) => apiFetch('/chat/message', {
     method: 'POST',
     body: {
       message,
       language: window.lbaraI18n?.language ? window.lbaraI18n.language() : (document.documentElement.lang || 'en'),
+      history: options.history || [],
+      page_context: options.page_context || '',
     },
   }),
 
@@ -131,16 +133,34 @@ function ensureSocialStyles() {
     .lbara-social-icon:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 #003060;background:#003060;color:#fff}
     .lbara-social-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
     .lbara-social-icon svg path{fill:currentColor;stroke:none}
+    .lbara-social-menu{position:relative;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+    .lbara-social-menu.hidden{display:none!important}
+    .lbara-social-menu.lg\\:hidden{display:inline-flex!important}
+    .lbara-social-menu-toggle{height:36px;min-width:36px;border:2px solid #003060;border-radius:999px;background:#fff;color:#003060;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0 12px;font-family:Quicksand,Nunito,sans-serif;font-size:12px;font-weight:900;line-height:1;box-shadow:3px 3px 0 #003060;transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease}
+    .lbara-social-menu-at{font-size:15px;font-weight:900;line-height:1}
+    .lbara-social-menu-label{white-space:nowrap}
+    .lbara-social-menu-toggle:hover,.lbara-social-menu.is-open .lbara-social-menu-toggle{transform:translate(-1px,-1px);box-shadow:4px 4px 0 #003060;background:#003060;color:#fff}
+    .lbara-social-menu-panel{position:absolute;right:0;top:calc(100% + 10px);z-index:10020;min-width:168px;border:2px solid #003060;border-radius:18px;background:#fff;padding:8px;box-shadow:5px 5px 0 #003060;opacity:0;pointer-events:none;transform:translateY(-6px) scale(.98);transition:opacity .16s ease,transform .16s ease}
+    .lbara-social-menu.is-open .lbara-social-menu-panel{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
+    .lbara-social-menu-item{display:flex;align-items:center;gap:9px;width:100%;border-radius:12px;padding:9px 10px;color:#003060;font-family:Quicksand,sans-serif;font-size:13px;font-weight:900;text-decoration:none;transition:background .15s ease,color .15s ease,transform .15s ease}
+    .lbara-social-menu-item:hover{background:#003060;color:#fff;transform:translateX(-1px)}
+    .lbara-social-menu-item svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+    .lbara-social-menu-item svg path{fill:currentColor;stroke:none}
     .lbara-social-icon-footer{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;box-shadow:3px 3px 0 #B8860B}
     .lbara-social-icon-footer:hover{background:#B8860B;color:#003060;box-shadow:4px 4px 0 rgba(255,255,255,.15)}
     @media(max-width:767px){
       .lbara-social-row-mobile{gap:5px}
       .lbara-social-row-mobile .lbara-social-icon{width:23px;height:23px;box-shadow:2px 2px 0 #003060}
       .lbara-social-row-mobile .lbara-social-icon svg{width:12px;height:12px}
+      .lbara-social-menu-mobile .lbara-social-menu-toggle{height:32px;min-width:74px;padding:0 9px;font-size:11px;box-shadow:2px 2px 0 #003060}
+      .lbara-social-menu-mobile .lbara-social-menu-at{font-size:13px}
+      .lbara-social-menu-mobile .lbara-social-menu-panel{right:-8px;min-width:154px;border-radius:16px;box-shadow:4px 4px 0 #003060}
+      .lbara-social-menu-mobile .lbara-social-menu-item{font-size:12px;padding:8px 9px}
       #designer-credit-mobile{max-width:104px}
     }
-    @media(max-width:430px){#designer-credit-mobile{max-width:88px;font-size:8px!important;padding:5px 6px!important}.lbara-social-row-mobile .lbara-social-icon{width:21px;height:21px}}
-    @media(max-width:360px){#designer-credit-mobile{max-width:66px}.lbara-social-row-mobile{gap:3px}.lbara-social-row-mobile .lbara-social-icon{width:19px;height:19px}.lbara-social-row-mobile .lbara-social-icon svg{width:10px;height:10px}}
+    @media(min-width:1024px){.lbara-social-menu.lg\\:hidden{display:none!important}}
+    @media(max-width:430px){#designer-credit-mobile{max-width:88px;font-size:8px!important;padding:5px 6px!important}.lbara-social-row-mobile .lbara-social-icon{width:21px;height:21px}.lbara-social-menu-mobile .lbara-social-menu-toggle{height:30px;min-width:66px;padding:0 7px;font-size:10px}.lbara-social-menu-mobile .lbara-social-menu-panel{right:-10px}}
+    @media(max-width:360px){#designer-credit-mobile{max-width:66px}.lbara-social-row-mobile{gap:3px}.lbara-social-row-mobile .lbara-social-icon{width:19px;height:19px}.lbara-social-row-mobile .lbara-social-icon svg{width:10px;height:10px}.lbara-social-menu-mobile .lbara-social-menu-toggle{height:28px;min-width:60px;padding:0 6px;font-size:9px}.lbara-social-menu-mobile .lbara-social-menu-at{font-size:12px}}
   `;
   document.head.appendChild(style);
 }
@@ -162,6 +182,60 @@ function createSocialLinks(id, extraClass = '') {
     row.appendChild(link);
   });
   return row;
+}
+
+function createSocialMenu(id, extraClass = '') {
+  ensureSocialStyles();
+  const menu = document.createElement('div');
+  menu.id = id;
+  menu.className = `lbara-social-menu ${extraClass}`.trim();
+  menu.innerHTML = `
+    <button type="button" class="lbara-social-menu-toggle" aria-label="Open social media links" aria-expanded="false">
+      <span class="lbara-social-menu-at" aria-hidden="true">@</span>
+      <span class="lbara-social-menu-label">Socials</span>
+    </button>
+    <div class="lbara-social-menu-panel" role="menu">
+      ${LBARA_SOCIAL_LINKS.map(function (item) {
+        return `<a class="lbara-social-menu-item" href="${item.url}" target="_blank" rel="noopener noreferrer" role="menuitem" aria-label="${item.name}">
+          ${item.svg}
+          <span>${item.name}</span>
+        </a>`;
+      }).join('')}
+    </div>
+  `;
+
+  const toggle = menu.querySelector('.lbara-social-menu-toggle');
+  function close() {
+    menu.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+
+  toggle.addEventListener('click', function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const open = !menu.classList.contains('is-open');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu) mobileMenu.style.display = 'none';
+    document.querySelectorAll('.lbara-language-wrap.open').forEach(function (item) {
+      item.classList.remove('open');
+    });
+    document.querySelectorAll('.lbara-social-menu.is-open').forEach(function (item) {
+      if (item !== menu) item.classList.remove('is-open');
+      const button = item.querySelector('.lbara-social-menu-toggle');
+      if (button) button.setAttribute('aria-expanded', 'false');
+    });
+    menu.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  document.addEventListener('click', function (event) {
+    if (!menu.contains(event.target)) close();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') close();
+  });
+
+  return menu;
 }
 
 function ensureDesktopActions() {
@@ -240,7 +314,7 @@ function initDesignerCredit() {
 
     let mobileSocial = document.getElementById('lbara-social-mobile');
     if (!mobileSocial) {
-      mobileSocial = createSocialLinks('lbara-social-mobile', 'lg:hidden lbara-social-row-mobile');
+      mobileSocial = createSocialMenu('lbara-social-mobile', 'lg:hidden lbara-social-menu-mobile');
     }
 
     mobileShop.style.fontSize = '12px';
@@ -360,9 +434,20 @@ function ensureEngagementStyles() {
     .lbara-chat-bubble{border:2px solid rgba(0,48,96,.12);border-radius:18px;padding:10px 12px;font-family:Nunito,sans-serif;font-weight:800;font-size:13px;line-height:1.45;max-width:88%}
     .lbara-chat-bubble.bot{background:#fff;color:#003060;align-self:flex-start}
     .lbara-chat-bubble.user{background:#003060;color:#fff;align-self:flex-end}
-    .lbara-chat-suggestions{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;border-top:2px solid rgba(0,48,96,.08);scrollbar-width:none}
-    .lbara-chat-suggestions::-webkit-scrollbar{display:none}
-    .lbara-chat-chip{white-space:nowrap;border:2px solid rgba(0,48,96,.18);background:#fff;border-radius:999px;color:#003060;font-weight:900;font-size:11px;padding:7px 10px}
+    .lbara-chat-bubble.is-typing{display:inline-flex;align-items:center;gap:5px;min-width:58px;min-height:38px}
+    .lbara-chat-typing-dot{width:7px;height:7px;border-radius:999px;background:#B8860B;animation:lbaraTypingDot 1s infinite ease-in-out}
+    .lbara-chat-typing-dot:nth-child(2){animation-delay:.14s}
+    .lbara-chat-typing-dot:nth-child(3){animation-delay:.28s}
+    @keyframes lbaraTypingDot{0%,80%,100%{opacity:.35;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+    .lbara-chat-next-steps{align-self:flex-start;max-width:94%;padding:4px 0 2px;display:flex;flex-direction:column;gap:8px}
+    .lbara-chat-next-label{padding-left:2px;font-family:Quicksand,Nunito,sans-serif;font-size:11px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:rgba(0,48,96,.62)}
+    .lbara-chat-detail-row{display:flex;flex-wrap:wrap;gap:7px}
+    .lbara-chat-detail-chip{max-width:100%;border:2px solid rgba(0,48,96,.16);background:#fff;color:#003060;border-radius:999px;padding:7px 11px;font-family:Quicksand,Nunito,sans-serif;font-size:11px;font-weight:900;line-height:1.25;box-shadow:2px 2px 0 rgba(0,48,96,.14);transition:transform .14s ease,box-shadow .14s ease,background .14s ease,color .14s ease;white-space:normal;text-align:left}
+    .lbara-chat-detail-chip:hover{background:#003060;color:#fff;transform:translate(-1px,-1px);box-shadow:3px 3px 0 #B8860B}
+    .lbara-chat-detail-chip:active{transform:translate(1px,1px);box-shadow:none}
+    .lbara-chat-contact-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .lbara-chat-contact-button{display:inline-flex;align-items:center;gap:6px;border:2px solid #003060;background:#B8860B;color:#fff;border-radius:999px;padding:8px 12px;font-family:Quicksand,sans-serif;font-size:12px;font-weight:900;text-decoration:none;box-shadow:2px 2px 0 #003060}
+    .lbara-chat-contact-button:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 #003060}
     .lbara-chat-form{display:flex;gap:8px;padding:12px;border-top:2px solid rgba(0,48,96,.08);background:#fff}
     .lbara-chat-input{flex:1;border:2px solid rgba(0,48,96,.18);border-radius:16px;padding:10px 12px;font-weight:800;color:#003060;min-width:0}
     .lbara-chat-input:focus{outline:none;border-color:#B8860B}
@@ -477,6 +562,10 @@ const lbaraEngagement = (function () {
     if (favorite) {
       event.preventDefault();
       event.stopPropagation();
+      favorite.classList.remove('lbara-favorite-press');
+      void favorite.offsetWidth;
+      favorite.classList.add('lbara-favorite-press');
+      setTimeout(function () { favorite.classList.remove('lbara-favorite-press'); }, 420);
       toggleFavorite(favorite.getAttribute('data-favorite-product'), favorite.getAttribute('data-product-name'));
       return;
     }
@@ -516,13 +605,7 @@ function initChatWidget() {
       <button type="button" class="lbara-chat-close" aria-label="Close chat"><span class="material-symbols-outlined" style="font-size:18px;">close</span></button>
     </div>
     <div id="lbara-chat-messages" class="lbara-chat-messages">
-      <div class="lbara-chat-bubble bot">Hi, I can explain how to buy, what details are needed, delivery timing, VPN needs, request tickets, favorites, and sale alerts.</div>
-    </div>
-    <div class="lbara-chat-suggestions">
-      <button type="button" class="lbara-chat-chip" data-chat-prompt="How do I buy a service?">How do I buy?</button>
-      <button type="button" class="lbara-chat-chip" data-chat-prompt="How will I receive my service?">Delivery</button>
-      <button type="button" class="lbara-chat-chip" data-chat-prompt="When do I need to provide my account?">Account details</button>
-      <button type="button" class="lbara-chat-chip" data-chat-prompt="What does a request ticket mean?">Request ticket</button>
+      <div class="lbara-chat-bubble bot">Hi. Tell me what you want to buy, compare, or understand, and I will guide you through the right option, what details are needed, delivery, and checkout.</div>
     </div>
     <form id="lbara-chat-form" class="lbara-chat-form">
       <input id="lbara-chat-input" class="lbara-chat-input" autocomplete="off" maxlength="800" placeholder="Ask a question..."/>
@@ -538,6 +621,12 @@ function initChatWidget() {
   const messages = panel.querySelector('#lbara-chat-messages');
   const form = panel.querySelector('#lbara-chat-form');
   const input = panel.querySelector('#lbara-chat-input');
+  let supportMode = false;
+  let supportStarted = false;
+  let supportTurns = 0;
+  let contactPromptShown = false;
+  let sending = false;
+  const conversation = [];
 
   function addBubble(text, role) {
     const bubble = document.createElement('div');
@@ -548,18 +637,137 @@ function initChatWidget() {
     return bubble;
   }
 
+  function sleep(ms) {
+    return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  }
+
+  function pushHistory(role, content) {
+    conversation.push({ role, content: String(content || '').slice(0, 700) });
+    while (conversation.length > 10) conversation.shift();
+  }
+
+  function addTypingBubble() {
+    const bubble = document.createElement('div');
+    bubble.className = 'lbara-chat-bubble bot is-typing';
+    bubble.setAttribute('aria-label', lbaraT('Thinking...'));
+    bubble.innerHTML = '<span class="lbara-chat-typing-dot"></span><span class="lbara-chat-typing-dot"></span><span class="lbara-chat-typing-dot"></span>';
+    messages.appendChild(bubble);
+    messages.scrollTop = messages.scrollHeight;
+    return bubble;
+  }
+
+  async function typeBotText(bubble, text) {
+    const answer = String(text || lbaraT('I could not answer that right now.'));
+    const step = answer.length > 260 ? 4 : 2;
+    const delay = answer.length > 420 ? 8 : 14;
+    bubble.classList.remove('is-typing');
+    bubble.removeAttribute('aria-label');
+    bubble.textContent = '';
+    for (let i = step; i < answer.length; i += step) {
+      bubble.textContent = answer.slice(0, i);
+      messages.scrollTop = messages.scrollHeight;
+      await sleep(delay);
+    }
+    bubble.textContent = answer;
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function chatPageContext() {
+    const title = document.title ? 'Page: ' + document.title : '';
+    const path = window.location.pathname ? 'Path: ' + window.location.pathname : '';
+    const productTitle = document.getElementById('product-title')?.textContent?.trim();
+    const shopSearch = document.getElementById('shop-search')?.value?.trim();
+    return [
+      title,
+      path,
+      productTitle ? 'Product: ' + productTitle : '',
+      shopSearch ? 'Shop search: ' + shopSearch : '',
+    ].filter(Boolean).join(' | ').slice(0, 500);
+  }
+
+  function addDetailPrompts(prompts) {
+    if (!Array.isArray(prompts) || !prompts.length) return;
+    messages.querySelectorAll('.lbara-chat-next-steps').forEach(function (node) { node.remove(); });
+    const suggestions = document.createElement('div');
+    suggestions.className = 'lbara-chat-next-steps';
+    const label = document.createElement('div');
+    label.className = 'lbara-chat-next-label';
+    label.textContent = lbaraT('Tell me a bit more:');
+    const row = document.createElement('div');
+    row.className = 'lbara-chat-detail-row';
+    prompts.slice(0, 3).forEach(function (prompt) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'lbara-chat-detail-chip';
+      button.textContent = lbaraT(prompt);
+      button.addEventListener('click', function () { send(lbaraT(prompt)); });
+      row.appendChild(button);
+    });
+    suggestions.appendChild(label);
+    suggestions.appendChild(row);
+    messages.appendChild(suggestions);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function addContactPrompt() {
+    if (contactPromptShown) return;
+    contactPromptShown = true;
+    const bubble = document.createElement('div');
+    bubble.className = 'lbara-chat-bubble bot';
+    bubble.innerHTML = lbaraEscapeHtml(lbaraT('If you still need a person, contact us and we will follow up from the contact page.'))
+      + '<div class="lbara-chat-contact-row">'
+      + '<a class="lbara-chat-contact-button" href="/contact.html?category=technical">'
+      + '<span class="material-symbols-outlined" style="font-size:16px;">support_agent</span>'
+      + lbaraEscapeHtml(lbaraT('Contact us'))
+      + '</a>'
+      + '</div>';
+    messages.appendChild(bubble);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function startSupportFlow() {
+    supportMode = true;
+    if (!supportStarted) {
+      supportStarted = true;
+      addBubble(lbaraT('Start here with the assistant. Ask your question, and if it still needs a human after one or two messages, I will send you to the contact page.'), 'bot');
+    }
+  }
+
+  function openChat(options = {}) {
+    panel.classList.remove('hidden');
+    if (options.support) startSupportFlow();
+    setTimeout(function () { input.focus(); }, 50);
+  }
+
   async function send(text) {
     const message = String(text || '').trim();
-    if (!message) return;
+    if (!message || sending) return;
+    sending = true;
+    messages.querySelectorAll('.lbara-chat-next-steps').forEach(function (node) { node.remove(); });
+    const previousHistory = conversation.slice(-8);
     addBubble(message, 'user');
+    pushHistory('user', message);
     input.value = '';
-    const loading = addBubble(lbaraT('Thinking...'), 'bot');
+    if (supportMode) supportTurns += 1;
+    const loading = addTypingBubble();
     try {
-      const res = await api.chat(message);
-      loading.innerHTML = lbaraEscapeHtml(res.answer || lbaraT('I could not answer that right now.'));
+      await sleep(Math.min(850, Math.max(420, message.length * 12)));
+      const res = await api.chat(message, {
+        history: previousHistory,
+        page_context: chatPageContext(),
+      });
+      const answer = res.answer || lbaraT('I could not answer that right now.');
+      await typeBotText(loading, answer);
+      pushHistory('assistant', answer);
+      if (res.needs_details) addDetailPrompts(res.detail_prompts);
     } catch (err) {
-      loading.innerHTML = lbaraEscapeHtml(err.message || lbaraT('Chat is unavailable right now.'));
+      const errorMessage = lbaraT('Chat is unavailable right now.');
+      await typeBotText(loading, errorMessage);
+      pushHistory('assistant', errorMessage);
+    } finally {
+      sending = false;
     }
+    if (supportMode && supportTurns >= 2) addContactPrompt();
     messages.scrollTop = messages.scrollHeight;
   }
 
@@ -568,13 +776,152 @@ function initChatWidget() {
     if (!panel.classList.contains('hidden')) input.focus();
   });
   close.addEventListener('click', function () { panel.classList.add('hidden'); });
-  panel.querySelectorAll('[data-chat-prompt]').forEach(function (button) {
-    button.addEventListener('click', function () { send(lbaraT(button.getAttribute('data-chat-prompt'))); });
-  });
   form.addEventListener('submit', function (event) {
     event.preventDefault();
     send(input.value);
   });
+
+  document.addEventListener('click', function (event) {
+    const supportLink = event.target.closest('[data-lbara-support-chat]');
+    if (!supportLink) return;
+    event.preventDefault();
+    openChat({ support: true });
+  });
+
+  window.lbaraOpenChat = openChat;
+  window.lbaraOpenSupportChat = function () { openChat({ support: true }); };
+}
+
+function ensureMotionStyles() {
+  if (document.getElementById('lbara-motion-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'lbara-motion-styles';
+  style.textContent = `
+    @keyframes lbaraPageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes lbaraLogoHello{0%{transform:translateY(-6px) scale(.96);filter:saturate(.8)}60%{transform:translateY(1px) scale(1.04)}100%{transform:translateY(0) scale(1);filter:saturate(1)}}
+    @keyframes lbaraLogoClick{0%{transform:scale(1)}45%{transform:scale(.94) rotate(-1deg)}100%{transform:scale(1.04) rotate(.6deg)}}
+    @keyframes lbaraStampIn{0%{opacity:0;transform:translateY(16px) scale(.9) rotate(-2deg)}55%{opacity:1;transform:translateY(-2px) scale(1.04) rotate(.8deg)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
+    @keyframes lbaraIntroOut{0%,55%{opacity:1}100%{opacity:0;visibility:hidden}}
+    @keyframes lbaraTapBounce{0%{transform:scale(1)}45%{transform:scale(.96)}100%{transform:scale(1)}}
+    @keyframes lbaraOptionSelect{0%{transform:scale(.985);box-shadow:4px 4px 0 #003060}100%{transform:scale(1);box-shadow:8px 8px 0 #003060}}
+    body.lbara-motion-ready main{animation:lbaraPageIn .42s ease both}
+    body.lbara-page-leaving main,body.lbara-page-leaving footer{opacity:0;transform:translateY(8px);transition:opacity .16s ease,transform .16s ease}
+    .lbara-logo-interactive{position:relative;display:inline-flex;align-items:center;transition:transform .18s ease,color .18s ease;text-decoration:none}
+    .lbara-logo-interactive::after{content:'';position:absolute;left:8%;right:8%;bottom:-6px;height:4px;border-radius:999px;background:#B8860B;transform:scaleX(0);transform-origin:left;opacity:.85;transition:transform .2s ease}
+    .lbara-logo-interactive:hover{transform:translateY(-2px)}
+    .lbara-logo-interactive:hover::after{transform:scaleX(1)}
+    .lbara-logo-interactive.is-logo-clicked{animation:lbaraLogoClick .22s ease both}
+    body.lbara-motion-ready .lbara-logo-interactive{animation:lbaraLogoHello .55s cubic-bezier(.2,.8,.2,1) both}
+    nav a[href]:not(.cartoon-button):not(.lbara-social-icon):not(.lbara-social-menu-item):not(.lbara-logo-interactive):not([id^="designer-credit"]){position:relative;text-decoration:none}
+    nav a[href]:not(.cartoon-button):not(.lbara-social-icon):not(.lbara-social-menu-item):not(.lbara-logo-interactive):not([id^="designer-credit"])::after{content:'';position:absolute;left:0;right:0;bottom:-7px;height:4px;border-radius:999px;background:#003060;transform:scaleX(0);transform-origin:left;transition:transform .18s ease,background .18s ease}
+    nav a[href]:not(.cartoon-button):not(.lbara-social-icon):not(.lbara-social-menu-item):not(.lbara-logo-interactive):not([id^="designer-credit"]):hover::after,
+    nav a[href]:not(.cartoon-button):not(.lbara-social-icon):not(.lbara-social-menu-item):not(.lbara-logo-interactive):not([id^="designer-credit"]):focus-visible::after{transform:scaleX(1)}
+    .lbara-intro-stamp{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;background:#F8FAFC;pointer-events:none;animation:lbaraIntroOut 1.05s ease .45s forwards}
+    .lbara-intro-badge{font-family:Quicksand,Nunito,sans-serif;font-weight:900;color:#003060;background:#fff;border:4px solid #003060;border-radius:28px;padding:18px 28px;box-shadow:8px 8px 0 #003060;letter-spacing:-.02em;animation:lbaraStampIn .55s cubic-bezier(.2,.9,.2,1) both}
+    .lbara-intro-badge span{display:block;color:#B8860B;font-size:12px;text-transform:uppercase;letter-spacing:.16em;margin-top:4px;text-align:center}
+    .lbara-section-enter{animation:lbaraPageIn .28s ease both}
+    @keyframes lbaraProductOpen{0%{transform:scale(1);filter:saturate(1)}45%{transform:scale(.985);filter:saturate(1.16)}100%{transform:scale(1);filter:saturate(1)}}
+    @keyframes lbaraCartPress{0%{transform:translateY(0) scale(1)}45%{transform:translateY(2px) scale(.96)}100%{transform:translateY(-1px) scale(1.03)}}
+    @keyframes lbaraFavoritePress{0%{transform:scale(1)}50%{transform:scale(1.18) rotate(-5deg)}100%{transform:scale(1)}}
+    #products-grid{transition:opacity .2s ease,transform .2s ease,filter .2s ease}
+    #products-grid.lbara-grid-switching{opacity:.45;transform:translateY(8px);filter:saturate(.88)}
+    #products-grid .shop-product-card{will-change:transform;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+    #products-grid .shop-product-card:hover{transform:translate(-3px,-3px) rotate(-.12deg);box-shadow:11px 11px 0 #003060}
+    #products-grid .shop-product-card:active{transform:translate(1px,1px);box-shadow:5px 5px 0 #003060}
+    #products-grid .shop-product-card.lbara-product-opening{animation:lbaraProductOpen .22s ease both;border-color:#B8860B}
+    #products-grid .shop-product-card .shop-card-img{transition:transform .36s ease,filter .36s ease}
+    #products-grid .shop-product-card:hover .shop-card-img{transform:scale(1.035);filter:saturate(1.08)}
+    #products-grid .shop-product-card .inline-flex.w-10 .material-symbols-outlined{transition:transform .18s ease}
+    #products-grid .shop-product-card:hover .inline-flex.w-10 .material-symbols-outlined{transform:translateX(3px)}
+    .filter-item,.shop-chip{transition:transform .16s ease,box-shadow .16s ease,background .16s ease,color .16s ease}
+    .filter-item:hover,.shop-chip:hover{transform:translate(-1px,-1px)}
+    .filter-item.active .material-symbols-outlined,.shop-chip.active .material-symbols-outlined{animation:lbaraTapBounce .26s ease}
+    .lbara-tap-bounce{animation:lbaraTapBounce .24s ease}
+    .option-card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease}
+    .option-card:hover{transform:translate(-2px,-2px)}
+    .option-card.active{animation:lbaraOptionSelect .24s ease}
+    .lbara-cart-press,.lbara-add-cart-press{animation:lbaraCartPress .28s ease both}
+    .lbara-favorite-press .material-symbols-outlined{animation:lbaraFavoritePress .36s ease both}
+    #pagination button{transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease}
+    #pagination button:hover{transform:translateY(-2px)}
+    @media(max-width:767px){
+      .lbara-intro-badge{font-size:24px;padding:14px 20px;border-radius:22px;box-shadow:6px 6px 0 #003060}
+      #products-grid .shop-product-card:hover{transform:translate(-1px,-1px);box-shadow:7px 7px 0 #003060}
+    }
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important}
+      body.lbara-page-leaving main,body.lbara-page-leaving footer{opacity:1;transform:none}
+      .lbara-intro-stamp{display:none!important}
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function initLogoMotion() {
+  document.querySelectorAll('nav a[href="/index.html"], nav a[href="/"]').forEach(function (logo) {
+    if (logo.dataset.lbaraLogoReady === '1') return;
+    logo.dataset.lbaraLogoReady = '1';
+    logo.classList.add('lbara-logo-interactive');
+    logo.addEventListener('click', function (event) {
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+      event.preventDefault();
+      logo.classList.remove('is-logo-clicked');
+      void logo.offsetWidth;
+      logo.classList.add('is-logo-clicked');
+      window.lbaraNavigate(logo.href, 180);
+    });
+  });
+}
+
+function pressElement(el, className, duration = 320) {
+  if (!el) return;
+  el.classList.remove(className);
+  void el.offsetWidth;
+  el.classList.add(className);
+  setTimeout(function () { el.classList.remove(className); }, duration);
+}
+
+function initOpeningStamp() {
+  if (sessionStorage.getItem('lbara_intro_seen') === '1') return;
+  if (!['/', '/index.html'].includes(window.location.pathname)) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  sessionStorage.setItem('lbara_intro_seen', '1');
+  const stamp = document.createElement('div');
+  stamp.className = 'lbara-intro-stamp';
+  stamp.innerHTML = '<div class="lbara-intro-badge">Lbara.tn<span>Digital access starts here</span></div>';
+  document.body.appendChild(stamp);
+  setTimeout(function () { stamp.remove(); }, 1700);
+}
+
+function lbaraNavigate(href, delay = 130) {
+  if (!href) return;
+  document.body.classList.add('lbara-page-leaving');
+  setTimeout(function () { window.location.href = href; }, delay);
+}
+
+function initSoftPageTransitions() {
+  document.addEventListener('click', function (event) {
+    const link = event.target.closest('a[href]');
+    if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    if (link.target || link.hasAttribute('download') || link.dataset.noTransition === 'true') return;
+    const rawHref = link.getAttribute('href') || '';
+    if (rawHref === '#' || rawHref.startsWith('#') || /^(mailto:|tel:|javascript:)/i.test(rawHref)) return;
+    const url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin) return;
+    if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) return;
+    const isCartLink = /\/cart\.html$/i.test(url.pathname);
+    if (isCartLink) pressElement(link, 'lbara-cart-press', 360);
+    event.preventDefault();
+    lbaraNavigate(url.href, isCartLink ? 190 : 130);
+  });
+}
+
+function initLbaraMotion() {
+  ensureMotionStyles();
+  initLogoMotion();
+  initSoftPageTransitions();
+  initOpeningStamp();
+  requestAnimationFrame(function () { document.body.classList.add('lbara-motion-ready'); });
 }
 
 // Show toast notifications
@@ -603,6 +950,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initDesignerCredit();
   initLanguageSystem();
   initFooterSocials();
+  initLbaraMotion();
   lbaraEngagement.load();
   initChatWidget();
 
@@ -610,7 +958,16 @@ document.addEventListener('DOMContentLoaded', function() {
   var mobileMenu = document.getElementById('mobile-menu');
   if (hamburger && mobileMenu) {
     hamburger.addEventListener('click', function() {
-      mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'block' : 'none';
+      const shouldOpen = mobileMenu.style.display === 'none' || !mobileMenu.style.display;
+      document.querySelectorAll('.lbara-language-wrap.open').forEach(function (item) {
+        item.classList.remove('open');
+      });
+      document.querySelectorAll('.lbara-social-menu.is-open').forEach(function (item) {
+        item.classList.remove('is-open');
+        var button = item.querySelector('.lbara-social-menu-toggle');
+        if (button) button.setAttribute('aria-expanded', 'false');
+      });
+      mobileMenu.style.display = shouldOpen ? 'block' : 'none';
     });
   }
 });
@@ -619,3 +976,4 @@ window.showToast = showToast;
 window.lbaraEngagement = lbaraEngagement;
 window.lbaraT = lbaraT;
 window.lbaraCreateSocialLinks = createSocialLinks;
+window.lbaraNavigate = lbaraNavigate;

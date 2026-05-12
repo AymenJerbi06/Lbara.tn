@@ -84,6 +84,7 @@
       'Education': 'Éducation',
       'Gift Cards': 'Cartes cadeaux',
       'Social': 'Réseaux sociaux',
+      'Socials': 'Réseaux',
       'Storage': 'Stockage',
       'Cloud': 'Cloud',
       'VPN': 'VPN',
@@ -270,6 +271,7 @@
       'Cancel': 'Annuler',
       'Lbara assistant': 'Assistant Lbara',
       'Ask before you buy': 'Demandez avant d’acheter',
+      'Hi. Tell me what you want to buy, compare, or understand, and I will guide you through the right option, what details are needed, delivery, and checkout.': 'Bonjour. Dites-moi ce que vous voulez acheter, comparer ou comprendre, et je vous guiderai vers la bonne option, les informations nécessaires, la livraison et le paiement.',
       'Hi, I can explain how to buy, what details are needed, delivery timing, VPN needs, request tickets, favorites, and sale alerts.': 'Bonjour, je peux expliquer comment acheter, quels détails sont nécessaires, les délais de livraison, les besoins VPN, les tickets de demande, les favoris et les alertes promo.',
       'How do I buy?': 'Comment acheter ?',
       'How do I buy a service?': 'Comment acheter un service ?',
@@ -278,9 +280,16 @@
       'Account details': 'Détails du compte',
       'What does a request ticket mean?': 'Que signifie ticket de demande ?',
       'Ask a question...': 'Posez une question...',
+      'Tell me a bit more:': 'Donnez-moi un peu plus de détails :',
+      'Netflix delivery': 'Livraison Netflix',
+      'ChatGPT account activation': 'Activation du compte ChatGPT',
+      'Special request pricing': 'Prix d’une demande spéciale',
       'Thinking...': 'Réflexion...',
       'I could not answer that right now.': 'Je ne peux pas répondre à cette question pour le moment.',
       'Chat is unavailable right now.': 'Le chat est indisponible pour le moment.',
+      'Contact us': 'Nous contacter',
+      'Start here with the assistant. Ask your question, and if it still needs a human after one or two messages, I will send you to the contact page.': 'Commencez avec l’assistant. Posez votre question, et si cela nécessite encore une personne après un ou deux messages, je vous enverrai vers la page de contact.',
+      'If you still need a person, contact us and we will follow up from the contact page.': 'Si vous avez encore besoin d’une personne, contactez-nous et nous vous répondrons depuis la page de contact.',
     },
     ar: {
       'Full Name': 'الاسم الكامل',
@@ -390,6 +399,7 @@
       'Education': 'التعليم',
       'Gift Cards': 'بطاقات الهدايا',
       'Social': 'التواصل الاجتماعي',
+      'Socials': 'تواصل',
       'Storage': 'التخزين',
       'Cloud': 'السحابة',
       'VPN': 'VPN',
@@ -575,6 +585,7 @@
       'Cancel': 'إلغاء',
       'Lbara assistant': 'مساعد Lbara',
       'Ask before you buy': 'اسأل قبل الشراء',
+      'Hi. Tell me what you want to buy, compare, or understand, and I will guide you through the right option, what details are needed, delivery, and checkout.': 'مرحباً. أخبرني بما تريد شراءه أو مقارنته أو فهمه، وسأرشدك إلى الخيار المناسب، والمعلومات المطلوبة، والتسليم، والدفع.',
       'Hi, I can explain how to buy, what details are needed, delivery timing, VPN needs, request tickets, favorites, and sale alerts.': 'مرحباً، أستطيع أن أشرح لك كيف تشتري، ما التفاصيل المطلوبة، وقت التسليم، متى تحتاج VPN، تذاكر الطلب، المفضلة وتنبيهات التخفيض.',
       'How do I buy?': 'كيف أشتري؟',
       'How do I buy a service?': 'كيف أشتري خدمة؟',
@@ -583,9 +594,16 @@
       'Account details': 'تفاصيل الحساب',
       'What does a request ticket mean?': 'ماذا تعني تذكرة الطلب؟',
       'Ask a question...': 'اكتب سؤالك...',
+      'Tell me a bit more:': 'أخبرني بتفاصيل أكثر:',
+      'Netflix delivery': 'تسليم نتفليكس',
+      'ChatGPT account activation': 'تفعيل حساب شات جي بي تي',
+      'Special request pricing': 'تسعير الطلب الخاص',
       'Thinking...': 'جار التفكير...',
       'I could not answer that right now.': 'لا أستطيع الإجابة الآن.',
       'Chat is unavailable right now.': 'الدردشة غير متاحة حالياً.',
+      'Contact us': 'تواصل معنا',
+      'Start here with the assistant. Ask your question, and if it still needs a human after one or two messages, I will send you to the contact page.': 'ابدأ هنا مع المساعد. اطرح سؤالك، وإذا احتجت إلى شخص بعد رسالة أو رسالتين فسأوجهك إلى صفحة التواصل.',
+      'If you still need a person, contact us and we will follow up from the contact page.': 'إذا كنت ما زلت تحتاج إلى شخص، تواصل معنا وسنتابع معك من صفحة التواصل.',
     },
   };
 
@@ -1751,6 +1769,12 @@
     `;
     wrap.querySelector('.lbara-language-btn').addEventListener('click', (event) => {
       event.stopPropagation();
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (mobileMenu) mobileMenu.style.display = 'none';
+      document.querySelectorAll('.lbara-social-menu.is-open').forEach((el) => {
+        el.classList.remove('is-open');
+        el.querySelector('.lbara-social-menu-toggle')?.setAttribute('aria-expanded', 'false');
+      });
       wrap.classList.toggle('open');
     });
     wrap.querySelectorAll('[data-set-language]').forEach((button) => {

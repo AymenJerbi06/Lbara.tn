@@ -232,6 +232,29 @@ function scrollToProductsTop() {
   });
 }
 
+function startGridTransition() {
+  var grid = document.getElementById('products-grid');
+  if (!grid) return;
+  grid.classList.add('lbara-grid-switching');
+}
+
+function finishGridTransition(root) {
+  var grid = root || document.getElementById('products-grid');
+  if (!grid) return;
+  requestAnimationFrame(function () {
+    grid.classList.remove('lbara-grid-switching');
+    document.dispatchEvent(new CustomEvent('lbara:contentupdated', { detail: { root: grid } }));
+  });
+}
+
+function pulseControl(control) {
+  if (!control) return;
+  control.classList.remove('lbara-tap-bounce');
+  void control.offsetWidth;
+  control.classList.add('lbara-tap-bounce');
+  setTimeout(function () { control.classList.remove('lbara-tap-bounce'); }, 280);
+}
+
 function updateMobileCategoryToggle(panel, toggle) {
   if (!panel || !toggle) return;
   var expanded = panel.classList.contains('is-expanded');
@@ -304,6 +327,7 @@ function renderProducts() {
   if (!grid) return;
   const pageSize = getPageSize();
 
+  startGridTransition();
   grid.innerHTML = '<div class="col-span-3 text-center py-12 text-primary/40 font-bold">' + escapeHtml(tr('Loading...')) + '</div>';
   applyTranslations(grid);
 
@@ -320,6 +344,7 @@ function renderProducts() {
       if (paginationEl) paginationEl.innerHTML = '';
       if (requestCta) requestCta.classList.remove('hidden');
       applyTranslations(grid);
+      finishGridTransition(grid);
       return;
     }
 
@@ -396,9 +421,11 @@ function renderProducts() {
       requestCta.classList.toggle('hidden', !isLastPage);
       applyTranslations(requestCta);
     }
+    finishGridTransition(grid);
   }).catch(function (err) {
     grid.innerHTML = '<div class="col-span-3 text-center py-12 text-red-500 font-bold">' + escapeHtml(err.message || 'Failed to load products.') + '</div>';
     applyTranslations(grid);
+    finishGridTransition(grid);
   });
 }
 
@@ -435,7 +462,11 @@ document.addEventListener('DOMContentLoaded', function () {
       var card = event.target.closest('[data-product-card]');
       if (!card) return;
       var href = card.getAttribute('data-product-href');
-      if (href) window.location.href = href;
+      if (href) {
+        card.classList.add('lbara-product-opening');
+        if (window.lbaraNavigate) window.lbaraNavigate(href, 180);
+        else window.location.href = href;
+      }
     });
 
     productsGrid.addEventListener('keydown', function (event) {
@@ -444,7 +475,11 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!card) return;
       event.preventDefault();
       var href = card.getAttribute('data-product-href');
-      if (href) window.location.href = href;
+      if (href) {
+        card.classList.add('lbara-product-opening');
+        if (window.lbaraNavigate) window.lbaraNavigate(href, 180);
+        else window.location.href = href;
+      }
     });
   }
 
@@ -453,6 +488,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!btn) return;
     var nextPage = parseInt(btn.getAttribute('data-page'), 10);
     if (!Number.isFinite(nextPage)) return;
+    pulseControl(btn);
 
     if (nextPage === currentPage) {
       scrollToProductsTop();
@@ -466,11 +502,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.querySelectorAll('[data-category]').forEach(function (btn) {
     btn.addEventListener('click', function () {
+      pulseControl(btn);
       currentCategory = btn.dataset.category;
       currentPage = 1;
       document.querySelectorAll('[data-category]').forEach(function (b) { b.classList.remove('active'); });
       document.querySelectorAll('[data-category="' + CSS.escape(btn.dataset.category) + '"]').forEach(function (b) { b.classList.add('active'); });
       renderProducts();
+      requestAnimationFrame(scrollToProductsTop);
     });
   });
 

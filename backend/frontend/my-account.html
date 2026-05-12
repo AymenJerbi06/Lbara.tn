@@ -129,7 +129,7 @@
       <span class="material-symbols-outlined">lock</span>
       <span class="font-label">Security</span>
     </a>
-    <a href="/contact.html"
+    <a href="#support-chat" data-lbara-support-chat
       class="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-blue-800 hover:bg-slate-200/50 transition-colors duration-200">
       <span class="material-symbols-outlined">support_agent</span>
       <span class="font-label">Support</span>
@@ -282,7 +282,7 @@
         <div class="flex flex-wrap gap-3 text-xs font-black uppercase tracking-widest headline-font">
           <a class="px-4 py-2 rounded-full bg-surface-container text-primary hover:bg-primary-container hover:text-on-primary transition-colors" href="#">Privacy</a>
           <a class="px-4 py-2 rounded-full bg-surface-container text-primary hover:bg-primary-container hover:text-on-primary transition-colors" href="#">Terms</a>
-          <a class="px-4 py-2 rounded-full bg-surface-container text-primary hover:bg-primary-container hover:text-on-primary transition-colors" href="/contact.html">Help</a>
+          <a class="px-4 py-2 rounded-full bg-surface-container text-primary hover:bg-primary-container hover:text-on-primary transition-colors" href="#support-chat" data-lbara-support-chat>Help</a>
         </div>
       </footer>
     </div>
@@ -465,7 +465,14 @@ function formatTnd(value) {
 
 function showSection(name) {
   SECTIONS.forEach(s => {
-    document.getElementById('section-' + s).style.display = (s === name) ? '' : 'none';
+    const section = document.getElementById('section-' + s);
+    section.style.display = (s === name) ? '' : 'none';
+    if (s === name) {
+      section.classList.remove('lbara-section-enter');
+      void section.offsetWidth;
+      section.classList.add('lbara-section-enter');
+      document.dispatchEvent(new CustomEvent('lbara:contentupdated', { detail: { root: section } }));
+    }
   });
 
   // Update sidebar active state

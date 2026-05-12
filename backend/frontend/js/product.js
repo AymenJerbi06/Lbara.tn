@@ -105,6 +105,18 @@ function waitForI18n() {
   });
 }
 
+function pulseControl(control) {
+  if (!control) return;
+  control.classList.remove('lbara-tap-bounce');
+  void control.offsetWidth;
+  control.classList.add('lbara-tap-bounce');
+  setTimeout(function () { control.classList.remove('lbara-tap-bounce'); }, 280);
+}
+
+function refreshMotion(root) {
+  document.dispatchEvent(new CustomEvent('lbara:contentupdated', { detail: { root: root || document } }));
+}
+
 function categoryLabel(value) {
   var key = String(value || 'service').toLowerCase();
   var labels = {
@@ -311,12 +323,14 @@ function renderOptions() {
       + '</button>';
   }).join('');
   applyTranslations(list);
+  refreshMotion(list);
 
   list.querySelectorAll('[data-variant-id]').forEach(function (button) {
     button.addEventListener('click', function () {
       selectedVariantId = button.getAttribute('data-variant-id');
       renderOptions();
       renderSelection();
+      pulseControl(document.getElementById('selection-panel'));
     });
   });
 }
@@ -441,6 +455,7 @@ function renderProduct(item) {
       window.lbaraEngagement.syncButtons(document.getElementById('product-content'));
     });
   }
+  refreshMotion(document.getElementById('product-content') || document);
 }
 
 document.addEventListener('DOMContentLoaded', async function () {
@@ -471,10 +486,15 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 
   document.getElementById('continue-btn').addEventListener('click', function () {
+    pulseControl(this);
     addSelectedToCart({ checkout: true });
   });
   var addCartBtn = document.getElementById('add-cart-btn');
   if (addCartBtn) addCartBtn.addEventListener('click', function () {
+    this.classList.remove('lbara-add-cart-press');
+    void this.offsetWidth;
+    this.classList.add('lbara-add-cart-press');
+    setTimeout(() => this.classList.remove('lbara-add-cart-press'), 360);
     addSelectedToCart({ checkout: false });
   });
 });
