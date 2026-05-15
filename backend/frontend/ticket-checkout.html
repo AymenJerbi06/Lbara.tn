@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Final Ticket Checkout - Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: { primary: "#003060", secondary: "#005F4B", accent: "#B8860B", "on-surface": "#1A202C" },
+        fontFamily: { headline: ["Quicksand", "sans-serif"], body: ["Nunito", "sans-serif"] },
+      },
+    },
+  };
+</script>
+<style type="text/tailwindcss">
+  @layer base { body { @apply bg-[#F8FAFC] text-on-surface font-body; } }
+  .vibrant-gradient { background: linear-gradient(135deg, #001F3F 0%, #000C1A 100%); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24; }
+  .cartoon-card { @apply bg-white border-4 border-primary shadow-[8px_8px_0px_0px_#003060]; }
+  .cartoon-button { @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none; }
+  .payment-option { @apply flex items-center gap-3 p-4 rounded-2xl border-2 border-primary/15 cursor-pointer font-black text-primary transition-all; }
+  .payment-option.active { @apply border-primary bg-primary/5 shadow-[4px_4px_0px_0px_#B8860B]; }
+</style>
+<link href="/css/mobile.css" rel="stylesheet"/>
+</head>
+<body>
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
+  <div class="flex justify-between items-center w-full px-4 lg:px-8 py-4 max-w-screen-2xl mx-auto">
+    <a href="/shop.html" class="text-2xl lg:text-3xl font-bold tracking-tight text-primary font-headline">Lbara.tn</a>
+    <div class="hidden md:flex items-center gap-6 font-headline font-bold text-sm">
+      <a class="text-on-surface/70 hover:text-primary" href="/shop.html">Shop</a>
+      <a class="text-on-surface/70 hover:text-primary" href="/contact.html">Contact</a>
+      <button id="nav-account-btn" class="cartoon-button bg-primary text-white font-bold px-6 py-2 rounded-full">My Account</button>
+    </div>
+    <button id="nav-account-btn-mobile" class="md:hidden cartoon-button bg-primary text-white font-bold px-4 py-2 rounded-full text-sm">My Account</button>
+  </div>
+</nav>
+
+<header class="vibrant-gradient pt-32 pb-16 px-6 text-center">
+  <p class="text-accent font-black tracking-[0.25em] uppercase text-sm mb-3">Request ticket</p>
+  <h1 class="font-headline text-4xl md:text-6xl font-black text-white">Final Checkout</h1>
+  <p class="text-white/65 font-bold mt-4">Review the custom quote and pay only if everything matches what the admin confirmed.</p>
+</header>
+
+<main class="max-w-5xl mx-auto px-5 py-12">
+  <div id="quote-error" class="hidden cartoon-card border-red-400 shadow-[8px_8px_0px_0px_#ef4444] p-6 text-red-700 font-black"></div>
+
+  <div id="quote-loading" class="cartoon-card p-10 text-center">
+    <span class="material-symbols-outlined text-primary text-5xl animate-pulse">hourglass_empty</span>
+    <p class="font-headline font-black text-primary text-xl mt-4">Loading your quote...</p>
+  </div>
+
+  <section id="quote-content" class="hidden grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-start">
+    <div class="cartoon-card rounded-3xl p-7">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <div>
+          <p class="text-xs font-black text-accent uppercase tracking-widest">Final service</p>
+          <h2 id="quote-title" class="font-headline text-3xl font-black text-primary mt-2"></h2>
+        </div>
+        <span id="quote-ref" class="rounded-full bg-primary/5 border-2 border-primary/10 px-4 py-2 text-xs font-black text-primary"></span>
+      </div>
+      <div class="bg-primary/5 rounded-2xl p-5 border-2 border-primary/10">
+        <p class="text-xs font-black text-primary/45 uppercase tracking-widest mb-2">Admin explanation</p>
+        <p id="quote-description" class="font-bold text-primary/75 leading-relaxed whitespace-pre-wrap"></p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+        <div class="rounded-2xl border-2 border-primary/10 p-4">
+          <p class="text-xs font-black text-primary/45 uppercase tracking-widest">Original ticket</p>
+          <p id="quote-ticket-ref" class="font-black text-primary mt-1"></p>
+        </div>
+        <div class="rounded-2xl border-2 border-primary/10 p-4">
+          <p class="text-xs font-black text-primary/45 uppercase tracking-widest">Delivery email</p>
+          <p id="quote-email" class="font-black text-primary mt-1 break-all"></p>
+        </div>
+      </div>
+    </div>
+
+    <aside class="cartoon-card rounded-3xl p-7 lg:sticky lg:top-28">
+      <h3 class="font-headline text-2xl font-black text-primary mb-5 flex items-center gap-2">
+        <span class="material-symbols-outlined text-accent">shopping_basket</span>
+        Payment
+      </h3>
+      <div class="border-y-4 border-dashed border-primary/10 py-6 mb-6">
+        <p class="text-xs font-black text-primary/45 uppercase tracking-widest">Total to pay</p>
+        <p class="mt-2"><span id="quote-amount" class="font-headline text-5xl font-black text-primary"></span> <span class="font-black text-primary">TND</span></p>
+      </div>
+
+      <div class="space-y-3 mb-6">
+        <button type="button" class="payment-option active w-full" data-payment-method="card">
+          <span class="material-symbols-outlined">credit_card</span>
+          Test bank card
+        </button>
+        <button type="button" class="payment-option w-full" data-payment-method="d17">
+          <span class="material-symbols-outlined">account_balance_wallet</span>
+          D17 / Local payment
+        </button>
+      </div>
+
+      <button id="quote-pay-btn" class="w-full cartoon-button bg-primary text-white font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined">lock_open</span>
+        Pay Final Quote
+      </button>
+      <p class="text-xs font-bold text-primary/45 text-center mt-4">After payment, the admin completes the activation and sends a confirmation email.</p>
+    </aside>
+  </section>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/ticket-checkout.js"></script>
+</body>
+</html>

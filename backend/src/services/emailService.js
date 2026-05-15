@@ -3,6 +3,11 @@ const { escapeHtml } = require('../utils/html');
 
 const FROM = process.env.EMAIL_FROM || 'Lbara.tn <notifications@lbara.tn>';
 
+function frontendUrl(path) {
+  const base = String(process.env.FRONTEND_URL || 'http://localhost:3025').replace(/\/+$/, '');
+  return `${base}${path}`;
+}
+
 function sanitizeHeader(value) {
   return String(value ?? '').replace(/[\r\n]+/g, ' ').slice(0, 200);
 }
@@ -92,7 +97,7 @@ function tableRow(label, value, color = '#003060') {
 }
 
 function fulfillmentNextStep(order, product) {
-  if (product.checkout_mode === 'quote') {
+  if (product.checkout_mode === 'quote' && !order.ticket_quote_id) {
     return 'This is a special request ticket. We will review the exact service, then contact you with the final price before completing the purchase.';
   }
 
@@ -180,6 +185,7 @@ async function sendFulfillmentEmail(order, product, credentials) {
   const safeOrderRef = escapeHtml(order.order_ref);
   const safeProductName = escapeHtml(product.name);
   const safeCredentials = escapeHtml(credentials);
+  const supportUrl = frontendUrl(`/contact.html?category=other&subject=${encodeURIComponent(`Problem with order ${order.order_ref}`)}`);
 
   await send({
     to: order.delivery_email,
@@ -200,10 +206,47 @@ async function sendFulfillmentEmail(order, product, credentials) {
             Keep these credentials safe. Do not share them.<br>
             If you have any issues, reply to this email with your order reference: <strong>${safeOrderRef}</strong>
           </p>
+          <p style="margin: 18px 0 0;">
+            <a href="${escapeHtml(supportUrl)}" style="display:inline-block;background:#003060;color:#fff;text-decoration:none;font-weight:bold;padding:12px 16px;border-radius:10px;">There is a problem? Contact us</a>
+          </p>
         </div>
         <p style="color: #999; font-size: 12px; text-align: center;">
           Thank you for choosing Lbara.tn - Breaking digital walls one subscription at a time.
         </p>
+      </div>
+    `,
+  });
+}
+
+async function sendTicketCompletionEmail(order, product, message) {
+  const safeOrderRef = escapeHtml(order.order_ref);
+  const safeProductName = escapeHtml(product.name);
+  const safeMessage = escapeHtml(message);
+  const supportUrl = frontendUrl(`/contact.html?category=ticket&ticket_ref=${encodeURIComponent(order.order_ref)}`);
+
+  await send({
+    to: order.delivery_email,
+    subject: `${product.name} activation is complete - ${order.order_ref} | Lbara.tn`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9f9;">
+        <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #B8860B; margin: 0; font-size: 28px;">Lbara.tn</h1>
+          <p style="color: #fff; margin: 8px 0 0;">Activation complete</p>
+        </div>
+        <div style="background: #fff; border: 4px solid #003060; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+          <h2 style="color: #003060; margin-top: 0;">${safeProductName} - Order #${safeOrderRef}</h2>
+          <p style="color: #666; line-height: 1.6;">
+            Your requested service has been handled. You can log back into your account, check the service, then change the password you previously shared with us.
+          </p>
+          <div style="background: #f8fafc; border: 2px dashed #003060; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <p style="margin: 0; font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Admin message</p>
+            <pre style="margin: 8px 0 0; font-size: 15px; color: #003060; font-weight: bold; white-space: pre-wrap;">${safeMessage}</pre>
+          </div>
+          <p style="color: #666; font-size: 13px;">If something is not working, contact us with your order reference: <strong>${safeOrderRef}</strong>.</p>
+          <p style="margin: 18px 0 0;">
+            <a href="${escapeHtml(supportUrl)}" style="display:inline-block;background:#003060;color:#fff;text-decoration:none;font-weight:bold;padding:12px 16px;border-radius:10px;">There is a problem? Contact us</a>
+          </p>
+        </div>
       </div>
     `,
   });
@@ -246,6 +289,41 @@ async function sendTicketFollowUpEmail(order, product, message) {
   });
 }
 
+async function sendTicketQuoteEmail(ticket, quote, checkoutUrl) {
+  const safeTicketRef = escapeHtml(ticket.order_ref);
+  const safeQuoteRef = escapeHtml(quote.quote_ref);
+  const safeTitle = escapeHtml(quote.service_title);
+  const safeDescription = escapeHtml(quote.description || 'Final custom quote prepared by Lbara.tn.');
+  const safeAmount = escapeHtml(money(quote.amount_tnd));
+  const safeCheckoutUrl = escapeHtml(checkoutUrl);
+
+  await send({
+    to: ticket.delivery_email,
+    subject: `Your custom checkout link is ready - ${quote.quote_ref} | Lbara.tn`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9f9;">
+        <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #B8860B; margin: 0; font-size: 28px;">Lbara.tn</h1>
+          <p style="color: #fff; margin: 8px 0 0;">Custom checkout prepared</p>
+        </div>
+        <div style="background: #fff; border: 4px solid #003060; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+          <h2 style="color: #003060; margin-top: 0;">${safeTitle}</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            ${tableRow('Ticket reference', safeTicketRef)}
+            ${tableRow('Quote reference', safeQuoteRef)}
+            ${tableRow('Final price', `${safeAmount} TND`)}
+          </table>
+          <div style="background:#f8fafc;border:2px solid #003060;border-radius:12px;padding:16px;margin:18px 0;color:#666;line-height:1.6;">${safeDescription}</div>
+          <p style="margin: 18px 0 0;">
+            <a href="${safeCheckoutUrl}" style="display:inline-block;background:#B8860B;color:#fff;text-decoration:none;font-weight:bold;padding:14px 18px;border-radius:10px;">Open secure checkout</a>
+          </p>
+          <p style="color:#999;font-size:12px;margin-top:16px;">After payment, Lbara.tn will complete the activation and send you a final confirmation email.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
 async function sendContactAck(name, email, reference) {
   const safeName = escapeHtml(name);
   const safeMessageRef = escapeHtml(String(reference || '').split('-')[0].toUpperCase());
@@ -275,7 +353,7 @@ async function sendInternalOrderNotification(order, product) {
   if (!recipient) return false;
 
   const safeOrderRef = escapeHtml(order.order_ref);
-  const isTicket = product.checkout_mode === 'quote' || order.variant_checkout_mode === 'quote';
+  const isTicket = (product.checkout_mode === 'quote' || order.variant_checkout_mode === 'quote') && !order.ticket_quote_id;
   const detailsRows = fulfillmentDetailsTable(order.fulfillment_details_decoded || {});
 
   await send({
@@ -365,7 +443,9 @@ module.exports = {
   sendEmailVerificationOTP,
   sendOrderConfirmation,
   sendFulfillmentEmail,
+  sendTicketCompletionEmail,
   sendTicketFollowUpEmail,
+  sendTicketQuoteEmail,
   sendContactAck,
   sendInternalOrderNotification,
   sendPasswordChangeOTP,

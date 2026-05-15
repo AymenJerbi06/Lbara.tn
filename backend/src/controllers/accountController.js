@@ -176,6 +176,7 @@ async function listContactRequests(req, res) {
          COALESCE(reference, UPPER(SUBSTRING(REPLACE(id::text, '-', '') FROM 1 FOR 8))) AS reference,
          subject,
          category,
+         ticket_reference,
          status,
          LEFT(message, 180) AS message_preview,
          created_at

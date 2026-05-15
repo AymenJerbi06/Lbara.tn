@@ -54,6 +54,8 @@ const api = {
 
   // Orders
   createOrder: (body) => apiFetch('/orders', { method: 'POST', body }),
+  getTicketQuote: (token) => apiFetch(`/ticket-quotes/${encodeURIComponent(token)}`),
+  checkoutTicketQuote: (token, body) => apiFetch(`/ticket-quotes/${encodeURIComponent(token)}/checkout`, { method: 'POST', body }),
   getOrder: (id) => apiFetch(`/orders/${id}`),
   myOrders: () => apiFetch('/orders/my'),
   reviewOrder: (id, body) => apiFetch(`/orders/${encodeURIComponent(id)}/review`, { method: 'POST', body }),

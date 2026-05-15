@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 const paymentService = require('../services/paymentService');
 const emailService = require('../services/emailService');
+const { consumePromoCode } = require('../services/promoService');
 const audit = require('../utils/audit');
 const { decrypt } = require('../utils/crypto');
 const {
@@ -88,6 +89,17 @@ async function markOrderPaidAndNotify(order, action) {
   if (order.status !== 'paid' && order.status !== 'fulfilled') {
     await pool.query(`UPDATE orders SET status = 'paid', updated_at = NOW() WHERE id = $1`, [order.id]);
     order.status = 'paid';
+    if (order.promo_code) {
+      await consumePromoCode(order.promo_code);
+    }
+    if (order.ticket_quote_id) {
+      await pool.query(
+        `UPDATE ticket_quotes
+         SET status = 'paid', final_order_id = $1, paid_at = NOW(), updated_at = NOW()
+         WHERE id = $2`,
+        [order.id, order.ticket_quote_id]
+      );
+    }
     await audit.log({ entityType: 'order', entityId: order.id, action, actorType: 'system' });
     console.log(`[INFO] Payment verified for order ${order.order_ref} (${order.id})`);
     await sendPaidOrderEmails(order);
@@ -220,9 +232,8 @@ async function webhookFlouci(req, res) {
     );
 
     if (verification.success && order.status === 'pending_payment') {
-      await pool.query(`UPDATE orders SET status = 'paid', updated_at = NOW() WHERE id = $1`, [order.id]);
-      await audit.log({ entityType: 'order', entityId: order.id, action: 'paid_via_webhook', actorType: 'system' });
-      console.log(`[INFO] Flouci webhook marked order ${order.order_ref} paid`);
+      const fullOrder = await loadOrderForPayment(order.id);
+      await markOrderPaidAndNotify(fullOrder || order, 'paid_via_webhook');
     }
     res.json({ success: true });
   } catch (err) {
@@ -252,9 +263,8 @@ async function webhookPaymee(req, res) {
     );
 
     if (payment_status === true && verification.success && order.status === 'pending_payment') {
-      await pool.query(`UPDATE orders SET status = 'paid', updated_at = NOW() WHERE id = $1`, [order.id]);
-      await audit.log({ entityType: 'order', entityId: order.id, action: 'paid_via_webhook', actorType: 'system' });
-      console.log(`[INFO] Paymee webhook marked order ${order.order_ref} paid`);
+      const fullOrder = await loadOrderForPayment(order.id);
+      await markOrderPaidAndNotify(fullOrder || order, 'paid_via_webhook');
     }
     res.json({ success: true });
   } catch (err) {

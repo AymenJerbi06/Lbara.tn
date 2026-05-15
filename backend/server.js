@@ -15,6 +15,7 @@ const adminRoutes = require('./src/routes/admin');
 const accountRoutes = require('./src/routes/account');
 const chatRoutes = require('./src/routes/chat');
 const promoRoutes = require('./src/routes/promos');
+const ticketQuoteRoutes = require('./src/routes/ticketQuotes');
 const { ensureRuntimeMigrations } = require('./src/config/migrations');
 const { apiLimiter } = require('./src/middleware/rateLimiter');
 
@@ -110,6 +111,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/promos', promoRoutes);
+app.use('/api/ticket-quotes', ticketQuoteRoutes);
 
 // ─── Catch-all: serve frontend for any non-API route ─────
 app.get('*', (req, res) => {

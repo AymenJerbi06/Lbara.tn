@@ -13,7 +13,9 @@ function decodeFulfillmentDetails(order) {
   order.fulfillment_type = type;
   order.fulfillment_type_label = getFulfillmentTypeLabel(type);
   order.fulfillment_method_label = getFulfillmentMethodLabel(order.fulfillment_method);
-  order.order_type = order.order_type || (order.variant_checkout_mode === 'quote' ? 'ticket' : 'service');
+  order.order_type = order.order_type || (
+    order.variant_checkout_mode === 'quote' && !order.ticket_quote_id ? 'ticket' : 'service'
+  );
 
   if (!order.fulfillment_details) {
     order.fulfillment_details = {};
@@ -55,9 +57,9 @@ async function listOrders(req, res) {
       return res.status(400).json({ success: false, message: 'Invalid order type filter.' });
     }
     if (type === 'ticket') {
-      whereParts.push(`v.checkout_mode = 'quote'`);
+      whereParts.push(`v.checkout_mode = 'quote' AND o.ticket_quote_id IS NULL`);
     } else {
-      whereParts.push(`COALESCE(v.checkout_mode, 'full_payment') <> 'quote'`);
+      whereParts.push(`(COALESCE(v.checkout_mode, 'full_payment') <> 'quote' OR o.ticket_quote_id IS NOT NULL)`);
     }
   }
 
@@ -71,7 +73,7 @@ async function listOrders(req, res) {
     const result = await pool.query(
       `SELECT o.*, p.name AS product_name, p.provider, p.fulfillment_type AS product_fulfillment_type,
               v.name AS variant_name, v.billing_period AS variant_billing_period, v.checkout_mode AS variant_checkout_mode,
-              CASE WHEN v.checkout_mode = 'quote' THEN 'ticket' ELSE 'service' END AS order_type,
+              CASE WHEN v.checkout_mode = 'quote' AND o.ticket_quote_id IS NULL THEN 'ticket' ELSE 'service' END AS order_type,
               u.email AS user_email
        FROM orders o
        JOIN products p ON p.id = o.product_id
@@ -121,17 +123,18 @@ async function fulfillOrder(req, res) {
     );
     const order = orderResult.rows[0];
     if (!order) return res.status(404).json({ success: false, message: 'Order not found.' });
-    const isTicket = order.variant_checkout_mode === 'quote';
-    if (!isTicket && order.status !== 'paid') {
+    const isRequestTicket = order.variant_checkout_mode === 'quote' && !order.ticket_quote_id;
+    const isTicketFinalOrder = Boolean(order.ticket_quote_id);
+    if (!isRequestTicket && order.status !== 'paid') {
       return res.status(400).json({ success: false, message: 'Can only fulfill paid service orders.' });
     }
-    if (isTicket && !['paid', 'processing'].includes(order.status)) {
+    if (isRequestTicket && !['paid', 'processing'].includes(order.status)) {
       return res.status(400).json({ success: false, message: 'Can only request details for paid request tickets.' });
     }
 
     const encryptedCreds = encrypt(credentials);
 
-    if (isTicket) {
+    if (isRequestTicket) {
       await pool.query(`UPDATE orders SET status = 'processing', updated_at = NOW() WHERE id = $1`, [id]);
       await pool.query(
         `INSERT INTO fulfillments (order_id, status, credentials, notes, fulfilled_by, delivered_at)
@@ -167,19 +170,51 @@ async function fulfillOrder(req, res) {
       [id, encryptedCreds, notes || null, req.user.id]
     );
 
-    await audit.log({ entityType: 'order', entityId: id, action: 'fulfilled', actorId: req.user.id, actorType: 'admin', metadata: { notes } });
+    await audit.log({
+      entityType: 'order',
+      entityId: id,
+      action: isTicketFinalOrder ? 'ticket_service_completed' : 'fulfilled',
+      actorId: req.user.id,
+      actorType: 'admin',
+      metadata: { notes },
+    });
+
+    if (isTicketFinalOrder) {
+      await pool.query(
+        `UPDATE ticket_quotes
+         SET status = 'fulfilled', updated_at = NOW()
+         WHERE id = $1`,
+        [order.ticket_quote_id]
+      );
+      await pool.query(
+        `UPDATE orders
+         SET status = 'fulfilled', updated_at = NOW()
+         WHERE id = (SELECT ticket_order_id FROM ticket_quotes WHERE id = $1)`,
+        [order.ticket_quote_id]
+      );
+    }
 
     // Send delivery email (with plain credentials — not encrypted)
     try {
-      await emailService.sendFulfillmentEmail(order, {
+      const product = {
         name: order.variant_name ? `${order.product_name} - ${order.variant_name}` : order.product_name,
         duration_label: order.variant_billing_period || order.duration_label,
-      }, credentials);
+      };
+      if (isTicketFinalOrder) {
+        await emailService.sendTicketCompletionEmail(order, product, credentials);
+      } else {
+        await emailService.sendFulfillmentEmail(order, product, credentials);
+      }
     } catch (emailErr) {
       console.error('[admin/fulfill email]', emailErr.message);
     }
 
-    res.json({ success: true, message: 'Order fulfilled and delivery email sent.' });
+    res.json({
+      success: true,
+      message: isTicketFinalOrder
+        ? 'Ticket service completed and confirmation email sent.'
+        : 'Order fulfilled and delivery email sent.',
+    });
   } catch (err) {
     console.error('[admin/fulfill]', err);
     res.status(500).json({ success: false, message: 'Fulfillment failed.' });
@@ -334,7 +369,11 @@ async function updateProduct(req, res) {
 
 async function listMessages(req, res) {
   try {
-    const result = await pool.query('SELECT * FROM contact_messages ORDER BY created_at DESC');
+    const result = await pool.query(
+      `SELECT *
+       FROM contact_messages
+       ORDER BY CASE WHEN category = 'ticket' THEN 0 ELSE 1 END, created_at DESC`
+    );
     res.json({ success: true, messages: result.rows });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to load messages.' });

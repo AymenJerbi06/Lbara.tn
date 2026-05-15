@@ -6,6 +6,7 @@ const {
   listProducts, createProduct, updateProduct,
   listMessages, stats,
 } = require('../controllers/adminController');
+const { createQuote } = require('../controllers/ticketQuoteController');
 const {
   listPromoCodes,
   createPromoCode,
@@ -20,6 +21,7 @@ router.get('/stats', stats);
 router.get('/orders', listOrders);
 router.put('/orders/:id/fulfill', fulfillOrder);
 router.put('/orders/:id/status', updateOrderStatus);
+router.post('/orders/:id/ticket-quote', createQuote);
 router.get('/products', listProducts);
 router.post('/products', createProduct);
 router.put('/products/:id', updateProduct);

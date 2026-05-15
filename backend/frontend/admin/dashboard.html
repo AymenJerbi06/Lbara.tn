@@ -164,6 +164,39 @@
   </div>
 
   <!-- ─── Products Tab ──────────────────────────────────── -->
+  <div id="ticket-quote-modal" style="display:none" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+    <div class="bg-white border-4 border-primary rounded-3xl p-8 w-full max-w-lg shadow-2xl">
+      <h2 class="font-headline text-xl font-black text-primary mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-accent">request_quote</span>
+        Send Final Checkout Link <span id="ticket-quote-order-ref" class="text-accent"></span>
+      </h2>
+      <div class="space-y-4">
+        <div class="bg-accent/10 border-2 border-accent/40 rounded-2xl p-4 text-sm font-bold text-primary/70">
+          This is for a paid request ticket after you review the exact service. The customer receives a private checkout link with your final price.
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Service to Charge For</label>
+          <input id="ticket-quote-title" class="w-full border-2 border-primary/20 rounded-xl px-4 py-3 font-bold text-primary placeholder:text-primary/30 focus:border-primary focus:ring-0" placeholder="Example: Coursera certificate for Course Name"/>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Final Price (TND)</label>
+          <input id="ticket-quote-amount" class="w-full border-2 border-primary/20 rounded-xl px-4 py-3 font-bold text-primary placeholder:text-primary/30 focus:border-primary focus:ring-0" type="number" min="0.001" step="0.001" placeholder="Example: 89.500"/>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Checkout Explanation</label>
+          <textarea id="ticket-quote-description" class="w-full border-2 border-primary/20 rounded-xl px-4 py-3 font-bold text-primary placeholder:text-primary/30 focus:border-primary focus:ring-0 h-28 resize-none" placeholder="Explain exactly what this final payment covers and what will happen after payment."></textarea>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button id="ticket-quote-cancel-btn" class="flex-1 border-2 border-primary/20 text-primary font-bold py-3 rounded-2xl hover:bg-primary/5">Cancel</button>
+        <button id="ticket-quote-submit-btn" class="flex-1 cartoon-button bg-primary text-white font-bold py-3 rounded-2xl">
+          <span class="material-symbols-outlined text-sm mr-1">send</span>
+          Send Link
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="content-products" style="display:none">
     <div class="flex items-center justify-between mb-8">
       <h1 class="font-headline text-3xl font-black text-primary">Products</h1>
@@ -395,9 +428,10 @@
         <span class="material-symbols-outlined text-accent">add_circle</span>
         Add Promo Code
       </h3>
-      <div class="grid grid-cols-1 md:grid-cols-[1fr_180px_140px] gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_160px_180px_140px] gap-3">
         <input id="promo-code-input" class="border-2 border-primary/20 rounded-xl px-4 py-3 text-sm font-bold text-primary focus:ring-0 focus:border-primary uppercase" placeholder="Code, e.g. FRIENDS20"/>
         <input id="promo-percent-input" class="border-2 border-primary/20 rounded-xl px-4 py-3 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="Discount %" type="number" min="0" max="100"/>
+        <input id="promo-max-uses-input" class="border-2 border-primary/20 rounded-xl px-4 py-3 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="Max uses (blank = no limit)" type="number" min="1" max="100000"/>
         <button id="create-promo-btn" class="cartoon-button bg-primary text-white font-bold px-5 py-3 rounded-xl flex items-center justify-center gap-2">
           <span class="material-symbols-outlined text-sm">save</span>
           Save
@@ -411,13 +445,14 @@
           <tr class="bg-primary/5 text-primary font-black uppercase text-xs tracking-wider">
             <th class="p-4 text-left">Code</th>
             <th class="p-4 text-left">Discount</th>
+            <th class="p-4 text-left">Usage / Capacity</th>
             <th class="p-4 text-left">Status</th>
             <th class="p-4 text-left">Created</th>
             <th class="p-4 text-left">Actions</th>
           </tr>
         </thead>
         <tbody id="promo-codes-tbody">
-          <tr><td colspan="5" class="text-center p-8 text-primary/40 font-bold">Loading promo codes...</td></tr>
+          <tr><td colspan="6" class="text-center p-8 text-primary/40 font-bold">Loading promo codes...</td></tr>
         </tbody>
       </table>
     </div>
@@ -430,6 +465,7 @@
 // ─── Admin Dashboard Logic ────────────────────────────────
 
 var fulfillOrderId = null;
+var ticketQuoteOrderId = null;
 var ordersMap = {};
 var productsMap = {};
 var promoCodesMap = {};
@@ -447,15 +483,23 @@ function fulfillmentTypeLabel(type) {
 }
 
 function isTicketOrder(order) {
-  return order && (order.order_type === 'ticket' || order.variant_checkout_mode === 'quote');
+  return order && (order.order_type === 'ticket' || (order.variant_checkout_mode === 'quote' && !order.ticket_quote_id));
+}
+
+function isTicketFinalOrder(order) {
+  return order && !!order.ticket_quote_id;
 }
 
 function orderTypeLabel(order) {
-  return isTicketOrder(order) ? 'Request Ticket' : 'Service Order';
+  if (isTicketOrder(order)) return 'Request Ticket';
+  if (isTicketFinalOrder(order)) return 'Custom Quote Order';
+  return 'Service Order';
 }
 
 function orderActionLabel(order) {
-  return isTicketOrder(order) ? 'Ask Details' : 'Fulfill';
+  if (isTicketOrder(order)) return 'Ask Details';
+  if (isTicketFinalOrder(order)) return 'Complete';
+  return 'Fulfill';
 }
 
 function formatFulfillmentDetails(o) {
@@ -668,6 +712,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Wire up fulfill modal buttons
     document.getElementById('fulfill-cancel-btn').addEventListener('click', function() { closeFulfillModal(); });
     document.getElementById('fulfill-submit-btn').addEventListener('click', function() { submitFulfillment(); });
+    document.getElementById('ticket-quote-cancel-btn').addEventListener('click', function() { closeTicketQuoteModal(); });
+    document.getElementById('ticket-quote-submit-btn').addEventListener('click', function() { submitTicketQuote(); });
     // Wire up edit modal buttons
     document.getElementById('edit-cancel-btn').addEventListener('click', function() { closeEditModal(); });
     document.getElementById('edit-save-btn').addEventListener('click', function() { saveEditProduct(); });
@@ -718,12 +764,15 @@ document.addEventListener('DOMContentLoaded', function() {
       var btn = e.target.closest('button[data-action]');
       if (!btn) return;
       if (btn.dataset.action === 'fulfill') openFulfillModal(btn.dataset.id, btn.dataset.ref);
+      if (btn.dataset.action === 'ticket-quote') openTicketQuoteModal(btn.dataset.id, btn.dataset.ref);
       if (btn.dataset.action === 'approve') updateStatus(btn.dataset.id, 'paid');
     });
     // Event delegation for recent orders list (Fulfill buttons)
     document.getElementById('recent-orders-list').addEventListener('click', function(e) {
-      var btn = e.target.closest('button[data-action="fulfill"]');
-      if (btn) openFulfillModal(btn.dataset.id, btn.dataset.ref);
+      var btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      if (btn.dataset.action === 'fulfill') openFulfillModal(btn.dataset.id, btn.dataset.ref);
+      if (btn.dataset.action === 'ticket-quote') openTicketQuoteModal(btn.dataset.id, btn.dataset.ref);
     });
     // Event delegation for products table (Edit / Toggle buttons)
     document.getElementById('products-tbody').addEventListener('click', function(e) {
@@ -743,6 +792,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePromoCode(btn.dataset.id, {
           code: row.querySelector('[data-promo-field="code"]').value,
           discount_percent: row.querySelector('[data-promo-field="discount_percent"]').value,
+          max_uses: row.querySelector('[data-promo-field="max_uses"]').value || null,
         });
       }
     });
@@ -798,7 +848,9 @@ async function loadOrders(status = '', type = '') {
     orders.forEach(function(o) { ordersMap[o.id] = o; });
     document.getElementById('orders-tbody').innerHTML = orders.length
       ? orders.map(o => {
-        var canAct = o.status === 'paid' || (isTicketOrder(o) && o.status === 'processing');
+        var canAskDetails = isTicketOrder(o) && (o.status === 'paid' || o.status === 'processing');
+        var canSendQuote = isTicketOrder(o) && (o.status === 'paid' || o.status === 'processing');
+        var canFulfill = !isTicketOrder(o) && o.status === 'paid';
         return `
           <tr class="border-t border-primary/5 hover:bg-primary/2">
             <td class="p-4 font-black text-primary text-xs">${escapeHtml(o.order_ref)}</td>
@@ -815,7 +867,11 @@ async function loadOrders(status = '', type = '') {
             <td class="p-4"><span class="status-pill status-${escapeAttr(o.status)}">${escapeHtml(String(o.status).replace(/_/g,' '))}</span></td>
             <td class="p-4 text-xs text-on-surface/50 font-bold">${new Date(o.created_at).toLocaleDateString()}</td>
             <td class="p-4">
-              ${canAct ? `<button data-action="fulfill" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">${escapeHtml(orderActionLabel(o))}</button>` : ''}
+              <div class="flex flex-wrap gap-2">
+                ${canAskDetails ? `<button data-action="fulfill" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">${escapeHtml(orderActionLabel(o))}</button>` : ''}
+                ${canSendQuote ? `<button data-action="ticket-quote" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-primary text-white font-bold px-3 py-1 rounded-lg text-xs">Send Quote</button>` : ''}
+                ${canFulfill ? `<button data-action="fulfill" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">${escapeHtml(orderActionLabel(o))}</button>` : ''}
+              </div>
               ${o.status === 'flagged' ? `<button data-action="approve" data-id="${escapeAttr(o.id)}" class="cartoon-button bg-primary text-white font-bold px-3 py-1 rounded-lg text-xs ml-1">Approve</button>` : ''}
             </td>
           </tr>`;
@@ -827,6 +883,15 @@ async function loadOrders(status = '', type = '') {
 }
 
 function renderOrderRow(o) {
+  var buttons = '';
+  if (isTicketOrder(o)) {
+    buttons = `
+      <button data-action="fulfill" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">${escapeHtml(orderActionLabel(o))}</button>
+      <button data-action="ticket-quote" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-primary text-white font-bold px-3 py-1 rounded-lg text-xs">Send Quote</button>
+    `;
+  } else {
+    buttons = `<button data-action="fulfill" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">${escapeHtml(orderActionLabel(o))}</button>`;
+  }
   return `<div class="flex items-center justify-between p-4 bg-primary/3 rounded-xl border border-primary/10">
     <div>
       <span class="font-black text-primary text-sm">${escapeHtml(o.order_ref)}</span>
@@ -837,7 +902,7 @@ function renderOrderRow(o) {
     </div>
     <div class="flex items-center gap-3">
       <span class="font-black text-primary">${parseFloat(o.amount_tnd).toFixed(3)} TND</span>
-      <button data-action="fulfill" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">${escapeHtml(orderActionLabel(o))}</button>
+      ${buttons}
     </div>
   </div>`;
 }
@@ -846,22 +911,31 @@ function openFulfillModal(orderId, orderRef) {
   fulfillOrderId = orderId;
   var order = ordersMap[orderId] || {};
   var isTicket = isTicketOrder(order);
+  var isTicketFinal = isTicketFinalOrder(order);
   document.getElementById('modal-order-ref').textContent = '#' + orderRef;
   document.getElementById('fulfill-credentials').value = '';
   document.getElementById('fulfill-notes').value = '';
   document.getElementById('fulfill-customer-details').innerHTML = formatFulfillmentDetails(order);
-  document.getElementById('fulfill-modal-title').textContent = isTicket ? 'Handle Request Ticket' : 'Fulfill Order';
-  document.getElementById('fulfill-primary-label').textContent = isTicket ? 'Follow-up Request to Customer' : 'Credentials / Access Details';
+  document.getElementById('fulfill-modal-title').textContent = isTicket
+    ? 'Handle Request Ticket'
+    : (isTicketFinal ? 'Complete Ticket Service' : 'Fulfill Order');
+  document.getElementById('fulfill-primary-label').textContent = isTicket
+    ? 'Follow-up Request to Customer'
+    : (isTicketFinal ? 'Completion Message' : 'Credentials / Access Details');
   document.getElementById('fulfill-credentials').placeholder = isTicket
     ? 'Example: Please reply with the exact course/book/app name, link if available, the account email you want us to use, and any access details needed to check the final price.'
-    : 'Email: user@example.com\nPassword: xxxxx\nOr: activation code';
+    : (isTicketFinal
+      ? 'Example: Everything is done. You can log back into your account, confirm the service is active, then change your password.'
+      : 'Email: user@example.com\nPassword: xxxxx\nOr: activation code');
   document.getElementById('fulfill-primary-help').textContent = isTicket
     ? 'This emails the customer for extra details and keeps the ticket in Processing. It does not mark the ticket fulfilled.'
-    : 'This will mark the order fulfilled and send the access details to the customer.';
+    : (isTicketFinal
+      ? 'This marks the final quote order and original request ticket fulfilled, then emails a completion confirmation.'
+      : 'This will mark the order fulfilled and send the access details to the customer.');
   document.getElementById('fulfill-notes').placeholder = isTicket
     ? 'Internal notes about final quote, needed credentials, or next step...'
-    : 'Internal notes...';
-  document.getElementById('fulfill-submit-label').textContent = isTicket ? 'Send Follow-up' : 'Send to Customer';
+    : (isTicketFinal ? 'Internal notes about the completed activation...' : 'Internal notes...');
+  document.getElementById('fulfill-submit-label').textContent = isTicket ? 'Send Follow-up' : (isTicketFinal ? 'Complete Ticket' : 'Send to Customer');
   document.getElementById('fulfill-modal').style.display = 'flex';
 }
 
@@ -870,20 +944,66 @@ function closeFulfillModal() {
   fulfillOrderId = null;
 }
 
+function openTicketQuoteModal(orderId, orderRef) {
+  ticketQuoteOrderId = orderId;
+  var order = ordersMap[orderId] || {};
+  document.getElementById('ticket-quote-order-ref').textContent = '#' + orderRef;
+  document.getElementById('ticket-quote-title').value = order.variant_name
+    ? `${order.product_name} - ${order.variant_name}`
+    : (order.product_name || '');
+  document.getElementById('ticket-quote-amount').value = '';
+  document.getElementById('ticket-quote-description').value = '';
+  document.getElementById('ticket-quote-modal').style.display = 'flex';
+}
+
+function closeTicketQuoteModal() {
+  document.getElementById('ticket-quote-modal').style.display = 'none';
+  ticketQuoteOrderId = null;
+}
+
+async function submitTicketQuote() {
+  const serviceTitle = document.getElementById('ticket-quote-title').value.trim();
+  const amount = document.getElementById('ticket-quote-amount').value.trim();
+  const description = document.getElementById('ticket-quote-description').value.trim();
+  if (!serviceTitle || !amount || !description) {
+    showToast('Service, final price, and explanation are required.', 'error');
+    return;
+  }
+  try {
+    const result = await apiFetchAdmin(`/admin/orders/${ticketQuoteOrderId}/ticket-quote`, {
+      method: 'POST',
+      body: {
+        service_title: serviceTitle,
+        amount_tnd: amount,
+        description,
+      },
+    });
+    closeTicketQuoteModal();
+    showToast('Final checkout link sent to the customer.');
+    if (result.checkout_url && navigator.clipboard) {
+      navigator.clipboard.writeText(result.checkout_url).catch(function() {});
+    }
+    loadOrders(document.getElementById('orders-filter').value, document.getElementById('orders-type-filter').value);
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
 async function submitFulfillment() {
   const credentials = document.getElementById('fulfill-credentials').value.trim();
   const notes = document.getElementById('fulfill-notes').value.trim();
   const order = ordersMap[fulfillOrderId] || {};
   const isTicket = isTicketOrder(order);
+  const isTicketFinal = isTicketFinalOrder(order);
   if (!credentials) {
-    showToast(isTicket ? 'Write the follow-up request before sending.' : 'Credentials are required.', 'error');
+    showToast(isTicket ? 'Write the follow-up request before sending.' : (isTicketFinal ? 'Write the completion message before sending.' : 'Credentials are required.'), 'error');
     return;
   }
   try {
     await apiFetchAdmin(`/admin/orders/${fulfillOrderId}/fulfill`, {
       method: 'PUT', body: { credentials, notes }
     });
-    showToast(isTicket ? 'Follow-up request sent to customer.' : 'Order fulfilled! Email sent to customer.');
+    showToast(isTicket ? 'Follow-up request sent to customer.' : (isTicketFinal ? 'Ticket service completed! Email sent to customer.' : 'Order fulfilled! Email sent to customer.'));
     closeFulfillModal();
     loadOrders(document.getElementById('orders-filter').value, document.getElementById('orders-type-filter').value);
   } catch (err) {
@@ -1108,6 +1228,7 @@ async function loadMessages() {
               <span class="ml-3 text-xs font-black text-primary/50 uppercase">#${escapeHtml(m.reference || String(m.id || '').split('-')[0].toUpperCase())}</span>
               <a class="ml-3 text-sm font-bold text-on-surface/50 hover:text-primary" href="mailto:${escapeHtml(m.email)}">${escapeHtml(m.email)}</a>
               ${m.category ? `<span class="ml-3 text-xs font-black text-accent uppercase">${escapeHtml(m.category)}</span>` : ''}
+              ${m.ticket_reference ? `<span class="ml-3 text-xs font-black text-secondary uppercase">Ticket ${escapeHtml(m.ticket_reference)}</span>` : ''}
               <span class="ml-3 text-xs font-black text-secondary uppercase">${escapeHtml(m.status || 'open')}</span>
             </div>
             <span class="text-xs font-bold text-on-surface/40">${new Date(m.created_at).toLocaleString()}</span>
@@ -1141,6 +1262,12 @@ async function loadPromoCodes() {
               </div>
             </td>
             <td class="p-4">
+              <div class="flex flex-col gap-2">
+                <span class="text-xs font-black text-primary">${Number(promo.usage_count || 0)} / ${promo.max_uses || 'Unlimited'}</span>
+                <input data-promo-field="max_uses" value="${escapeAttr(promo.max_uses || '')}" type="number" min="1" max="100000" class="w-36 border-2 border-primary/20 rounded-xl px-3 py-2 text-xs font-black text-primary focus:ring-0 focus:border-primary" placeholder="No limit"/>
+              </div>
+            </td>
+            <td class="p-4">
               <span class="status-pill ${promo.active ? 'status-fulfilled' : 'status-cancelled'}">${promo.active ? 'Active' : 'Inactive'}</span>
             </td>
             <td class="p-4 text-xs text-on-surface/50 font-bold">${new Date(promo.created_at).toLocaleDateString()}</td>
@@ -1151,26 +1278,29 @@ async function loadPromoCodes() {
             </td>
           </tr>`;
       }).join('')
-      : '<tr><td colspan="5" class="text-center p-8 text-primary/40 font-bold">No promo codes yet.</td></tr>';
+      : '<tr><td colspan="6" class="text-center p-8 text-primary/40 font-bold">No promo codes yet.</td></tr>';
   } catch (err) {
-    document.getElementById('promo-codes-tbody').innerHTML = `<tr><td colspan="5" class="text-center p-4 text-red-500 font-bold">${escapeHtml(err.message)}</td></tr>`;
+    document.getElementById('promo-codes-tbody').innerHTML = `<tr><td colspan="6" class="text-center p-4 text-red-500 font-bold">${escapeHtml(err.message)}</td></tr>`;
   }
 }
 
 async function createPromoCode() {
   const codeInput = document.getElementById('promo-code-input');
   const percentInput = document.getElementById('promo-percent-input');
+  const maxUsesInput = document.getElementById('promo-max-uses-input');
   const code = codeInput.value.trim().toUpperCase();
   const discount = percentInput.value;
+  const maxUses = maxUsesInput.value;
   if (!code) { showToast('Promo code is required.', 'error'); return; }
 
   try {
     await apiFetchAdmin('/admin/promo-codes', {
       method: 'POST',
-      body: { code, discount_percent: discount, active: true },
+      body: { code, discount_percent: discount, max_uses: maxUses || null, active: true },
     });
     codeInput.value = '';
     percentInput.value = '';
+    maxUsesInput.value = '';
     showToast('Promo code created.');
     loadPromoCodes();
   } catch (err) {

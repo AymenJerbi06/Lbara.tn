@@ -175,18 +175,19 @@
               <div>
                 <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Category</label>
                 <select id="contact-category" class="cartoon-input">
-                  <option value="">Select a category</option>
-                  <option value="general">General</option>
-                  <option value="sales">Sales</option>
-                  <option value="technical">Technical</option>
-                  <option value="billing">Billing / Refund</option>
-                  <option value="feedback">Feedback</option>
+                  <option value="other">Other contact</option>
+                  <option value="ticket">Ticket / request follow-up</option>
                 </select>
               </div>
               <div>
                 <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Subject</label>
                 <input id="contact-subject" class="cartoon-input" placeholder="Brief subject" type="text"/>
               </div>
+            </div>
+            <div id="ticket-reference-wrap" class="hidden bg-primary/5 border-2 border-primary/10 rounded-2xl p-4">
+              <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Ticket Reference *</label>
+              <input id="contact-ticket-reference" class="cartoon-input" placeholder="Example: LB-12345" type="text"/>
+              <p class="text-xs font-bold text-primary/50 mt-2">Use this only for a ticket or quote you already paid for. Ticket messages get priority because they are linked to your existing request.</p>
             </div>
             <div>
               <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Message *</label>

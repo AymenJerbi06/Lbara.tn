@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const nameEl = document.getElementById('contact-name');
   const emailEl = document.getElementById('contact-email');
   const categoryEl = document.getElementById('contact-category');
+  const ticketReferenceWrap = document.getElementById('ticket-reference-wrap');
+  const ticketReferenceEl = document.getElementById('contact-ticket-reference');
   const subjectEl = document.getElementById('contact-subject');
   const messageEl = document.getElementById('contact-message');
 
@@ -45,6 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function syncTicketReferenceField() {
+    const isTicket = categoryEl?.value === 'ticket';
+    if (ticketReferenceWrap) ticketReferenceWrap.classList.toggle('hidden', !isTicket);
+    if (ticketReferenceEl) ticketReferenceEl.required = isTicket;
+  }
+
   async function loadAccount() {
     try {
       const res = await api.me();
@@ -68,6 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const requestedService = params.get('service')?.trim();
   const requestedCategory = params.get('category')?.trim();
+  const requestedTicketRef = (params.get('ticket_ref') || params.get('order_ref') || '').trim();
+  const requestedSubject = params.get('subject')?.trim();
+  if (requestedSubject && subjectEl && !subjectEl.value) {
+    subjectEl.value = requestedSubject;
+  }
   if (requestedService || requestedCategory === 'request_service') {
     if (serviceNote) serviceNote.scrollIntoView({ behavior: 'smooth', block: 'center' });
     if (subjectEl && !subjectEl.value) subjectEl.value = 'Question about request-ticket path';
@@ -75,7 +88,16 @@ document.addEventListener('DOMContentLoaded', () => {
       messageEl.value = `I was looking for ${requestedService}. I understand missing services must go through the paid request-ticket path, not this support form.`;
     }
   } else if (requestedCategory && categoryEl) {
-    categoryEl.value = requestedCategory;
+    categoryEl.value = requestedCategory === 'ticket' ? 'ticket' : 'other';
+  }
+  if (requestedTicketRef) {
+    if (categoryEl) categoryEl.value = 'ticket';
+    if (ticketReferenceEl) ticketReferenceEl.value = requestedTicketRef;
+  }
+  syncTicketReferenceField();
+
+  if (categoryEl) {
+    categoryEl.addEventListener('change', syncTicketReferenceField);
   }
 
   form.addEventListener('submit', async (e) => {
@@ -91,11 +113,16 @@ document.addEventListener('DOMContentLoaded', () => {
       email: accountUser.email,
       subject: subjectEl?.value.trim(),
       category: categoryEl?.value,
+      ticket_reference: ticketReferenceEl?.value.trim(),
       message: messageEl?.value.trim(),
     };
 
     if (!body.full_name || !body.email || !body.message) {
       setError('Please fill in all required fields.');
+      return;
+    }
+    if (body.category === 'ticket' && !body.ticket_reference) {
+      setError('Please enter the ticket reference so we can prioritize the right request.');
       return;
     }
 
@@ -106,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await api.sendContact(body);
       form.reset();
+      syncTicketReferenceField();
       if (nameEl) nameEl.value = accountUser.full_name || accountUser.email.split('@')[0];
       if (emailEl) emailEl.value = accountUser.email;
       setSuccess(res.reference);

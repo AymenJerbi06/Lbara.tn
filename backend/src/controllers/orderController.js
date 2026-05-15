@@ -3,6 +3,7 @@ const audit = require('../utils/audit');
 const { generateOrderRef } = require('../utils/orderRef');
 const emailService = require('../services/emailService');
 const paymentService = require('../services/paymentService');
+const { validatePromoForAmount } = require('../services/promoService');
 const { encrypt } = require('../utils/crypto');
 const { normalizeFulfillmentForOrder } = require('../utils/fulfillment');
 const {
@@ -103,20 +104,12 @@ async function create(req, res) {
     let appliedPromoCode = null;
 
     if (promo_code) {
-      const promoResult = await pool.query(
-        `SELECT code, discount_percent
-         FROM promo_codes
-         WHERE UPPER(code) = UPPER($1) AND active = TRUE
-         LIMIT 1`,
-        [promo_code]
-      );
-      const promo = promoResult.rows[0];
+      const promo = await validatePromoForAmount(promo_code, amount);
       if (!promo) {
         return res.status(400).json({ success: false, message: 'Invalid promo code.' });
       }
-      const discountPercent = Number(promo.discount_percent);
-      discount = parseFloat((amount * (discountPercent / 100)).toFixed(3));
-      amount = parseFloat(Math.max(0, amount - discount).toFixed(3));
+      discount = Number(promo.discount_tnd || 0);
+      amount = Number(promo.total_tnd);
       appliedPromoCode = promo.code;
     }
 

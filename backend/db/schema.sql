@@ -95,10 +95,31 @@ CREATE TABLE IF NOT EXISTS promo_codes (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code              VARCHAR(50) UNIQUE NOT NULL,
   discount_percent  INTEGER NOT NULL CHECK (discount_percent BETWEEN 0 AND 100),
+  usage_count       INTEGER DEFAULT 0,
+  max_uses          INTEGER CHECK (max_uses IS NULL OR max_uses > 0),
   active            BOOLEAN DEFAULT TRUE,
   created_at        TIMESTAMPTZ DEFAULT NOW(),
   updated_at        TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS ticket_quotes (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  quote_ref       VARCHAR(20) UNIQUE NOT NULL,
+  ticket_order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
+  final_order_id  UUID REFERENCES orders(id) ON DELETE SET NULL,
+  token           VARCHAR(96) UNIQUE NOT NULL,
+  service_title   VARCHAR(255) NOT NULL,
+  description     TEXT,
+  amount_tnd      NUMERIC(10, 3) NOT NULL,
+  status          VARCHAR(30) DEFAULT 'sent',
+  created_by      UUID REFERENCES users(id) ON DELETE SET NULL,
+  sent_at         TIMESTAMPTZ,
+  paid_at         TIMESTAMPTZ,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS ticket_quote_id UUID REFERENCES ticket_quotes(id) ON DELETE SET NULL;
 
 -- ─── Fulfillments ─────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS fulfillments (
@@ -121,6 +142,7 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   email       VARCHAR(255) NOT NULL,
   subject     VARCHAR(255),
   category    VARCHAR(100),
+  ticket_reference VARCHAR(30),
   message     TEXT NOT NULL,
   status      VARCHAR(30) DEFAULT 'open',  -- open | in_progress | resolved
   created_at  TIMESTAMPTZ DEFAULT NOW()
@@ -149,6 +171,10 @@ CREATE INDEX IF NOT EXISTS idx_products_active ON products(active);
 CREATE INDEX IF NOT EXISTS idx_product_variants_product_id ON product_variants(product_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
 CREATE INDEX IF NOT EXISTS idx_promo_codes_code ON promo_codes(UPPER(code));
+CREATE INDEX IF NOT EXISTS idx_ticket_quotes_token ON ticket_quotes(token);
+CREATE INDEX IF NOT EXISTS idx_ticket_quotes_ticket_order_id ON ticket_quotes(ticket_order_id);
+CREATE INDEX IF NOT EXISTS idx_ticket_quotes_final_order_id ON ticket_quotes(final_order_id);
+CREATE INDEX IF NOT EXISTS idx_contact_messages_ticket_reference ON contact_messages(UPPER(ticket_reference));
 
 -- User engagement
 CREATE TABLE IF NOT EXISTS wishlist_items (
