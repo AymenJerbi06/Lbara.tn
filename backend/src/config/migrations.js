@@ -103,6 +103,9 @@ async function ensureRuntimeMigrations() {
     CREATE INDEX IF NOT EXISTS idx_ticket_quotes_token ON ticket_quotes(token);
     CREATE INDEX IF NOT EXISTS idx_ticket_quotes_ticket_order_id ON ticket_quotes(ticket_order_id);
     CREATE INDEX IF NOT EXISTS idx_ticket_quotes_final_order_id ON ticket_quotes(final_order_id);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_ticket_quotes_open_ticket_order_id
+      ON ticket_quotes(ticket_order_id)
+      WHERE status IN ('sent', 'paid');
 
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS variant_id UUID REFERENCES product_variants(id);
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS ticket_quote_id UUID REFERENCES ticket_quotes(id) ON DELETE SET NULL;

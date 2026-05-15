@@ -61,6 +61,26 @@ async function createQuote(req, res) {
       return res.status(400).json({ success: false, message: 'The request ticket must be paid before sending a quote link.' });
     }
 
+    const existingQuoteResult = await pool.query(
+      `SELECT quote_ref, token, status
+       FROM ticket_quotes
+       WHERE ticket_order_id = $1 AND status IN ('sent', 'paid')
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [ticket.id]
+    );
+    const existingQuote = existingQuoteResult.rows[0];
+    if (existingQuote) {
+      return res.status(409).json({
+        success: false,
+        message: existingQuote.status === 'paid'
+          ? 'This ticket already has a paid final quote.'
+          : 'This ticket already has an active checkout link.',
+        quote_ref: existingQuote.quote_ref,
+        checkout_url: frontendUrl(`/ticket-checkout.html?token=${encodeURIComponent(existingQuote.token)}`),
+      });
+    }
+
     let quote;
     for (let attempt = 0; attempt < 5; attempt += 1) {
       try {
@@ -73,7 +93,13 @@ async function createQuote(req, res) {
         quote = result.rows[0];
         break;
       } catch (err) {
-        if (err.code !== '23505') throw err;
+        if (err.code === '23505') {
+          if (err.constraint === 'idx_ticket_quotes_open_ticket_order_id') {
+            return res.status(409).json({ success: false, message: 'This ticket already has an active checkout link.' });
+          }
+          continue;
+        }
+        throw err;
       }
     }
     if (!quote) throw new Error('Could not generate a unique quote link.');

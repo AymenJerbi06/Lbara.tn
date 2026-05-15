@@ -133,20 +133,31 @@ async function updatePromoCode(req, res) {
     const result = await pool.query(
       `UPDATE promo_codes
        SET ${updates.join(', ')},
-           usage_count = CASE
-             WHEN $${values.length + 1}::boolean = TRUE
-              AND max_uses IS NOT NULL
-              AND COALESCE(usage_count, 0) >= max_uses
-             THEN 0
-             ELSE usage_count
-           END,
            updated_at = NOW()
        WHERE id = $${values.length}
        RETURNING id, code, discount_percent, active, usage_count, max_uses, created_at, updated_at`,
-      [...values, req.body.active === true]
+      values
     );
-    if (!result.rows[0]) return res.status(404).json({ success: false, message: 'Promo code not found.' });
-    res.json({ success: true, promo_code: result.rows[0] });
+    let promo = result.rows[0];
+    if (!promo) return res.status(404).json({ success: false, message: 'Promo code not found.' });
+
+    const usageCount = Number(promo.usage_count || 0);
+    const maxUses = promo.max_uses === null || promo.max_uses === undefined ? null : Number(promo.max_uses);
+    if (promo.active && maxUses !== null && usageCount >= maxUses) {
+      const resetOnReactivate = req.body.active === true;
+      const adjusted = await pool.query(
+        `UPDATE promo_codes
+         SET usage_count = CASE WHEN $2::boolean THEN 0 ELSE usage_count END,
+             active = $2::boolean,
+             updated_at = NOW()
+         WHERE id = $1
+         RETURNING id, code, discount_percent, active, usage_count, max_uses, created_at, updated_at`,
+        [promoId, resetOnReactivate]
+      );
+      promo = adjusted.rows[0] || promo;
+    }
+
+    res.json({ success: true, promo_code: promo });
   } catch (err) {
     if (handleValidationError(err, res)) return;
     if (err.code === '23505') {

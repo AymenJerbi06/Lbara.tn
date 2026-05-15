@@ -174,6 +174,9 @@ CREATE INDEX IF NOT EXISTS idx_promo_codes_code ON promo_codes(UPPER(code));
 CREATE INDEX IF NOT EXISTS idx_ticket_quotes_token ON ticket_quotes(token);
 CREATE INDEX IF NOT EXISTS idx_ticket_quotes_ticket_order_id ON ticket_quotes(ticket_order_id);
 CREATE INDEX IF NOT EXISTS idx_ticket_quotes_final_order_id ON ticket_quotes(final_order_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ticket_quotes_open_ticket_order_id
+  ON ticket_quotes(ticket_order_id)
+  WHERE status IN ('sent', 'paid');
 CREATE INDEX IF NOT EXISTS idx_contact_messages_ticket_reference ON contact_messages(UPPER(ticket_reference));
 
 -- User engagement
