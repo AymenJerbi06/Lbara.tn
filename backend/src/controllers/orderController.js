@@ -11,6 +11,7 @@ const {
   cleanString,
   cleanUuid,
   cleanPhone,
+  cleanEnum,
   cleanInteger,
   badRequest,
   handleValidationError,
@@ -26,6 +27,7 @@ async function create(req, res) {
       'delivery_email',
       'delivery_phone',
       'promo_code',
+      'payment_method',
       'fulfillment_method',
       'fulfillment_details',
     ], 'Checkout');
@@ -35,6 +37,7 @@ async function create(req, res) {
     const delivery_email = cleanEmail(req.body.delivery_email, { label: 'Delivery email' });
     const delivery_phone = cleanPhone(req.body.delivery_phone);
     const promo_code = cleanString(req.body.promo_code, { label: 'Promo code', required: false, max: 50 });
+    const payment_method = cleanEnum(req.body.payment_method || 'd17', ['d17', 'card'], { label: 'Payment method' });
     const fulfillment_method = cleanString(req.body.fulfillment_method, { label: 'Fulfillment method', required: false, max: 80 });
     if (req.body.fulfillment_details !== undefined && (typeof req.body.fulfillment_details !== 'object' || Array.isArray(req.body.fulfillment_details))) {
       throw badRequest('Fulfillment details must be an object.');
@@ -97,15 +100,28 @@ async function create(req, res) {
     }
 
     let discount = 0;
+    let appliedPromoCode = null;
 
-    // Basic promo code logic (extend as needed)
-    if (promo_code && promo_code.toUpperCase() === 'LBARA10') {
-      discount = parseFloat((amount * 0.10).toFixed(3));
-      amount = parseFloat((amount - discount).toFixed(3));
+    if (promo_code) {
+      const promoResult = await pool.query(
+        `SELECT code, discount_percent
+         FROM promo_codes
+         WHERE UPPER(code) = UPPER($1) AND active = TRUE
+         LIMIT 1`,
+        [promo_code]
+      );
+      const promo = promoResult.rows[0];
+      if (!promo) {
+        return res.status(400).json({ success: false, message: 'Invalid promo code.' });
+      }
+      const discountPercent = Number(promo.discount_percent);
+      discount = parseFloat((amount * (discountPercent / 100)).toFixed(3));
+      amount = parseFloat(Math.max(0, amount - discount).toFixed(3));
+      appliedPromoCode = promo.code;
     }
 
     const orderRef = generateOrderRef();
-    const gateway = process.env.PAYMENT_GATEWAY || 'flouci';
+    const gateway = payment_method === 'card' || amount <= 0 ? 'mock' : (process.env.PAYMENT_GATEWAY || 'flouci');
 
     const orderResult = await pool.query(
       `INSERT INTO orders (order_ref, user_id, product_id, variant_id, amount_tnd, gateway, delivery_email, delivery_phone, fulfillment_type, fulfillment_method, fulfillment_details, promo_code, discount_tnd, ip_address, user_agent)
@@ -123,7 +139,7 @@ async function create(req, res) {
         fulfillment.fulfillment_type,
         fulfillment.fulfillment_method,
         encryptedFulfillmentDetails,
-        promo_code,
+        appliedPromoCode,
         discount,
         req.ip,
         req.headers['user-agent'],
@@ -160,6 +176,7 @@ async function create(req, res) {
         product: product.name,
         variant: variant?.name || null,
         checkout_mode: variant?.checkout_mode || 'full_payment',
+        payment_method,
       },
     });
 

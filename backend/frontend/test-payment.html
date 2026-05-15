@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Test Card Payment - Lbara.tn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: { "primary": "#003060", "secondary": "#005F4B", "accent": "#B8860B", "on-surface": "#1A202C" },
+        fontFamily: { "headline": ["Quicksand", "sans-serif"], "body": ["Nunito", "sans-serif"] },
+        borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer base { body { @apply bg-white text-on-surface font-body; } }
+  .vibrant-gradient { background: linear-gradient(135deg, #001F3F 0%, #000C1A 100%); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .cartoon-card { @apply bg-white border-4 border-primary shadow-[8px_8px_0px_0px_#003060] transition-all; }
+  .cartoon-button { @apply border-2 border-primary shadow-[4px_4px_0px_0px_#003060] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none; }
+  .input-cartoon { @apply w-full border-2 border-primary/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-0 transition-all font-bold text-primary placeholder:text-primary/30; }
+</style>
+<link href="/css/mobile.css" rel="stylesheet"/>
+</head>
+<body class="selection:bg-primary/30 selection:text-primary">
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b-2 border-primary/10">
+  <div class="flex justify-between items-center w-full px-4 lg:px-8 py-4 max-w-screen-2xl mx-auto">
+    <a href="/shop.html" class="text-2xl lg:text-3xl font-bold tracking-tight text-primary font-headline flex-shrink-0">Lbara.tn</a>
+    <a href="/checkout.html" class="cartoon-button bg-white text-primary font-black px-5 py-2 rounded-full flex items-center gap-2">
+      <span class="material-symbols-outlined text-lg">arrow_back</span>
+      Checkout
+    </a>
+  </div>
+</nav>
+
+<main class="vibrant-gradient min-h-screen pt-32 pb-24 px-6">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-10">
+      <p class="text-accent font-black uppercase tracking-[0.22em] text-xs mb-3">Testing portal</p>
+      <h1 class="font-headline text-4xl md:text-5xl font-black text-white mb-4">Bank Card Payment</h1>
+      <p class="text-white/70 font-bold">This is a test-only card portal. No real charge is made.</p>
+    </div>
+
+    <div class="cartoon-card rounded-3xl overflow-hidden">
+      <div class="bg-primary p-6 text-white flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs font-black text-white/50 uppercase tracking-widest">Amount</p>
+          <p class="font-headline text-3xl font-black"><span id="payment-amount">0.000</span> TND</p>
+        </div>
+        <span class="material-symbols-outlined text-accent text-5xl">credit_card</span>
+      </div>
+
+      <form id="test-card-form" class="p-6 md:p-8 space-y-5">
+        <div class="bg-accent/10 border-2 border-accent/20 rounded-2xl p-4 text-sm font-bold text-primary/70">
+          Use card number <strong>4242 4242 4242 4242</strong>, expiry <strong>12/30</strong>, and CVC <strong>123</strong>.
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Cardholder Name</label>
+          <input id="cardholder-name" class="input-cartoon" value="Lbara Test Customer" autocomplete="cc-name"/>
+        </div>
+        <div>
+          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Card Number</label>
+          <input id="card-number" class="input-cartoon" value="4242 4242 4242 4242" inputmode="numeric" autocomplete="cc-number"/>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Expiry</label>
+            <input id="card-expiry" class="input-cartoon" value="12/30" inputmode="numeric" autocomplete="cc-exp"/>
+          </div>
+          <div>
+            <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">CVC</label>
+            <input id="card-cvc" class="input-cartoon" value="123" inputmode="numeric" autocomplete="cc-csc"/>
+          </div>
+        </div>
+
+        <div id="payment-error" class="hidden rounded-2xl border-2 border-red-300 bg-red-50 p-4 text-sm font-black text-red-700"></div>
+
+        <button id="pay-now-btn" class="w-full cartoon-button bg-primary text-white font-black py-5 rounded-2xl text-xl flex items-center justify-center gap-3">
+          <span class="material-symbols-outlined">lock_open</span>
+          Pay Test Order
+        </button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/test-payment.js"></script>
+</body>
+</html>

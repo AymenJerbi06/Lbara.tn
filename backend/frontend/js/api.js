@@ -57,9 +57,11 @@ const api = {
   getOrder: (id) => apiFetch(`/orders/${id}`),
   myOrders: () => apiFetch('/orders/my'),
   reviewOrder: (id, body) => apiFetch(`/orders/${encodeURIComponent(id)}/review`, { method: 'POST', body }),
+  validatePromoCode: (body) => apiFetch('/promos/validate', { method: 'POST', body }),
 
   // Payments
   verifyPayment: (orderId) => apiFetch(`/payments/verify/${orderId}`),
+  submitTestCardPayment: (orderId, body) => apiFetch(`/payments/test-card/${encodeURIComponent(orderId)}`, { method: 'POST', body }),
 
   // Contact
   sendContact: (body) => apiFetch('/contact', { method: 'POST', body }),

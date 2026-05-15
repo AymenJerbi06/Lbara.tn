@@ -82,13 +82,65 @@ async function sendEmailVerificationOTP(email, otp) {
   });
 }
 
+function money(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number.toFixed(3) : String(value || '0.000');
+}
+
+function tableRow(label, value, color = '#003060') {
+  return `<tr><td style="padding: 8px 0; color: #666; font-size: 14px;">${escapeHtml(label)}</td><td style="padding: 8px 0; font-weight: bold; color: ${color};">${escapeHtml(value || '-')}</td></tr>`;
+}
+
+function fulfillmentNextStep(order, product) {
+  if (product.checkout_mode === 'quote') {
+    return 'This is a special request ticket. We will review the exact service, then contact you with the final price before completing the purchase.';
+  }
+
+  const method = order.fulfillment_method;
+  if (method === 'gift_card_self_redeem') {
+    return 'We will send the code or gift card with the redemption steps. Some services may require the correct account region or VPN during redemption.';
+  }
+  if (method === 'gift_to_existing_account') {
+    return 'We will gift or activate the subscription on the service account email you provided. Watch that inbox for any confirmation email from the service.';
+  }
+  if (method === 'create_account') {
+    return 'We will create and activate a fresh account using the email you provided, then send the account details after processing.';
+  }
+  if (method === 'store_credit') {
+    return 'We will prepare the store credit path you selected. Store region rules may apply, especially for Apple App Store and Google Play.';
+  }
+  return 'We will use the activation details you provided to complete the service on the correct account. Stay reachable in case the platform asks for verification.';
+}
+
+function fulfillmentDetailsTable(details = {}) {
+  const labels = {
+    service_account_email: 'Service account email',
+    service_account_password: 'Service account password',
+    new_account_email: 'New account email',
+    account_full_name: 'Name on account',
+    store_platform: 'Store platform',
+    store_account_email: 'Store account email',
+    store_region: 'Store region',
+    customer_notes: 'Customer notes',
+  };
+
+  const rows = Object.entries(details)
+    .filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== '')
+    .map(([key, value]) => {
+      const label = labels[key] || key.replace(/_/g, ' ');
+      const displayValue = key.toLowerCase().includes('password')
+        ? 'Available securely in the admin dashboard'
+        : value;
+      return tableRow(label, displayValue);
+    })
+    .join('');
+
+  return rows || tableRow('Checkout details', 'No extra details were submitted.');
+}
+
 async function sendOrderConfirmation(order, product) {
   const safeOrderRef = escapeHtml(order.order_ref);
-  const safeProductName = escapeHtml(product.name);
-  const safeDuration = escapeHtml(product.duration_label || '1 Month');
-  const safeAmount = escapeHtml(order.amount_tnd);
-  const safeEmail = escapeHtml(order.delivery_email);
-  const safeDeliveryHours = escapeHtml(product.delivery_hours || 2);
+  const safeNextStep = escapeHtml(fulfillmentNextStep(order, product));
 
   await send({
     to: order.delivery_email,
@@ -102,12 +154,18 @@ async function sendOrderConfirmation(order, product) {
         <div style="background: #fff; border: 2px solid #003060; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
           <h2 style="color: #003060; margin-top: 0;">Order #${safeOrderRef}</h2>
           <table style="width: 100%; border-collapse: collapse;">
-            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Product</td><td style="padding: 8px 0; font-weight: bold; color: #003060;">${safeProductName}</td></tr>
-            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Duration</td><td style="padding: 8px 0; font-weight: bold; color: #003060;">${safeDuration}</td></tr>
-            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Amount Paid</td><td style="padding: 8px 0; font-weight: bold; color: #003060;">${safeAmount} TND</td></tr>
-            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Delivery To</td><td style="padding: 8px 0; font-weight: bold; color: #003060;">${safeEmail}</td></tr>
-            <tr><td style="padding: 8px 0; color: #666; font-size: 14px;">Estimated Delivery</td><td style="padding: 8px 0; font-weight: bold; color: #005F4B;">Within ${safeDeliveryHours} hour(s)</td></tr>
+            ${tableRow('Product', product.name)}
+            ${tableRow('Duration', product.duration_label || '1 Month')}
+            ${tableRow('Activation flow', product.fulfillment_type_label || 'Service activation')}
+            ${tableRow('Selected method', product.fulfillment_method_label || 'Selected during checkout')}
+            ${tableRow('Amount Paid', `${money(order.amount_tnd)} TND`)}
+            ${tableRow('Delivery To', order.delivery_email)}
+            ${tableRow('Estimated Delivery', `Within ${product.delivery_hours || 2} hour(s)`, '#005F4B')}
           </table>
+        </div>
+        <div style="background: #fff; border: 2px solid #B8860B; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+          <h3 style="color: #003060; margin: 0 0 8px;">What happens next?</h3>
+          <p style="color: #43474f; font-size: 14px; line-height: 1.6; margin: 0;">${safeNextStep}</p>
         </div>
         <p style="color: #666; font-size: 13px; text-align: center;">
           Your access details and activation instructions will be sent to this email once our team processes your order.<br>
@@ -180,10 +238,7 @@ async function sendInternalOrderNotification(order, product) {
   if (!recipient) return false;
 
   const safeOrderRef = escapeHtml(order.order_ref);
-  const safeProductName = escapeHtml(product.name);
-  const safeAmount = escapeHtml(order.amount_tnd);
-  const safeDeliveryEmail = escapeHtml(order.delivery_email);
-  const safeGateway = escapeHtml(order.gateway || 'payment gateway');
+  const detailsRows = fulfillmentDetailsTable(order.fulfillment_details_decoded || {});
 
   await send({
     to: recipient,
@@ -195,13 +250,22 @@ async function sendInternalOrderNotification(order, product) {
           <p style="color: #fff; margin: 8px 0 0;">New paid order</p>
         </div>
         <table style="width: 100%; border-collapse: collapse;">
-          <tr><td style="padding: 8px 0; color: #666;">Order</td><td style="padding: 8px 0; font-weight: bold;">${safeOrderRef}</td></tr>
-          <tr><td style="padding: 8px 0; color: #666;">Product</td><td style="padding: 8px 0; font-weight: bold;">${safeProductName}</td></tr>
-          <tr><td style="padding: 8px 0; color: #666;">Amount</td><td style="padding: 8px 0; font-weight: bold;">${safeAmount} TND</td></tr>
-          <tr><td style="padding: 8px 0; color: #666;">Delivery email</td><td style="padding: 8px 0; font-weight: bold;">${safeDeliveryEmail}</td></tr>
-          <tr><td style="padding: 8px 0; color: #666;">Gateway</td><td style="padding: 8px 0; font-weight: bold;">${safeGateway}</td></tr>
+          ${tableRow('Order', order.order_ref)}
+          ${tableRow('Product', product.name)}
+          ${tableRow('Activation flow', product.fulfillment_type_label || 'Service activation')}
+          ${tableRow('Selected method', product.fulfillment_method_label || order.fulfillment_method || 'Selected during checkout')}
+          ${tableRow('Amount', `${money(order.amount_tnd)} TND`)}
+          ${tableRow('Promo code', order.promo_code || '-')}
+          ${tableRow('Discount', `${money(order.discount_tnd || 0)} TND`)}
+          ${tableRow('Delivery email', order.delivery_email)}
+          ${tableRow('Phone', order.delivery_phone || '-')}
+          ${tableRow('Gateway', order.gateway || 'payment gateway')}
         </table>
-        <p style="color: #666; font-size: 13px; margin-top: 20px;">Open the admin dashboard to review fulfillment details.</p>
+        <div style="background: #f8fafc; border: 2px solid #003060; border-radius: 12px; padding: 16px; margin-top: 20px;">
+          <h3 style="color: #003060; margin: 0 0 10px;">Fulfillment details</h3>
+          <table style="width: 100%; border-collapse: collapse;">${detailsRows}</table>
+          <p style="color: #666; font-size: 12px; margin: 12px 0 0;">Sensitive passwords are intentionally kept in the admin dashboard instead of this email.</p>
+        </div>
       </div>
     `,
   });

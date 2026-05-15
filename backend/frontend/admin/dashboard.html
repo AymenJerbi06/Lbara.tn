@@ -54,6 +54,9 @@
     <button id="tab-messages" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white/70 hover:bg-white/10 transition-colors">
       <span class="material-symbols-outlined">forum</span> Messages
     </button>
+    <button id="tab-promo-codes" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white/70 hover:bg-white/10 transition-colors">
+      <span class="material-symbols-outlined">sell</span> Promo Codes
+    </button>
   </nav>
   <div class="p-4 border-t border-white/10">
     <a href="/api/auth/logout" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white/70 hover:bg-red-500/20 transition-colors">
@@ -372,6 +375,47 @@
     </div>
   </div>
 
+  <div id="content-promo-codes" style="display:none">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="font-headline text-3xl font-black text-primary">Promo Codes</h1>
+        <p class="text-sm font-bold text-primary/45 mt-1">Create discounts between 0% and 100% for checkout.</p>
+      </div>
+    </div>
+
+    <div class="cartoon-card p-6 mb-8">
+      <h3 class="font-headline font-bold text-primary text-lg mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-accent">add_circle</span>
+        Add Promo Code
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_180px_140px] gap-3">
+        <input id="promo-code-input" class="border-2 border-primary/20 rounded-xl px-4 py-3 text-sm font-bold text-primary focus:ring-0 focus:border-primary uppercase" placeholder="Code, e.g. FRIENDS20"/>
+        <input id="promo-percent-input" class="border-2 border-primary/20 rounded-xl px-4 py-3 text-sm font-bold text-primary focus:ring-0 focus:border-primary" placeholder="Discount %" type="number" min="0" max="100"/>
+        <button id="create-promo-btn" class="cartoon-button bg-primary text-white font-bold px-5 py-3 rounded-xl flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">save</span>
+          Save
+        </button>
+      </div>
+    </div>
+
+    <div class="cartoon-card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-primary/5 text-primary font-black uppercase text-xs tracking-wider">
+            <th class="p-4 text-left">Code</th>
+            <th class="p-4 text-left">Discount</th>
+            <th class="p-4 text-left">Status</th>
+            <th class="p-4 text-left">Created</th>
+            <th class="p-4 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="promo-codes-tbody">
+          <tr><td colspan="5" class="text-center p-8 text-primary/40 font-bold">Loading promo codes...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <script src="/js/api.js"></script>
@@ -381,6 +425,7 @@
 var fulfillOrderId = null;
 var ordersMap = {};
 var productsMap = {};
+var promoCodesMap = {};
 var pendingEditImage = null;
 var pendingAddImage = null;
 var cropState = null;
@@ -565,7 +610,7 @@ function applyImageCrop() {
 }
 
 function showTab(tab) {
-  ['dashboard','orders','products','messages'].forEach(function(t) {
+  ['dashboard','orders','products','messages','promo-codes'].forEach(function(t) {
     var content = document.getElementById('content-' + t);
     var btn = document.getElementById('tab-' + t);
     if (t === tab) {
@@ -582,6 +627,7 @@ function showTab(tab) {
   if (tab === 'orders') loadOrders();
   if (tab === 'products') loadProducts();
   if (tab === 'messages') loadMessages();
+  if (tab === 'promo-codes') loadPromoCodes();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -589,7 +635,7 @@ document.addEventListener('DOMContentLoaded', function() {
   api.me().then(function(data) {
     if (!data.user || !data.user.is_admin) { window.location.href = '/login.html'; return; }
     // Wire up sidebar tabs
-    ['dashboard','orders','products','messages'].forEach(function(t) {
+    ['dashboard','orders','products','messages','promo-codes'].forEach(function(t) {
       document.getElementById('tab-' + t).addEventListener('click', function() { showTab(t); });
     });
     // Wire up view-all button
@@ -655,6 +701,20 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!btn) return;
       if (btn.dataset.action === 'edit') openEditModal(productsMap[btn.dataset.id]);
       if (btn.dataset.action === 'toggle') toggleProduct(btn.dataset.id, btn.dataset.active === 'true');
+    });
+    document.getElementById('create-promo-btn').addEventListener('click', function() { createPromoCode(); });
+    document.getElementById('promo-codes-tbody').addEventListener('click', function(e) {
+      var btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      if (btn.dataset.action === 'delete-promo') deletePromoCode(btn.dataset.id);
+      if (btn.dataset.action === 'toggle-promo') updatePromoCode(btn.dataset.id, { active: btn.dataset.active === 'true' });
+      if (btn.dataset.action === 'save-promo') {
+        var row = btn.closest('[data-promo-row]');
+        updatePromoCode(btn.dataset.id, {
+          code: row.querySelector('[data-promo-field="code"]').value,
+          discount_percent: row.querySelector('[data-promo-field="discount_percent"]').value,
+        });
+      }
     });
     // Show dashboard tab initially
     showTab('dashboard');
@@ -1000,6 +1060,84 @@ async function loadMessages() {
       : '<p class="text-primary/40 font-bold text-center py-8">No messages.</p>';
   } catch(err) {
     console.error(err);
+  }
+}
+
+async function loadPromoCodes() {
+  try {
+    const { promo_codes } = await apiFetchAdmin('/admin/promo-codes');
+    const list = promo_codes || [];
+    promoCodesMap = {};
+    list.forEach(function(promo) { promoCodesMap[promo.id] = promo; });
+    document.getElementById('promo-codes-tbody').innerHTML = list.length
+      ? list.map(function(promo) {
+        return `
+          <tr class="border-t border-primary/5" data-promo-row="${escapeAttr(promo.id)}">
+            <td class="p-4">
+              <input data-promo-field="code" value="${escapeAttr(promo.code)}" class="w-full border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-black text-primary focus:ring-0 focus:border-primary uppercase"/>
+            </td>
+            <td class="p-4">
+              <div class="flex items-center gap-2">
+                <input data-promo-field="discount_percent" value="${escapeAttr(promo.discount_percent)}" type="number" min="0" max="100" class="w-24 border-2 border-primary/20 rounded-xl px-3 py-2 text-sm font-black text-primary focus:ring-0 focus:border-primary"/>
+                <span class="font-black text-primary/50">%</span>
+              </div>
+            </td>
+            <td class="p-4">
+              <span class="status-pill ${promo.active ? 'status-fulfilled' : 'status-cancelled'}">${promo.active ? 'Active' : 'Inactive'}</span>
+            </td>
+            <td class="p-4 text-xs text-on-surface/50 font-bold">${new Date(promo.created_at).toLocaleDateString()}</td>
+            <td class="p-4 flex items-center gap-2">
+              <button data-action="save-promo" data-id="${escapeAttr(promo.id)}" class="cartoon-button bg-primary text-white font-bold px-3 py-1 rounded-lg text-xs">Save</button>
+              <button data-action="toggle-promo" data-id="${escapeAttr(promo.id)}" data-active="${promo.active ? 'false' : 'true'}" class="cartoon-button ${promo.active ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-secondary/10 text-secondary border-secondary/20'} font-bold px-3 py-1 rounded-lg text-xs">${promo.active ? 'Disable' : 'Enable'}</button>
+              <button data-action="delete-promo" data-id="${escapeAttr(promo.id)}" class="cartoon-button bg-red-50 text-red-600 border-red-200 font-bold px-3 py-1 rounded-lg text-xs">Delete</button>
+            </td>
+          </tr>`;
+      }).join('')
+      : '<tr><td colspan="5" class="text-center p-8 text-primary/40 font-bold">No promo codes yet.</td></tr>';
+  } catch (err) {
+    document.getElementById('promo-codes-tbody').innerHTML = `<tr><td colspan="5" class="text-center p-4 text-red-500 font-bold">${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+async function createPromoCode() {
+  const codeInput = document.getElementById('promo-code-input');
+  const percentInput = document.getElementById('promo-percent-input');
+  const code = codeInput.value.trim().toUpperCase();
+  const discount = percentInput.value;
+  if (!code) { showToast('Promo code is required.', 'error'); return; }
+
+  try {
+    await apiFetchAdmin('/admin/promo-codes', {
+      method: 'POST',
+      body: { code, discount_percent: discount, active: true },
+    });
+    codeInput.value = '';
+    percentInput.value = '';
+    showToast('Promo code created.');
+    loadPromoCodes();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function updatePromoCode(id, body) {
+  try {
+    await apiFetchAdmin(`/admin/promo-codes/${id}`, { method: 'PUT', body });
+    showToast('Promo code updated.');
+    loadPromoCodes();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function deletePromoCode(id) {
+  if (!confirm('Delete this promo code?')) return;
+  try {
+    await apiFetchAdmin(`/admin/promo-codes/${id}`, { method: 'DELETE' });
+    showToast('Promo code deleted.');
+    loadPromoCodes();
+  } catch (err) {
+    showToast(err.message, 'error');
   }
 }
 

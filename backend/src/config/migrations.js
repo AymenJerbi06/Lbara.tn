@@ -63,6 +63,20 @@ async function ensureRuntimeMigrations() {
     CREATE INDEX IF NOT EXISTS idx_product_reviews_product_id ON product_reviews(product_id);
     CREATE INDEX IF NOT EXISTS idx_product_reviews_user_id ON product_reviews(user_id);
 
+    CREATE TABLE IF NOT EXISTS promo_codes (
+      id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      code              VARCHAR(50) UNIQUE NOT NULL,
+      discount_percent  INTEGER NOT NULL CHECK (discount_percent BETWEEN 0 AND 100),
+      active            BOOLEAN DEFAULT TRUE,
+      created_at        TIMESTAMPTZ DEFAULT NOW(),
+      updated_at        TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_promo_codes_code ON promo_codes(UPPER(code));
+    INSERT INTO promo_codes (code, discount_percent, active)
+    VALUES ('LBARA10', 10, TRUE)
+    ON CONFLICT (code) DO NOTHING;
+
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS variant_id UUID REFERENCES product_variants(id);
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_type VARCHAR(50);
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_method VARCHAR(80);

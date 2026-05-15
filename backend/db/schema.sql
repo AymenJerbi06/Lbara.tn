@@ -91,6 +91,15 @@ CREATE TABLE IF NOT EXISTS payments (
   created_at          TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS promo_codes (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  code              VARCHAR(50) UNIQUE NOT NULL,
+  discount_percent  INTEGER NOT NULL CHECK (discount_percent BETWEEN 0 AND 100),
+  active            BOOLEAN DEFAULT TRUE,
+  created_at        TIMESTAMPTZ DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ─── Fulfillments ─────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS fulfillments (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -139,6 +148,7 @@ CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_active ON products(active);
 CREATE INDEX IF NOT EXISTS idx_product_variants_product_id ON product_variants(product_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_promo_codes_code ON promo_codes(UPPER(code));
 
 -- User engagement
 CREATE TABLE IF NOT EXISTS wishlist_items (
@@ -205,6 +215,10 @@ WHERE cm.user_id IS NULL
   AND LOWER(cm.email) = LOWER(u.email);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_contact_messages_reference ON contact_messages(reference);
 CREATE INDEX IF NOT EXISTS idx_contact_messages_user_id ON contact_messages(user_id);
+
+INSERT INTO promo_codes (code, discount_percent, active)
+VALUES ('LBARA10', 10, TRUE)
+ON CONFLICT (code) DO NOTHING;
 
 -- ─── Seed Products ────────────────────────────────────────
 INSERT INTO products (slug, name, provider, category, description, price_tnd, badge, account_type, duration_label, delivery_hours, fulfillment_type)

@@ -188,21 +188,32 @@ document.addEventListener('DOMContentLoaded', async function () {
       const code = promoInput.value.trim().toUpperCase();
       if (!code) return;
 
-      if (code === 'LBARA10') {
-        if (!pricingReady) {
-          showToast('Promo codes can be applied after pricing is set.', 'error');
-          return;
-        }
-        discountApplied = parseFloat((price * 0.10).toFixed(3));
-        const newTotal = parseFloat((price - discountApplied).toFixed(3));
+      if (!pricingReady) {
+        showToast('Promo codes can be applied after pricing is set.', 'error');
+        return;
+      }
+
+      promoBtn.disabled = true;
+      promoBtn.textContent = tr('Checking...');
+      try {
+        const result = await api.validatePromoCode({ code, amount_tnd: price });
+        const promo = result.promo || {};
+        discountApplied = Number(promo.discount_tnd || 0);
+        const newTotal = Number(promo.total_tnd ?? Math.max(0, price - discountApplied));
         if (totalEl) totalEl.textContent = newTotal.toFixed(3);
         if (discountRow) {
           discountRow.classList.remove('hidden');
           discountRow.querySelector('.discount-amount').textContent = '-' + formatCurrency(discountApplied);
         }
-        showToast('Promo code applied! 10% discount.');
-      } else {
-        showToast('Invalid promo code.', 'error');
+        showToast('Promo code applied! ' + Number(promo.discount_percent || 0) + '% discount.');
+      } catch (err) {
+        discountApplied = 0;
+        if (totalEl) totalEl.textContent = price.toFixed(3);
+        if (discountRow) discountRow.classList.add('hidden');
+        showToast(err.message || 'Invalid promo code.', 'error');
+      } finally {
+        promoBtn.disabled = false;
+        promoBtn.textContent = tr('Apply');
       }
     });
   }
