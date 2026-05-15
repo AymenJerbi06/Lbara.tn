@@ -95,14 +95,20 @@
   <div id="content-orders" style="display:none">
     <div class="flex items-center justify-between mb-8">
       <h1 class="font-headline text-3xl font-black text-primary">Orders</h1>
-      <div class="flex gap-3">
+      <div class="flex flex-wrap gap-3">
+        <select id="orders-type-filter" class="border-2 border-primary/20 rounded-xl px-4 py-2 font-bold text-sm text-primary focus:ring-0 focus:border-primary">
+          <option value="">All Order Types</option>
+          <option value="service">Service Orders</option>
+          <option value="ticket">Request Tickets</option>
+        </select>
         <select id="orders-filter" class="border-2 border-primary/20 rounded-xl px-4 py-2 font-bold text-sm text-primary focus:ring-0 focus:border-primary">
           <option value="">All Statuses</option>
-          <option value="paid">Paid (pending fulfillment)</option>
+          <option value="paid">Needs Action</option>
+          <option value="processing">Processing</option>
           <option value="fulfilled">Fulfilled</option>
-          <option value="pending_payment">Pending Payment</option>
-          <option value="payment_failed">Payment Failed</option>
           <option value="flagged">Flagged</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="refunded">Refunded</option>
         </select>
       </div>
     </div>
@@ -131,15 +137,16 @@
     <div class="bg-white border-4 border-primary rounded-3xl p-8 w-full max-w-lg shadow-2xl">
       <h2 class="font-headline text-xl font-black text-primary mb-6 flex items-center gap-2">
         <span class="material-symbols-outlined text-secondary">send</span>
-        Fulfill Order <span id="modal-order-ref" class="text-accent"></span>
+        <span id="fulfill-modal-title">Fulfill Order</span> <span id="modal-order-ref" class="text-accent"></span>
       </h2>
       <div class="space-y-4">
         <div id="fulfill-customer-details" class="bg-primary/5 border-2 border-primary/10 rounded-2xl p-4 text-sm font-bold text-primary/70">
           Customer checkout details will appear here.
         </div>
         <div>
-          <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Credentials / Access Details</label>
+          <label id="fulfill-primary-label" class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Credentials / Access Details</label>
           <textarea id="fulfill-credentials" class="w-full border-2 border-primary/20 rounded-xl px-4 py-3 font-bold text-primary placeholder:text-primary/30 focus:border-primary focus:ring-0 h-32 resize-none" placeholder="Email: user@example.com&#10;Password: xxxxx&#10;Or: activation code"></textarea>
+          <p id="fulfill-primary-help" class="mt-2 text-xs font-bold text-primary/50"></p>
         </div>
         <div>
           <label class="block text-xs font-black text-primary/50 uppercase tracking-widest mb-2">Admin Notes (optional)</label>
@@ -150,7 +157,7 @@
         <button id="fulfill-cancel-btn" class="flex-1 border-2 border-primary/20 text-primary font-bold py-3 rounded-2xl hover:bg-primary/5">Cancel</button>
         <button id="fulfill-submit-btn" class="flex-1 cartoon-button bg-secondary text-white font-bold py-3 rounded-2xl">
           <span class="material-symbols-outlined text-sm mr-1">send</span>
-          Send to Customer
+          <span id="fulfill-submit-label">Send to Customer</span>
         </button>
       </div>
     </div>
@@ -439,9 +446,22 @@ function fulfillmentTypeLabel(type) {
   }[type] || 'Account Setup';
 }
 
+function isTicketOrder(order) {
+  return order && (order.order_type === 'ticket' || order.variant_checkout_mode === 'quote');
+}
+
+function orderTypeLabel(order) {
+  return isTicketOrder(order) ? 'Request Ticket' : 'Service Order';
+}
+
+function orderActionLabel(order) {
+  return isTicketOrder(order) ? 'Ask Details' : 'Fulfill';
+}
+
 function formatFulfillmentDetails(o) {
   var details = o.fulfillment_details || {};
   var rows = [
+    ['Order type', orderTypeLabel(o)],
     ['Product flow', o.fulfillment_type_label || fulfillmentTypeLabel(o.fulfillment_type)],
     ['Customer choice', o.fulfillment_method_label || o.fulfillment_method || 'Not selected'],
   ];
@@ -624,7 +644,12 @@ function showTab(tab) {
     }
   });
   if (tab === 'dashboard') loadDashboard();
-  if (tab === 'orders') loadOrders();
+  if (tab === 'orders') {
+    loadOrders(
+      document.getElementById('orders-filter').value,
+      document.getElementById('orders-type-filter').value
+    );
+  }
   if (tab === 'products') loadProducts();
   if (tab === 'messages') loadMessages();
   if (tab === 'promo-codes') loadPromoCodes();
@@ -681,8 +706,13 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('crop-cancel-btn').addEventListener('click', closeImageCropper);
     document.getElementById('crop-close-btn').addEventListener('click', closeImageCropper);
     window.addEventListener('resize', renderCropPreview);
-    // Wire up orders filter
-    document.getElementById('orders-filter').addEventListener('change', function() { loadOrders(this.value); });
+    // Wire up orders filters
+    document.getElementById('orders-filter').addEventListener('change', function() {
+      loadOrders(this.value, document.getElementById('orders-type-filter').value);
+    });
+    document.getElementById('orders-type-filter').addEventListener('change', function() {
+      loadOrders(document.getElementById('orders-filter').value, this.value);
+    });
     // Event delegation for orders table (Fulfill / Approve buttons)
     document.getElementById('orders-tbody').addEventListener('click', function(e) {
       var btn = e.target.closest('button[data-action]');
@@ -757,30 +787,39 @@ async function loadDashboard() {
 }
 
 // ─── Orders ───────────────────────────────────────────────
-async function loadOrders(status = '') {
+async function loadOrders(status = '', type = '') {
 
   try {
-    const { orders } = await apiFetchAdmin(`/admin/orders${status ? '?status=' + status : ''}`);
+    const params = new URLSearchParams();
+    if (status) params.set('status', status);
+    if (type) params.set('type', type);
+    const { orders } = await apiFetchAdmin(`/admin/orders${params.toString() ? '?' + params.toString() : ''}`);
     ordersMap = {};
     orders.forEach(function(o) { ordersMap[o.id] = o; });
     document.getElementById('orders-tbody').innerHTML = orders.length
-      ? orders.map(o => `
-        <tr class="border-t border-primary/5 hover:bg-primary/2">
-          <td class="p-4 font-black text-primary text-xs">${escapeHtml(o.order_ref)}</td>
-          <td class="p-4 font-bold text-sm">
-            ${escapeHtml(o.product_name)}
-            ${o.variant_name ? `<div class="text-[11px] text-secondary font-black mt-1">${escapeHtml(o.variant_name)}</div>` : ''}
-            <div class="text-[10px] uppercase tracking-widest text-accent font-black mt-1">${escapeHtml(o.fulfillment_type_label || fulfillmentTypeLabel(o.fulfillment_type))}</div>
-          </td>
-          <td class="p-4 text-sm text-on-surface/60 font-bold">${escapeHtml(o.delivery_email)}</td>
-          <td class="p-4 font-black text-primary">${parseFloat(o.amount_tnd).toFixed(3)}</td>
-          <td class="p-4"><span class="status-pill status-${escapeAttr(o.status)}">${escapeHtml(String(o.status).replace('_',' '))}</span></td>
-          <td class="p-4 text-xs text-on-surface/50 font-bold">${new Date(o.created_at).toLocaleDateString()}</td>
-          <td class="p-4">
-            ${o.status === 'paid' ? `<button data-action="fulfill" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">Fulfill</button>` : ''}
-            ${o.status === 'flagged' ? `<button data-action="approve" data-id="${escapeAttr(o.id)}" class="cartoon-button bg-primary text-white font-bold px-3 py-1 rounded-lg text-xs ml-1">Approve</button>` : ''}
-          </td>
-        </tr>`).join('')
+      ? orders.map(o => {
+        var canAct = o.status === 'paid' || (isTicketOrder(o) && o.status === 'processing');
+        return `
+          <tr class="border-t border-primary/5 hover:bg-primary/2">
+            <td class="p-4 font-black text-primary text-xs">${escapeHtml(o.order_ref)}</td>
+            <td class="p-4 font-bold text-sm">
+              ${escapeHtml(o.product_name)}
+              ${o.variant_name ? `<div class="text-[11px] text-secondary font-black mt-1">${escapeHtml(o.variant_name)}</div>` : ''}
+              <div class="flex flex-wrap gap-2 mt-2">
+                <span class="text-[10px] uppercase tracking-widest text-accent font-black">${escapeHtml(orderTypeLabel(o))}</span>
+                <span class="text-[10px] uppercase tracking-widest text-primary/45 font-black">${escapeHtml(o.fulfillment_type_label || fulfillmentTypeLabel(o.fulfillment_type))}</span>
+              </div>
+            </td>
+            <td class="p-4 text-sm text-on-surface/60 font-bold">${escapeHtml(o.delivery_email)}</td>
+            <td class="p-4 font-black text-primary">${parseFloat(o.amount_tnd).toFixed(3)}</td>
+            <td class="p-4"><span class="status-pill status-${escapeAttr(o.status)}">${escapeHtml(String(o.status).replace(/_/g,' '))}</span></td>
+            <td class="p-4 text-xs text-on-surface/50 font-bold">${new Date(o.created_at).toLocaleDateString()}</td>
+            <td class="p-4">
+              ${canAct ? `<button data-action="fulfill" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">${escapeHtml(orderActionLabel(o))}</button>` : ''}
+              ${o.status === 'flagged' ? `<button data-action="approve" data-id="${escapeAttr(o.id)}" class="cartoon-button bg-primary text-white font-bold px-3 py-1 rounded-lg text-xs ml-1">Approve</button>` : ''}
+            </td>
+          </tr>`;
+      }).join('')
       : '<tr><td colspan="7" class="text-center p-8 text-primary/40 font-bold">No orders found.</td></tr>';
   } catch(err) {
     document.getElementById('orders-tbody').innerHTML = `<tr><td colspan="7" class="text-center p-4 text-red-500 font-bold">${escapeHtml(err.message)}</td></tr>`;
@@ -792,12 +831,13 @@ function renderOrderRow(o) {
     <div>
       <span class="font-black text-primary text-sm">${escapeHtml(o.order_ref)}</span>
       <span class="ml-3 text-sm font-bold text-on-surface/60">${escapeHtml(o.product_name)}${o.variant_name ? ' - ' + escapeHtml(o.variant_name) : ''}</span>
-      <span class="ml-3 text-xs font-black text-accent uppercase">${escapeHtml(o.fulfillment_type_label || fulfillmentTypeLabel(o.fulfillment_type))}</span>
+      <span class="ml-3 text-xs font-black text-accent uppercase">${escapeHtml(orderTypeLabel(o))}</span>
+      <span class="ml-3 text-xs font-black text-primary/40 uppercase">${escapeHtml(o.fulfillment_type_label || fulfillmentTypeLabel(o.fulfillment_type))}</span>
       <span class="ml-3 text-xs font-bold text-on-surface/40">${escapeHtml(o.delivery_email)}</span>
     </div>
     <div class="flex items-center gap-3">
       <span class="font-black text-primary">${parseFloat(o.amount_tnd).toFixed(3)} TND</span>
-      <button data-action="fulfill" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">Fulfill</button>
+      <button data-action="fulfill" data-id="${escapeAttr(o.id)}" data-ref="${escapeAttr(o.order_ref)}" class="cartoon-button bg-secondary text-white font-bold px-3 py-1 rounded-lg text-xs">${escapeHtml(orderActionLabel(o))}</button>
     </div>
   </div>`;
 }
@@ -805,10 +845,23 @@ function renderOrderRow(o) {
 function openFulfillModal(orderId, orderRef) {
   fulfillOrderId = orderId;
   var order = ordersMap[orderId] || {};
+  var isTicket = isTicketOrder(order);
   document.getElementById('modal-order-ref').textContent = '#' + orderRef;
   document.getElementById('fulfill-credentials').value = '';
   document.getElementById('fulfill-notes').value = '';
   document.getElementById('fulfill-customer-details').innerHTML = formatFulfillmentDetails(order);
+  document.getElementById('fulfill-modal-title').textContent = isTicket ? 'Handle Request Ticket' : 'Fulfill Order';
+  document.getElementById('fulfill-primary-label').textContent = isTicket ? 'Follow-up Request to Customer' : 'Credentials / Access Details';
+  document.getElementById('fulfill-credentials').placeholder = isTicket
+    ? 'Example: Please reply with the exact course/book/app name, link if available, the account email you want us to use, and any access details needed to check the final price.'
+    : 'Email: user@example.com\nPassword: xxxxx\nOr: activation code';
+  document.getElementById('fulfill-primary-help').textContent = isTicket
+    ? 'This emails the customer for extra details and keeps the ticket in Processing. It does not mark the ticket fulfilled.'
+    : 'This will mark the order fulfilled and send the access details to the customer.';
+  document.getElementById('fulfill-notes').placeholder = isTicket
+    ? 'Internal notes about final quote, needed credentials, or next step...'
+    : 'Internal notes...';
+  document.getElementById('fulfill-submit-label').textContent = isTicket ? 'Send Follow-up' : 'Send to Customer';
   document.getElementById('fulfill-modal').style.display = 'flex';
 }
 
@@ -820,14 +873,19 @@ function closeFulfillModal() {
 async function submitFulfillment() {
   const credentials = document.getElementById('fulfill-credentials').value.trim();
   const notes = document.getElementById('fulfill-notes').value.trim();
-  if (!credentials) { showToast('Credentials are required.', 'error'); return; }
+  const order = ordersMap[fulfillOrderId] || {};
+  const isTicket = isTicketOrder(order);
+  if (!credentials) {
+    showToast(isTicket ? 'Write the follow-up request before sending.' : 'Credentials are required.', 'error');
+    return;
+  }
   try {
     await apiFetchAdmin(`/admin/orders/${fulfillOrderId}/fulfill`, {
       method: 'PUT', body: { credentials, notes }
     });
-    showToast('Order fulfilled! Email sent to customer.');
+    showToast(isTicket ? 'Follow-up request sent to customer.' : 'Order fulfilled! Email sent to customer.');
     closeFulfillModal();
-    loadOrders();
+    loadOrders(document.getElementById('orders-filter').value, document.getElementById('orders-type-filter').value);
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -837,7 +895,7 @@ async function updateStatus(orderId, status) {
   try {
     await apiFetchAdmin(`/admin/orders/${orderId}/status`, { method: 'PUT', body: { status } });
     showToast('Status updated.');
-    loadOrders();
+    loadOrders(document.getElementById('orders-filter').value, document.getElementById('orders-type-filter').value);
   } catch(err) {
     showToast(err.message, 'error');
   }

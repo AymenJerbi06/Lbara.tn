@@ -235,6 +235,7 @@ async function myOrders(req, res) {
        LEFT JOIN product_variants v ON v.id = o.variant_id
        LEFT JOIN product_reviews r ON r.order_id = o.id AND r.user_id = $1
        WHERE o.user_id = $1
+         AND o.status IN ('paid','processing','fulfilled','cancelled','refunded','flagged')
        ORDER BY o.created_at DESC`,
       [req.user.id]
     );

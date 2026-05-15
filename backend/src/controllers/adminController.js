@@ -13,6 +13,7 @@ function decodeFulfillmentDetails(order) {
   order.fulfillment_type = type;
   order.fulfillment_type_label = getFulfillmentTypeLabel(type);
   order.fulfillment_method_label = getFulfillmentMethodLabel(order.fulfillment_method);
+  order.order_type = order.order_type || (order.variant_checkout_mode === 'quote' ? 'ticket' : 'service');
 
   if (!order.fulfillment_details) {
     order.fulfillment_details = {};
@@ -31,17 +32,38 @@ function decodeFulfillmentDetails(order) {
 // ─── Orders ───────────────────────────────────────────────
 
 async function listOrders(req, res) {
-  const { status, page = 1, limit = 20 } = req.query;
-  const offset = (parseInt(page) - 1) * parseInt(limit);
+  const { status, type, page = 1, limit = 20 } = req.query;
+  const allowedStatuses = ['paid', 'processing', 'fulfilled', 'cancelled', 'refunded', 'flagged'];
+  const pageNumber = Math.max(1, parseInt(page, 10) || 1);
+  const pageLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+  const offset = (pageNumber - 1) * pageLimit;
   const params = [];
-  let where = '';
+  const whereParts = [];
 
   if (status) {
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid order status filter.' });
+    }
     params.push(status);
-    where = `WHERE o.status = $1`;
+    whereParts.push(`o.status = $${params.length}`);
+  } else {
+    whereParts.push(`o.status = ANY(ARRAY['paid','processing','fulfilled','cancelled','refunded','flagged'])`);
   }
 
-  params.push(parseInt(limit), offset);
+  if (type) {
+    if (!['service', 'ticket'].includes(type)) {
+      return res.status(400).json({ success: false, message: 'Invalid order type filter.' });
+    }
+    if (type === 'ticket') {
+      whereParts.push(`v.checkout_mode = 'quote'`);
+    } else {
+      whereParts.push(`COALESCE(v.checkout_mode, 'full_payment') <> 'quote'`);
+    }
+  }
+
+  const where = `WHERE ${whereParts.join(' AND ')}`;
+
+  params.push(pageLimit, offset);
   const limitIdx = params.length - 1;
   const offsetIdx = params.length;
 
@@ -49,6 +71,7 @@ async function listOrders(req, res) {
     const result = await pool.query(
       `SELECT o.*, p.name AS product_name, p.provider, p.fulfillment_type AS product_fulfillment_type,
               v.name AS variant_name, v.billing_period AS variant_billing_period, v.checkout_mode AS variant_checkout_mode,
+              CASE WHEN v.checkout_mode = 'quote' THEN 'ticket' ELSE 'service' END AS order_type,
               u.email AS user_email
        FROM orders o
        JOIN products p ON p.id = o.product_id
@@ -60,7 +83,10 @@ async function listOrders(req, res) {
       params
     );
     const countResult = await pool.query(
-      `SELECT COUNT(*) FROM orders o ${where}`,
+      `SELECT COUNT(*)
+       FROM orders o
+       LEFT JOIN product_variants v ON v.id = o.variant_id
+       ${where}`,
       params.slice(0, -2)
     );
     const orders = result.rows.map(decodeFulfillmentDetails);
@@ -80,13 +106,13 @@ async function fulfillOrder(req, res) {
   const { credentials, notes } = req.body;
 
   if (!credentials) {
-    return res.status(400).json({ success: false, message: 'Credentials are required to fulfill.' });
+    return res.status(400).json({ success: false, message: 'Delivery details are required.' });
   }
 
   try {
     const orderResult = await pool.query(
       `SELECT o.*, p.name AS product_name, p.provider, p.duration_label, p.delivery_hours,
-              v.name AS variant_name, v.billing_period AS variant_billing_period
+              v.name AS variant_name, v.billing_period AS variant_billing_period, v.checkout_mode AS variant_checkout_mode
        FROM orders o
        JOIN products p ON p.id = o.product_id
        LEFT JOIN product_variants v ON v.id = o.variant_id
@@ -95,11 +121,44 @@ async function fulfillOrder(req, res) {
     );
     const order = orderResult.rows[0];
     if (!order) return res.status(404).json({ success: false, message: 'Order not found.' });
-    if (order.status !== 'paid') {
-      return res.status(400).json({ success: false, message: 'Can only fulfill paid orders.' });
+    const isTicket = order.variant_checkout_mode === 'quote';
+    if (!isTicket && order.status !== 'paid') {
+      return res.status(400).json({ success: false, message: 'Can only fulfill paid service orders.' });
+    }
+    if (isTicket && !['paid', 'processing'].includes(order.status)) {
+      return res.status(400).json({ success: false, message: 'Can only request details for paid request tickets.' });
     }
 
     const encryptedCreds = encrypt(credentials);
+
+    if (isTicket) {
+      await pool.query(`UPDATE orders SET status = 'processing', updated_at = NOW() WHERE id = $1`, [id]);
+      await pool.query(
+        `INSERT INTO fulfillments (order_id, status, credentials, notes, fulfilled_by, delivered_at)
+         VALUES ($1, 'sent', $2, $3, $4, NOW())`,
+        [id, encryptedCreds, notes || 'Request-ticket follow-up sent to customer.', req.user.id]
+      );
+
+      await audit.log({
+        entityType: 'order',
+        entityId: id,
+        action: 'ticket_followup_sent',
+        actorId: req.user.id,
+        actorType: 'admin',
+        metadata: { notes },
+      });
+
+      try {
+        await emailService.sendTicketFollowUpEmail(order, {
+          name: order.variant_name ? `${order.product_name} - ${order.variant_name}` : order.product_name,
+          duration_label: order.variant_billing_period || order.duration_label,
+        }, credentials);
+      } catch (emailErr) {
+        console.error('[admin/ticket followup email]', emailErr.message);
+      }
+
+      return res.json({ success: true, message: 'Follow-up request sent and ticket moved to processing.' });
+    }
 
     await pool.query(`UPDATE orders SET status = 'fulfilled', updated_at = NOW() WHERE id = $1`, [id]);
     await pool.query(
@@ -287,8 +346,8 @@ async function listMessages(req, res) {
 async function stats(req, res) {
   try {
     const [orders, revenue, pending, messages] = await Promise.all([
-      pool.query(`SELECT COUNT(*) FROM orders WHERE status NOT IN ('draft','payment_failed')`),
-      pool.query(`SELECT COALESCE(SUM(amount_tnd), 0) AS total FROM orders WHERE status IN ('paid','fulfilled')`),
+      pool.query(`SELECT COUNT(*) FROM orders WHERE status IN ('paid','processing','fulfilled','cancelled','refunded','flagged')`),
+      pool.query(`SELECT COALESCE(SUM(amount_tnd), 0) AS total FROM orders WHERE status IN ('paid','processing','fulfilled')`),
       pool.query(`SELECT COUNT(*) FROM orders WHERE status = 'paid'`),
       pool.query(`SELECT COUNT(*) FROM contact_messages WHERE status = 'open'`),
     ]);

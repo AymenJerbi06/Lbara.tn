@@ -209,6 +209,43 @@ async function sendFulfillmentEmail(order, product, credentials) {
   });
 }
 
+async function sendTicketFollowUpEmail(order, product, message) {
+  const safeOrderRef = escapeHtml(order.order_ref);
+  const safeProductName = escapeHtml(product.name);
+  const safeMessage = escapeHtml(message);
+
+  await send({
+    to: order.delivery_email,
+    subject: `Action needed for ${product.name} - ${order.order_ref} | Lbara.tn`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9f9;">
+        <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #B8860B; margin: 0; font-size: 28px;">Lbara.tn</h1>
+          <p style="color: #fff; margin: 8px 0 0;">More details needed for your request</p>
+        </div>
+        <div style="background: #fff; border: 4px solid #003060; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+          <h2 style="color: #003060; margin-top: 0;">${safeProductName} - Ticket #${safeOrderRef}</h2>
+          <p style="color: #666; line-height: 1.6;">
+            Your request ticket is paid and open. To prepare the final quote or complete the special request,
+            we need the extra details below.
+          </p>
+          <div style="background: #f8fafc; border: 2px dashed #003060; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <p style="margin: 0; font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 1px;">What we need from you</p>
+            <pre style="margin: 8px 0 0; font-size: 15px; color: #003060; font-weight: bold; white-space: pre-wrap;">${safeMessage}</pre>
+          </div>
+          <p style="color: #666; font-size: 13px;">
+            Reply with your order reference: <strong>${safeOrderRef}</strong>.<br>
+            This ticket is not the final service delivery email. We will confirm the final price or next step after reviewing your details.
+          </p>
+        </div>
+        <p style="color: #999; font-size: 12px; text-align: center;">
+          Thank you for choosing Lbara.tn.
+        </p>
+      </div>
+    `,
+  });
+}
+
 async function sendContactAck(name, email, reference) {
   const safeName = escapeHtml(name);
   const safeMessageRef = escapeHtml(String(reference || '').split('-')[0].toUpperCase());
@@ -238,19 +275,21 @@ async function sendInternalOrderNotification(order, product) {
   if (!recipient) return false;
 
   const safeOrderRef = escapeHtml(order.order_ref);
+  const isTicket = product.checkout_mode === 'quote' || order.variant_checkout_mode === 'quote';
   const detailsRows = fulfillmentDetailsTable(order.fulfillment_details_decoded || {});
 
   await send({
     to: recipient,
-    subject: `Paid Order: ${safeOrderRef} | Lbara.tn`,
+    subject: `${isTicket ? 'Paid Request Ticket' : 'Paid Order'}: ${safeOrderRef} | Lbara.tn`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px;">
         <div style="background: #003060; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
           <h1 style="color: #B8860B; margin: 0; font-size: 24px;">Lbara.tn</h1>
-          <p style="color: #fff; margin: 8px 0 0;">New paid order</p>
+          <p style="color: #fff; margin: 8px 0 0;">${isTicket ? 'New paid request ticket' : 'New paid order'}</p>
         </div>
         <table style="width: 100%; border-collapse: collapse;">
           ${tableRow('Order', order.order_ref)}
+          ${tableRow('Type', isTicket ? 'Request ticket' : 'Service order')}
           ${tableRow('Product', product.name)}
           ${tableRow('Activation flow', product.fulfillment_type_label || 'Service activation')}
           ${tableRow('Selected method', product.fulfillment_method_label || order.fulfillment_method || 'Selected during checkout')}
@@ -326,6 +365,7 @@ module.exports = {
   sendEmailVerificationOTP,
   sendOrderConfirmation,
   sendFulfillmentEmail,
+  sendTicketFollowUpEmail,
   sendContactAck,
   sendInternalOrderNotification,
   sendPasswordChangeOTP,
