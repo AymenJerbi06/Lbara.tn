@@ -77,14 +77,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function setUnavailable(query) {
     setIndicator('cancel', '#DC2626', true);
-    status.textContent = 'Not in the catalog yet. Request it and we will track demand.';
-    showAction('Request a Service', '/contact.html?service=' + encodeURIComponent(query), 'solid');
+    status.textContent = 'Not in the catalog yet. Use the paid request-ticket path so we can review it.';
+    showAction('Open Request Tickets', '/shop.html?search=request', 'solid');
   }
 
   function setError() {
     setIndicator('error', '#DC2626', false);
-    status.textContent = 'We could not check right now. You can still request the service.';
-    showAction('Request a Service', '/contact.html', 'solid');
+    status.textContent = 'We could not check right now. You can still open a paid request ticket.';
+    showAction('Open Request Tickets', '/shop.html?search=request', 'solid');
   }
 
   async function checkAvailability() {

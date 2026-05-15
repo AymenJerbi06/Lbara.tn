@@ -63,6 +63,7 @@ const api = {
 
   // Contact
   sendContact: (body) => apiFetch('/contact', { method: 'POST', body }),
+  getContactRequests: () => apiFetch('/account/contact-requests'),
 
   // Profile
   updateProfile: (body) => apiFetch('/auth/profile', { method: 'POST', body }),

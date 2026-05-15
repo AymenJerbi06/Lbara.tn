@@ -139,6 +139,27 @@
           <!-- Error message -->
           <div id="contact-error" class="hidden mb-6 bg-red-50 border-2 border-red-400 text-red-700 px-4 py-3 rounded-xl font-bold text-sm"></div>
 
+          <div id="contact-auth-gate" class="hidden mb-6 bg-primary/5 border-4 border-primary rounded-2xl p-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <p class="font-headline font-black text-primary text-lg">Login required</p>
+                <p class="text-primary/70 font-bold text-sm mt-1">To protect support capacity and keep each request linked to the right account, please login or create an account before sending a message.</p>
+              </div>
+              <a href="/login.html" class="cartoon-button bg-primary text-white font-black px-6 py-3 rounded-2xl text-sm text-center whitespace-nowrap">Login / Sign Up</a>
+            </div>
+          </div>
+
+          <div id="contact-service-note" class="mb-6 bg-accent/10 border-2 border-accent/50 rounded-2xl p-5">
+            <div class="flex gap-3">
+              <span class="material-symbols-outlined text-accent">info</span>
+              <div>
+                <p class="font-black text-primary text-sm">Support messages are not service requests.</p>
+                <p class="text-primary/70 font-bold text-sm mt-1">Use this form for account, order, billing, technical, or general support. If you cannot find a service in the shop, use the paid request-ticket path instead. The ticket costs 1.500 TND and is not part of the final service price.</p>
+                <a href="/shop.html?search=request" class="inline-flex mt-3 text-primary font-black underline underline-offset-4">Open request-ticket options</a>
+              </div>
+            </div>
+          </div>
+
           <form id="contact-form" class="space-y-5">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
@@ -159,7 +180,6 @@
                   <option value="sales">Sales</option>
                   <option value="technical">Technical</option>
                   <option value="billing">Billing / Refund</option>
-                  <option value="request_service">Request a Service</option>
                   <option value="feedback">Feedback</option>
                 </select>
               </div>

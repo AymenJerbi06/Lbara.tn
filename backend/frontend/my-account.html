@@ -246,6 +246,23 @@
               </a>
             </div>
           </section>
+
+          <section class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
+            <div class="flex justify-between items-start gap-4 mb-6">
+              <div>
+                <h3 class="headline-font font-bold text-2xl">Support Requests</h3>
+                <p class="text-sm text-on-surface-variant mt-1">Messages you sent through the contact page.</p>
+              </div>
+              <a href="/contact.html" class="text-primary font-bold text-sm underline underline-offset-4">New Message</a>
+            </div>
+            <div class="rounded-2xl border-2 border-secondary-container/50 bg-secondary-container/10 p-4 mb-5">
+              <p class="text-xs font-black headline-font uppercase tracking-widest text-secondary mb-1">Important</p>
+              <p class="text-sm font-semibold text-on-surface-variant">This area is for support conversations only. Missing-service requests must use the paid 1.500 TND request-ticket path.</p>
+            </div>
+            <div id="support-requests-loading" class="text-sm font-semibold text-on-surface-variant">Loading support requests...</div>
+            <div id="support-requests-empty" class="hidden text-sm font-semibold text-on-surface-variant bg-surface-container rounded-2xl p-4">No support requests yet.</div>
+            <div id="support-requests-list" class="hidden space-y-3"></div>
+          </section>
         </div>
 
         <section class="xl:col-span-12 bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_20px_40px_rgba(22,28,39,0.06)]">
@@ -647,6 +664,57 @@ function removeCartItem(cartItemId) {
   if (window.showToast) window.showToast(tr('Removed from cart.'));
 }
 
+function supportRequestStatus(status) {
+  const labels = {
+    open: 'Open',
+    in_progress: 'In progress',
+    resolved: 'Resolved',
+  };
+  return labels[status] || status || 'Open';
+}
+
+function supportRequestRow(request) {
+  const subject = request.subject || 'Support request';
+  const preview = request.message_preview || '';
+  return `
+    <div class="rounded-2xl bg-surface-container p-4">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div class="min-w-0">
+          <p class="text-xs headline-font font-black uppercase tracking-widest text-secondary mb-1">#${escapeHtml(request.reference)}</p>
+          <p class="headline-font font-black text-primary truncate">${escapeHtml(tr(subject))}</p>
+          <p class="text-xs text-on-surface-variant font-semibold mt-1">${fmtDate(request.created_at)}${request.category ? ' &bull; ' + escapeHtml(tr(request.category)) : ''}</p>
+        </div>
+        <span class="self-start text-[10px] font-black headline-font uppercase px-3 py-1 rounded-full bg-primary-fixed text-primary">${escapeHtml(tr(supportRequestStatus(request.status)))}</span>
+      </div>
+      ${preview ? `<p class="text-sm font-semibold text-on-surface-variant mt-3 line-clamp-2">${escapeHtml(preview)}</p>` : ''}
+    </div>`;
+}
+
+async function loadSupportRequests() {
+  const loading = document.getElementById('support-requests-loading');
+  const empty = document.getElementById('support-requests-empty');
+  const list = document.getElementById('support-requests-list');
+  if (!loading || !empty || !list) return;
+
+  try {
+    const res = await api.getContactRequests();
+    const requests = res.requests || [];
+    loading.classList.add('hidden');
+    if (!requests.length) {
+      empty.classList.remove('hidden');
+      list.classList.add('hidden');
+      list.innerHTML = '';
+      return;
+    }
+    empty.classList.add('hidden');
+    list.classList.remove('hidden');
+    list.innerHTML = requests.slice(0, 5).map(supportRequestRow).join('');
+    applyTranslations(list);
+  } catch {
+    loading.textContent = tr('Could not load support requests.');
+  }
+}
+
 async function loadFavoriteServices() {
   try {
     const [wishlist, saleAlerts] = await Promise.all([
@@ -869,6 +937,7 @@ async function init() {
   document.getElementById('header-avatar').textContent = initial;
   renderAccountCart();
   loadFavoriteServices();
+  loadSupportRequests();
 
   try {
     const res = await api.myOrders();

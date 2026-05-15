@@ -359,7 +359,7 @@ function renderSelection() {
       ? '<span class="material-symbols-outlined">add_shopping_cart</span> ' + escapeHtml(tr('Add to Cart'))
       : '<span class="material-symbols-outlined">schedule</span> ' + escapeHtml(tr('Pricing Soon'));
   }
-  contactBtn.href = '/contact.html?service=' + encodeURIComponent(product.name + (variant ? ' - ' + variant.name : ''));
+  contactBtn.href = '/contact.html?category=sales';
   applyTranslations(document.getElementById('selection-panel') || document);
 }
 

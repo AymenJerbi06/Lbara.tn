@@ -106,6 +106,8 @@ CREATE TABLE IF NOT EXISTS fulfillments (
 -- ─── Contact Messages ─────────────────────────────────────
 CREATE TABLE IF NOT EXISTS contact_messages (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID REFERENCES users(id) ON DELETE SET NULL,
+  reference   VARCHAR(20) UNIQUE,
   full_name   VARCHAR(255) NOT NULL,
   email       VARCHAR(255) NOT NULL,
   subject     VARCHAR(255),
@@ -191,6 +193,18 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS variant_id UUID REFERENCES product_v
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_type VARCHAR(50);
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_method VARCHAR(80);
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_details TEXT;
+ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS reference VARCHAR(20);
+UPDATE contact_messages
+SET reference = UPPER(SUBSTRING(REPLACE(id::text, '-', '') FROM 1 FOR 8))
+WHERE reference IS NULL;
+UPDATE contact_messages cm
+SET user_id = u.id
+FROM users u
+WHERE cm.user_id IS NULL
+  AND LOWER(cm.email) = LOWER(u.email);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_contact_messages_reference ON contact_messages(reference);
+CREATE INDEX IF NOT EXISTS idx_contact_messages_user_id ON contact_messages(user_id);
 
 -- ─── Seed Products ────────────────────────────────────────
 INSERT INTO products (slug, name, provider, category, description, price_tnd, badge, account_type, duration_label, delivery_hours, fulfillment_type)

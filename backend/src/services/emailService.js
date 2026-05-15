@@ -151,9 +151,9 @@ async function sendFulfillmentEmail(order, product, credentials) {
   });
 }
 
-async function sendContactAck(name, email, messageId) {
+async function sendContactAck(name, email, reference) {
   const safeName = escapeHtml(name);
-  const safeMessageRef = escapeHtml(messageId.split('-')[0].toUpperCase());
+  const safeMessageRef = escapeHtml(String(reference || '').split('-')[0].toUpperCase());
 
   await send({
     to: email,

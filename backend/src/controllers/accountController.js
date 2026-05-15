@@ -168,6 +168,31 @@ async function removeSaleNotification(req, res) {
   }
 }
 
+async function listContactRequests(req, res) {
+  try {
+    const result = await pool.query(
+      `SELECT
+         id,
+         COALESCE(reference, UPPER(SUBSTRING(REPLACE(id::text, '-', '') FROM 1 FOR 8))) AS reference,
+         subject,
+         category,
+         status,
+         LEFT(message, 180) AS message_preview,
+         created_at
+       FROM contact_messages
+       WHERE user_id = $1
+       ORDER BY created_at DESC
+       LIMIT 25`,
+      [req.user.id]
+    );
+
+    res.json({ success: true, requests: result.rows });
+  } catch (err) {
+    console.error('[account/listContactRequests]', err);
+    res.status(500).json({ success: false, message: 'Failed to load support requests.' });
+  }
+}
+
 module.exports = {
   listWishlist,
   addWishlist,
@@ -175,4 +200,5 @@ module.exports = {
   listSaleNotifications,
   addSaleNotification,
   removeSaleNotification,
+  listContactRequests,
 };

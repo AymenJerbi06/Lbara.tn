@@ -8,6 +8,7 @@ const {
   listSaleNotifications,
   addSaleNotification,
   removeSaleNotification,
+  listContactRequests,
 } = require('../controllers/accountController');
 
 router.use(authMiddleware);
@@ -19,5 +20,7 @@ router.delete('/wishlist/:productId', removeWishlist);
 router.get('/sale-notifications', listSaleNotifications);
 router.post('/sale-notifications', addSaleNotification);
 router.delete('/sale-notifications/:productId', removeSaleNotification);
+
+router.get('/contact-requests', listContactRequests);
 
 module.exports = router;

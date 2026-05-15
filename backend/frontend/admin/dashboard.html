@@ -987,6 +987,7 @@ async function loadMessages() {
           <div class="flex items-start justify-between mb-3">
             <div>
               <span class="font-black text-primary">${escapeHtml(m.full_name)}</span>
+              <span class="ml-3 text-xs font-black text-primary/50 uppercase">#${escapeHtml(m.reference || String(m.id || '').split('-')[0].toUpperCase())}</span>
               <a class="ml-3 text-sm font-bold text-on-surface/50 hover:text-primary" href="mailto:${escapeHtml(m.email)}">${escapeHtml(m.email)}</a>
               ${m.category ? `<span class="ml-3 text-xs font-black text-accent uppercase">${escapeHtml(m.category)}</span>` : ''}
               <span class="ml-3 text-xs font-black text-secondary uppercase">${escapeHtml(m.status || 'open')}</span>

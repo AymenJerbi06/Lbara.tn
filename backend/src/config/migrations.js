@@ -74,6 +74,21 @@ async function ensureRuntimeMigrations() {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(30);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(100);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS preferred_language VARCHAR(10) DEFAULT 'en';
+    ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id) ON DELETE SET NULL;
+    ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS reference VARCHAR(20);
+
+    UPDATE contact_messages
+    SET reference = UPPER(SUBSTRING(REPLACE(id::text, '-', '') FROM 1 FOR 8))
+    WHERE reference IS NULL;
+
+    UPDATE contact_messages cm
+    SET user_id = u.id
+    FROM users u
+    WHERE cm.user_id IS NULL
+      AND LOWER(cm.email) = LOWER(u.email);
+
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_contact_messages_reference ON contact_messages(reference);
+    CREATE INDEX IF NOT EXISTS idx_contact_messages_user_id ON contact_messages(user_id);
 
     CREATE TABLE IF NOT EXISTS schema_migrations (
       key VARCHAR(120) PRIMARY KEY,
