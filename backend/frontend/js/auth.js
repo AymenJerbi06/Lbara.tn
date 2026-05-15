@@ -29,9 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         if (err.verification_required && err.email) {
           sessionStorage.setItem('lbara_verify_email', err.email);
-          showToast(tr('Please verify your email before logging in.'), 'error');
+          showToast(err.email_delivery_failed
+            ? (err.email_delivery_message || tr('Please verify your email before logging in. We could not send a new code right now, so try Resend Code in a moment.'))
+            : tr('Please verify your email before logging in. We sent you a new verification code.'), err.email_delivery_failed ? 'error' : 'success');
           setTimeout(() => {
-            window.location.href = `/verify-email.html?email=${encodeURIComponent(err.email)}`;
+            const deliveryParam = err.email_delivery_failed ? '&delivery=failed' : '&delivery=sent';
+            window.location.href = `/verify-email.html?email=${encodeURIComponent(err.email)}${deliveryParam}`;
           }, 900);
           return;
         }
@@ -94,7 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
           showToast(result.email_delivery_failed
             ? (result.email_delivery_message || tr('Account created, but the verification email could not be sent. Please try resending the code in a moment.'))
             : tr('Account created. Please verify your email before logging in.'));
-          setTimeout(() => { window.location.href = `/verify-email.html?email=${encodeURIComponent(email)}`; }, 1200);
+          const deliveryParam = result.email_delivery_failed ? '&delivery=failed' : '&delivery=sent';
+          setTimeout(() => { window.location.href = `/verify-email.html?email=${encodeURIComponent(email)}${deliveryParam}`; }, 1200);
         } else {
           showToast(tr('Account created! Welcome to Lbara.tn'));
           setTimeout(() => { window.location.href = '/shop.html'; }, 800);
@@ -137,8 +141,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (verifyEmailInput) {
-    const emailFromUrl = new URLSearchParams(window.location.search).get('email');
+    const verifyParams = new URLSearchParams(window.location.search);
+    const emailFromUrl = verifyParams.get('email');
     verifyEmailInput.value = emailFromUrl || sessionStorage.getItem('lbara_verify_email') || '';
+    if (verifyParams.get('delivery') === 'failed') {
+      showVerifyMessage(tr('Account created, but the verification email could not be sent. Please press Resend Code.'));
+    } else if (verifyParams.get('delivery') === 'sent') {
+      showVerifyMessage(tr('Verification code sent. Check your inbox, Spam, Promotions, and Updates.'), 'success');
+    }
   }
 
   if (verifyForm) {
@@ -181,12 +191,12 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         await api.resendVerification({ email });
         sessionStorage.setItem('lbara_verify_email', email);
-        showVerifyMessage(tr('Verification code sent. Check your email.'), 'success');
+        showVerifyMessage(tr('Verification code sent. Check your inbox, Spam, Promotions, and Updates.'), 'success');
       } catch (err) {
         showVerifyMessage(err.message || tr('Could not send a verification code right now.'));
       } finally {
         resendBtn.disabled = false;
-        resendBtn.textContent = tr('Resend Code');
+        resendBtn.innerHTML = tr('Resend Code') + ' ' + icon('forward_to_inbox');
       }
     });
   }

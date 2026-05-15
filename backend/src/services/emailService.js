@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { escapeHtml } = require('../utils/html');
 
-const FROM = process.env.EMAIL_FROM || 'Lbara.tn <notifications@lbara.tn>';
+const DEFAULT_FROM = 'Lbara.tn <notifications@lbara.tn>';
 
 function frontendUrl(path) {
   const base = String(process.env.FRONTEND_URL || 'http://localhost:3025').replace(/\/+$/, '');
@@ -12,39 +12,73 @@ function sanitizeHeader(value) {
   return String(value ?? '').replace(/[\r\n]+/g, ' ').slice(0, 200);
 }
 
-async function send({ to, subject, html, replyTo }) {
+function emailFrom() {
+  return sanitizeHeader(process.env.EMAIL_FROM || DEFAULT_FROM);
+}
+
+function fromAddress(value = emailFrom()) {
+  const sanitized = sanitizeHeader(value);
+  const angleMatch = sanitized.match(/<([^<>\s@]+@[^<>\s@]+\.[^<>\s@]+)>/);
+  const directMatch = sanitized.match(/^([^<>\s@]+@[^<>\s@]+\.[^<>\s@]+)$/);
+  return (angleMatch?.[1] || directMatch?.[1] || '').toLowerCase();
+}
+
+function diagnostics() {
+  const address = fromAddress();
+  return {
+    resend_configured: Boolean(process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.includes('your_') && process.env.RESEND_API_KEY.length > 20),
+    from: emailFrom(),
+    from_address: address,
+    from_domain: address.split('@')[1] || '',
+    sandbox_sender: /@resend\.dev$/i.test(address),
+  };
+}
+
+async function send({ to, subject, html, text, replyTo }) {
   if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.includes('your_')) {
     throw new Error('Email delivery is not configured. Set RESEND_API_KEY and EMAIL_FROM in your environment.');
   }
 
+  const from = emailFrom();
+  const address = fromAddress(from);
+  if (!address) {
+    throw new Error('EMAIL_FROM must be a valid sender such as "Lbara.tn <notifications@lbara.tn>".');
+  }
+
   try {
     const payload = {
-      from: FROM,
+      from,
       to: [to],
       subject: sanitizeHeader(subject),
       html,
     };
+    if (text) payload.text = text;
     if (replyTo) payload.reply_to = sanitizeHeader(replyTo);
 
-    await axios.post('https://api.resend.com/emails', payload, {
+    const response = await axios.post('https://api.resend.com/emails', payload, {
       headers: {
         'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
     });
+    return response.data || {};
   } catch (err) {
     const details = err.response?.data || err.message;
     console.error('[emailService] Resend error:', JSON.stringify(details));
-    throw new Error(typeof details === 'object' ? (details.message || JSON.stringify(details)) : details);
+    const deliveryError = new Error(typeof details === 'object' ? (details.message || JSON.stringify(details)) : details);
+    deliveryError.status = err.response?.status;
+    deliveryError.details = details;
+    throw deliveryError;
   }
 }
 
 async function sendEmailVerificationLink(email, verifyUrl) {
   const safeVerifyUrl = escapeHtml(verifyUrl);
 
-  await send({
+  return send({
     to: email,
     subject: 'Verify your email - Lbara.tn',
+    text: `Please confirm this email address before using your Lbara.tn account: ${verifyUrl}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9ff;">
         <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
@@ -64,9 +98,10 @@ async function sendEmailVerificationLink(email, verifyUrl) {
 async function sendEmailVerificationOTP(email, otp) {
   const safeOtp = escapeHtml(otp);
 
-  await send({
+  return send({
     to: email,
     subject: 'Your Lbara.tn verification code',
+    text: `Your Lbara.tn verification code is ${otp}. This code expires in 20 minutes. If you did not create an account, you can ignore this email.`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9ff;">
         <div style="background: #003060; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
@@ -81,6 +116,7 @@ async function sendEmailVerificationOTP(email, otp) {
           </div>
           <p style="color: #43474f; font-size: 13px;">This code expires in <strong>20 minutes</strong>.</p>
           <p style="color: #999; font-size: 12px;">If you did not create an account, you can safely ignore this email.</p>
+          <p style="color: #999; font-size: 12px;">If the code is not in your inbox, please check Spam, Promotions, and Updates.</p>
         </div>
       </div>
     `,
@@ -103,7 +139,7 @@ function fulfillmentNextStep(order, product) {
 
   const method = order.fulfillment_method;
   if (method === 'gift_card_self_redeem') {
-    return 'We will send the code or gift card with the redemption steps. Some services may require the correct account region or VPN during redemption.';
+    return 'We will send the code or gift card with the redemption steps. If this is a gift card rather than a simple activation code, use a reliable VPN set to Canada and redeem through the Canadian version or region of the service/store.';
   }
   if (method === 'gift_to_existing_account') {
     return 'We will gift or activate the subscription on the service account email you provided. Watch that inbox for any confirmation email from the service.';
@@ -112,7 +148,7 @@ function fulfillmentNextStep(order, product) {
     return 'We will create and activate a fresh account using the email you provided, then send the account details after processing.';
   }
   if (method === 'store_credit') {
-    return 'We will prepare the store credit path you selected. Store region rules may apply, especially for Apple App Store and Google Play.';
+    return 'We will prepare the store credit path you selected. Store region rules may apply, especially for Apple App Store and Google Play; Canadian store credit usually requires the account/store region and VPN signals to match Canada.';
   }
   return 'We will use the activation details you provided to complete the service on the correct account. Stay reachable in case the platform asks for verification.';
 }
@@ -438,6 +474,7 @@ async function sendPasswordResetLink(email, resetUrl) {
 }
 
 module.exports = {
+  diagnostics,
   send,
   sendEmailVerificationLink,
   sendEmailVerificationOTP,

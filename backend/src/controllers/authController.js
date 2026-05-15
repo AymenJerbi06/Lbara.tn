@@ -34,17 +34,18 @@ function hashToken(token) {
 }
 
 function publicEmailStatus() {
-  const resendKey = process.env.RESEND_API_KEY || '';
-  const from = process.env.EMAIL_FROM || 'Lbara.tn <notifications@lbara.tn>';
-  const sandboxSender = /@resend\.dev>?$/i.test(from.trim());
+  const emailDiagnostics = emailService.diagnostics();
   return {
     verification_required: emailVerificationRequired(),
-    resend_configured: Boolean(resendKey && !resendKey.includes('your_') && resendKey.length > 20),
-    sandbox_sender: sandboxSender,
+    resend_configured: emailDiagnostics.resend_configured,
+    sandbox_sender: emailDiagnostics.sandbox_sender,
+    sender_domain: emailDiagnostics.from_domain,
     frontend_url: process.env.FRONTEND_URL || 'http://localhost:3025',
-    hint: sandboxSender
-      ? 'Resend sandbox sender can only deliver to the email address attached to your Resend account.'
-      : 'Sender domain must be verified in Resend before it can deliver verification codes.',
+    hint: !emailDiagnostics.resend_configured
+      ? 'Set RESEND_API_KEY and EMAIL_FROM to send verification codes.'
+      : (emailDiagnostics.sandbox_sender
+        ? 'Resend sandbox sender can only deliver to the email address attached to your Resend account.'
+        : 'If delivery fails, confirm this sender domain is verified in Resend and check the Resend logs.'),
   };
 }
 
@@ -71,7 +72,9 @@ async function createEmailVerificationCode(userId, email) {
     [`otp:${hashedCode}`, expires, userId]
   );
 
-  await emailService.sendEmailVerificationOTP(email, code);
+  const delivery = await emailService.sendEmailVerificationOTP(email, code);
+  console.info(`[auth] Verification code accepted by Resend for ${email}${delivery?.id ? ` (${delivery.id})` : ''}`);
+  return delivery;
 }
 
 function cleanProfileFields(body, { requireName = false } = {}) {
@@ -132,10 +135,12 @@ async function register(req, res) {
     const user = result.rows[0];
     let emailDeliveryFailed = false;
     let emailDeliveryMessage = null;
+    let emailDeliveryId = null;
 
     if (verificationRequired) {
       try {
-        await createEmailVerificationCode(user.id, user.email);
+        const delivery = await createEmailVerificationCode(user.id, user.email);
+        emailDeliveryId = delivery?.id || null;
       } catch (emailErr) {
         console.error('[register verification email]', emailErr.message);
         emailDeliveryFailed = true;
@@ -152,6 +157,7 @@ async function register(req, res) {
       verification_required: verificationRequired,
       email_delivery_failed: emailDeliveryFailed,
       email_delivery_message: process.env.NODE_ENV === 'production' ? undefined : emailDeliveryMessage,
+      email_delivery_id: process.env.NODE_ENV === 'production' ? undefined : emailDeliveryId,
       message: verificationRequired
         ? (emailDeliveryFailed
           ? 'Account created, but the verification email could not be sent. Please try resending the code in a moment.'
@@ -183,11 +189,25 @@ async function login(req, res) {
       return res.status(403).json({ success: false, message: PREVIEW_AUTH_MESSAGE });
     }
     if (emailVerificationRequired() && !user.is_admin && !user.is_verified) {
+      let emailDeliveryFailed = false;
+      let emailDeliveryMessage = null;
+      try {
+        await createEmailVerificationCode(user.id, user.email);
+      } catch (emailErr) {
+        console.error('[login verification email]', emailErr.message);
+        emailDeliveryFailed = true;
+        emailDeliveryMessage = emailErr.message;
+      }
+
       return res.status(403).json({
         success: false,
         verification_required: true,
         email: user.email,
-        message: 'Please verify your email before logging in.',
+        email_delivery_failed: emailDeliveryFailed,
+        email_delivery_message: process.env.NODE_ENV === 'production' ? undefined : emailDeliveryMessage,
+        message: emailDeliveryFailed
+          ? 'Please verify your email before logging in. We could not send a new code right now, so try Resend Code in a moment.'
+          : 'Please verify your email before logging in. We sent you a new verification code.',
       });
     }
 
@@ -439,8 +459,12 @@ async function resendVerificationCode(req, res) {
       return res.json({ success: true, message: 'This email is already verified.' });
     }
 
-    await createEmailVerificationCode(user.id, user.email);
-    res.json({ success: true, message: 'Verification code sent. Check your email.' });
+    const delivery = await createEmailVerificationCode(user.id, user.email);
+    res.json({
+      success: true,
+      message: 'Verification code sent. Check your email.',
+      email_delivery_id: process.env.NODE_ENV === 'production' ? undefined : delivery?.id,
+    });
   } catch (err) {
     if (handleValidationError(err, res)) return;
     console.error('[resendVerificationCode]', err);

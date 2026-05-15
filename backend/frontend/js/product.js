@@ -138,7 +138,7 @@ function flowLabel(type) {
 
 function activationCopy(type) {
   if (type === 'gift_card') {
-    return tr('This service can use a gift card or store-credit path, and checkout also lets you choose assisted activation if you want Lbara.tn to handle it on your account.');
+    return tr('This service can use a gift card or store-credit path. If it is redeemed with a gift card rather than a simple activation code, you must use a reliable VPN set to Canada and open the Canadian version or region of the service/store before redeeming.');
   }
   if (type === 'giftable_subscription') {
     return tr('This service can be gifted to an existing account email, or you can choose assisted activation and provide temporary account access if you want Lbara.tn to handle it for you.');

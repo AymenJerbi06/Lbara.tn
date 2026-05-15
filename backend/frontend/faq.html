@@ -210,8 +210,8 @@
             <span class="material-symbols-outlined text-primary transition-transform">expand_more</span>
           </button>
           <div class="faq-answer px-6 pb-5">
-            <p class="text-on-surface/70 font-medium leading-relaxed">It depends on the specific product and activation path. Some services work through normal account setup or gifting. Others, especially gift-card or store-credit products, may require region steps or a VPN during redemption. If that applies to the product you ordered, we include the instructions with your delivery email.</p>
-            <p class="text-on-surface/70 font-medium leading-relaxed">No. The accounts we provide are configured to work from Tunisia without a VPN. That is one of the key reasons Lbara.tn exists — to break down these barriers for Tunisian users.</p>
+            <p class="text-on-surface/70 font-medium leading-relaxed">It depends on the specific product and activation path. Normal account setup or gifted subscriptions usually do not require you to use a VPN yourself. Gift-card or store-credit redemption is different: if the product is redeemed with a gift card instead of a simple activation code, you need a reliable VPN set to Canada and you must open the Canadian version or region of the service/store before redeeming.</p>
+            <p class="text-on-surface/70 font-medium leading-relaxed">When a product needs that step, we repeat it on the product page, checkout, and delivery instructions. If you do not want to handle VPN or region steps yourself, choose assisted activation when it is available.</p>
           </div>
         </div>
 
@@ -343,7 +343,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.faq-answer p').forEach(function (p) {
       if (p.textContent.indexOf('No. The accounts we provide are configured') === 0) {
-        p.textContent = 'It depends on the product and redemption path. Some services work after a normal gifted subscription or account setup. Some gift-card or store-credit products may require region steps or a VPN during redemption. If that applies, we include the instructions with your order.';
+        p.textContent = 'When a product needs that step, we repeat it on the product page, checkout, and delivery instructions. If you do not want to handle VPN or region steps yourself, choose assisted activation when it is available.';
       }
     });
 

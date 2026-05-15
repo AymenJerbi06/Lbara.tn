@@ -480,14 +480,15 @@ function renderFulfillmentFields(product, selectedVariant) {
       + quoteNotice
       + guidanceBlock('Allowed for this product', [
         'This service is configured as a gift-card or store-credit product, so self-redemption and store-credit choices may appear here.',
-        'If you choose self-redemption, you handle the service account region, VPN steps, and redemption instructions yourself.',
+        'Gift-card redemption is region-sensitive: use a reliable VPN set to Canada and open the Canadian version or region of the service/store before redeeming.',
+        'If this is a simple activation code instead of a gift card, follow the code instructions we send with your delivery email.',
         'Assisted activation is also available: you give us temporary access to your ' + accountName + ', and we handle whichever payment or redemption path works for this product.',
       ], 'primary', 'redeem')
       + '<div class="grid grid-cols-1 gap-3">'
       + optionCard('gift_card_self_redeem', 'Send me the code', 'Best if you want the most privacy and you are comfortable following the instructions yourself.', 'redeem', true, [
         'We send the code and any service-specific steps to your delivery email.',
-        'Some gift cards only work when the account region matches the card region.',
-        'You may need a VPN during redemption, depending on the service.',
+        'For gift cards, connect to a Canada VPN before opening the redemption page and keep the account/store region set to Canada.',
+        'Some gift cards only work when the account region matches the card region; activation codes may not need this step.',
       ])
       + assistedActivationOption(accountName, offerName, false)
       + optionCard('store_credit', 'Store credit help', 'For Apple App Store or Google Play credit when the service can be paid through the store balance.', 'phone_iphone', false, [
@@ -498,7 +499,8 @@ function renderFulfillmentFields(product, selectedVariant) {
       + '</div>'
       + guidanceBlock('Before choosing gift card delivery', [
         'Do not redeem the code before contacting us if you notice the wrong service, wrong amount, or wrong region.',
-        'We cannot control restrictions created by the service provider, your account country, or a previously used gift card.',
+        'If you cannot use a VPN or switch to the Canadian region, choose assisted activation so Lbara.tn can handle the gift-card redemption path.',
+        'We cannot control restrictions created by the service provider, your account country, VPN signals, or a previously used gift card.',
         'Keep your delivery email active because all code and activation updates are sent there.',
       ], 'accent', 'info')
       + assistedActivationPanel(accountName, offerName)
@@ -513,7 +515,7 @@ function renderFulfillmentFields(product, selectedVariant) {
       + field('store-region', 'Target Region', 'Canada', 'text', 'Write the region you want us to prepare for. Canada is the default for most imported services.')
       + '</div>'
       + notesField('Notes for the team', 'Mention your current account region, device type, VPN availability, or any redemption concern.')
-      + ackField('I understand this product can use gift-card, store-credit, or assisted activation depending on the option I choose. If I choose assisted activation, I agree to provide the requested ' + accountName + ' details and any verification needed.');
+      + ackField('I understand that gift-card redemption can require a VPN set to Canada and the Canadian service/store region. If I choose assisted activation, I agree to provide the requested account details and any verification needed.');
   } else if (type === 'giftable_subscription') {
     html = ''
       + quoteNotice

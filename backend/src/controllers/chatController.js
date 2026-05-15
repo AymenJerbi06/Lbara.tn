@@ -76,8 +76,8 @@ function fallbackAnswer(message, language = 'en') {
       greeting: 'Hi. Tell me which service you are interested in or what you are trying to figure out, and I will guide you step by step.',
       account: 'Account details are only needed when the activation method you choose requires them. For example, assisted activation for Netflix means checkout asks for the Netflix account email/password and any notes needed to activate it. If the service can be gifted, we usually only need the email linked to that service account. Please do not paste passwords into this chat.',
       payment: 'You choose the service and variation first, then checkout shows the local payment amount in TND. The idea is that you pay locally instead of needing an international card.',
-      delivery: 'After payment, the delivery path depends on the service. Some products are delivered as a code or gift card, some are gifted to your existing account email, and some require assisted activation on the exact service account you want to use. Most standard deliveries target under two hours, while special requests may need follow-up.',
-      vpn: 'Some services are not officially available in Tunisia. If the product page mentions a VPN, you should expect to use one even after the subscription is activated. Bundles can include NordVPN when that makes the service easier to use.',
+      delivery: 'After payment, the delivery path depends on the service. Some products are delivered as a code or gift card, some are gifted to your existing account email, and some require assisted activation on the exact service account you want to use. Gift-card redemption may require a VPN set to Canada and the Canadian service/store region. Most standard deliveries target under two hours, while special requests may need follow-up.',
+      vpn: 'Some services are not officially available in Tunisia. For gift-card redemption, use a reliable VPN set to Canada and open the Canadian version or region of the service/store before redeeming. If the product page mentions VPN use after activation, expect to keep using one while watching or using the service.',
       request: 'Special request products use a 1.500 TND request ticket so Lbara.tn can review the exact service and contact you. That ticket is not part of the final price and is not refundable if you change your mind.',
       favorite: 'Create or log in to your account, then use the heart button to save services and the sale alert button to be notified when a product is discounted.',
       buy: 'To buy: open the Shop, choose a service, select the exact variation, read the activation notes, then continue to checkout. Checkout will ask for the delivery method and the account details only when that service needs them.',
@@ -467,12 +467,12 @@ function productDeliveryText(product, language = 'en') {
   }
 
   if (language === 'fr') {
-    if (fulfillment === 'gift_card') return `Ce produit passe generalement par une carte cadeau ou un code, avec une livraison visee ${timeText}. Le checkout precise l etape exacte avant validation.`;
+    if (fulfillment === 'gift_card') return `Ce produit passe generalement par une carte cadeau ou un code, avec une livraison visee ${timeText}. Pour une carte cadeau, utilisez un VPN fiable regle sur le Canada et la version ou region canadienne du service/boutique avant redemption. Le checkout precise l etape exacte avant validation.`;
     if (fulfillment === 'gifted_subscription') return `L abonnement est generalement envoye vers l email lie au bon compte, avec une livraison visee ${timeText}.`;
     return `La livraison depend du parcours d activation de ce produit, avec une livraison visee ${timeText}.`;
   }
 
-  if (fulfillment === 'gift_card') return `This product is usually handled through a gift-card or code path, with delivery targeted in ${timeText}. Checkout shows the exact step before you confirm.`;
+  if (fulfillment === 'gift_card') return `This product is usually handled through a gift-card or code path, with delivery targeted in ${timeText}. For gift-card redemption, use a reliable VPN set to Canada and the Canadian service/store region before redeeming. Checkout shows the exact step before you confirm.`;
   if (fulfillment === 'gifted_subscription') return `This subscription is usually sent to the email linked to the correct account, with delivery targeted in ${timeText}.`;
   return `Delivery depends on this product's activation path, with delivery targeted in ${timeText}.`;
 }
