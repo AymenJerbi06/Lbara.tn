@@ -35,12 +35,11 @@ function hashToken(token) {
 
 function publicEmailStatus() {
   const resendKey = process.env.RESEND_API_KEY || '';
-  const from = process.env.EMAIL_FROM || 'Lbara.tn <onboarding@resend.dev>';
+  const from = process.env.EMAIL_FROM || 'Lbara.tn <notifications@lbara.tn>';
   const sandboxSender = /@resend\.dev>?$/i.test(from.trim());
   return {
     verification_required: emailVerificationRequired(),
     resend_configured: Boolean(resendKey && !resendKey.includes('your_') && resendKey.length > 20),
-    email_from: from,
     sandbox_sender: sandboxSender,
     frontend_url: process.env.FRONTEND_URL || 'http://localhost:3025',
     hint: sandboxSender

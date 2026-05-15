@@ -60,6 +60,14 @@ async function verify(req, res) {
         console.error(`[ERROR] Confirmation email failed for order ${order.order_ref}:`, emailErr.message);
       }
 
+      try {
+        await emailService.sendInternalOrderNotification(order, {
+          name: order.product_name,
+        });
+      } catch (emailErr) {
+        console.error(`[ERROR] Internal order notification failed for order ${order.order_ref}:`, emailErr.message);
+      }
+
       return res.json({ success: true, status: 'paid', order_ref: order.order_ref });
     }
 

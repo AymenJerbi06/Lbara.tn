@@ -76,6 +76,10 @@ function validateEmailConfig(errors) {
   if (!needsEmail) return;
   requireValue('RESEND_API_KEY', errors, { minLength: 20 });
   requireValue('EMAIL_FROM', errors);
+
+  if (envFlag('CONTACT_EMAIL_DELIVERY_ENABLED') && !process.env.SUPPORT_EMAIL && !process.env.ADMIN_EMAIL) {
+    errors.push('SUPPORT_EMAIL or ADMIN_EMAIL must be set when CONTACT_EMAIL_DELIVERY_ENABLED=true.');
+  }
 }
 
 function validateRuntimeConfig() {

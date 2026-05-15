@@ -40,7 +40,7 @@ Check each item before moving to the next section.
 - [ ] `SMTP_PORT=587`
 - [ ] `SMTP_USER` — staging email sender
 - [ ] `SMTP_PASS` — staging email password
-- [ ] `EMAIL_FROM="Lbara.tn <hello@lbara.tn>"`
+- [ ] `EMAIL_FROM="Lbara.tn <notifications@lbara.tn>"`
 - [ ] `FLOUCI_APP_TOKEN` — **sandbox** token only
 - [ ] `FLOUCI_APP_SECRET` — **sandbox** secret only
 - [ ] `FLOUCI_DEVELOPER_ID`

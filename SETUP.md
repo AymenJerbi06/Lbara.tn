@@ -53,7 +53,7 @@ Edit `.env` and fill in:
 - `JWT_SECRET` — any long random string
 - `ENCRYPTION_KEY` — exactly 64 hex characters (e.g. run `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
 - `RESEND_API_KEY` — your Resend API key for sending order and support emails
-- `EMAIL_FROM` — your verified sender, for example `lbara.tn <hello@lbara.tn>`
+- `EMAIL_FROM` — your verified sender, for example `Lbara.tn <notifications@lbara.tn>`
 - `FLOUCI_APP_TOKEN` + `FLOUCI_APP_SECRET` — from https://developers.flouci.com
   OR `PAYMEE_API_KEY` + `PAYMEE_VENDOR_ID` — from https://paymee.tn
 - Set `PAYMENT_GATEWAY=flouci` (or `paymee`)

@@ -10,8 +10,6 @@ const {
   handleValidationError,
 } = require('../utils/validation');
 
-const DEFAULT_ADMIN_EMAIL = 'Jerbiaymen6@gmail.com';
-
 async function submit(req, res) {
   try {
     rejectUnexpectedFields(req.body, ['full_name', 'email', 'subject', 'category', 'message'], 'Contact form');
@@ -41,12 +39,17 @@ async function submit(req, res) {
 
       // Notify admin
       try {
-        const adminEmail = process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL;
-        await emailService.send({
-          to: adminEmail,
-          subject: `New Contact: ${subject || 'General'} from ${full_name}`,
-          html: `<p><strong>From:</strong> ${escapeHtml(full_name)} (${escapeHtml(email)})</p><p><strong>Category:</strong> ${escapeHtml(category || 'N/A')}</p><p><strong>Subject:</strong> ${escapeHtml(subject || 'N/A')}</p><p><strong>Message:</strong><br>${htmlLines(message)}</p>`,
-        });
+        const supportEmail = process.env.SUPPORT_EMAIL || process.env.ADMIN_EMAIL;
+        if (supportEmail) {
+          await emailService.send({
+            to: supportEmail,
+            subject: `New Contact: ${subject || 'General'} from ${full_name}`,
+            html: `<p><strong>From:</strong> ${escapeHtml(full_name)} (${escapeHtml(email)})</p><p><strong>Category:</strong> ${escapeHtml(category || 'N/A')}</p><p><strong>Subject:</strong> ${escapeHtml(subject || 'N/A')}</p><p><strong>Message:</strong><br>${htmlLines(message)}</p>`,
+            replyTo: email,
+          });
+        } else {
+          console.info(`[contact/notify] Stored contact message ${messageId}; SUPPORT_EMAIL is not configured.`);
+        }
       } catch (e) {
         console.error('[admin notify]', e.message);
       }

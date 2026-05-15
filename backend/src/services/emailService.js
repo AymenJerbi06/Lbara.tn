@@ -1,24 +1,27 @@
 const axios = require('axios');
 const { escapeHtml } = require('../utils/html');
 
-const FROM = process.env.EMAIL_FROM || 'Lbara.tn <onboarding@resend.dev>';
+const FROM = process.env.EMAIL_FROM || 'Lbara.tn <notifications@lbara.tn>';
 
 function sanitizeHeader(value) {
   return String(value ?? '').replace(/[\r\n]+/g, ' ').slice(0, 200);
 }
 
-async function send({ to, subject, html }) {
+async function send({ to, subject, html, replyTo }) {
   if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.includes('your_')) {
     throw new Error('Email delivery is not configured. Set RESEND_API_KEY and EMAIL_FROM in your environment.');
   }
 
   try {
-    await axios.post('https://api.resend.com/emails', {
+    const payload = {
       from: FROM,
       to: [to],
       subject: sanitizeHeader(subject),
       html,
-    }, {
+    };
+    if (replyTo) payload.reply_to = sanitizeHeader(replyTo);
+
+    await axios.post('https://api.resend.com/emails', payload, {
       headers: {
         'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
         'Content-Type': 'application/json',
@@ -108,7 +111,7 @@ async function sendOrderConfirmation(order, product) {
         </div>
         <p style="color: #666; font-size: 13px; text-align: center;">
           Your access details and activation instructions will be sent to this email once our team processes your order.<br>
-          Need help? Contact us at <a href="mailto:hello@lbara.tn" style="color: #003060;">hello@lbara.tn</a>
+          Need help? Use the contact page on Lbara.tn and include your order reference.
         </p>
       </div>
     `,
@@ -169,6 +172,42 @@ async function sendContactAck(name, email, messageId) {
   });
 }
 
+async function sendInternalOrderNotification(order, product) {
+  const recipient = process.env.ORDER_NOTIFICATION_EMAIL
+    || process.env.BUYING_EMAIL
+    || process.env.SUPPORT_EMAIL
+    || process.env.ADMIN_EMAIL;
+  if (!recipient) return false;
+
+  const safeOrderRef = escapeHtml(order.order_ref);
+  const safeProductName = escapeHtml(product.name);
+  const safeAmount = escapeHtml(order.amount_tnd);
+  const safeDeliveryEmail = escapeHtml(order.delivery_email);
+  const safeGateway = escapeHtml(order.gateway || 'payment gateway');
+
+  await send({
+    to: recipient,
+    subject: `Paid Order: ${safeOrderRef} | Lbara.tn`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px;">
+        <div style="background: #003060; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+          <h1 style="color: #B8860B; margin: 0; font-size: 24px;">Lbara.tn</h1>
+          <p style="color: #fff; margin: 8px 0 0;">New paid order</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 8px 0; color: #666;">Order</td><td style="padding: 8px 0; font-weight: bold;">${safeOrderRef}</td></tr>
+          <tr><td style="padding: 8px 0; color: #666;">Product</td><td style="padding: 8px 0; font-weight: bold;">${safeProductName}</td></tr>
+          <tr><td style="padding: 8px 0; color: #666;">Amount</td><td style="padding: 8px 0; font-weight: bold;">${safeAmount} TND</td></tr>
+          <tr><td style="padding: 8px 0; color: #666;">Delivery email</td><td style="padding: 8px 0; font-weight: bold;">${safeDeliveryEmail}</td></tr>
+          <tr><td style="padding: 8px 0; color: #666;">Gateway</td><td style="padding: 8px 0; font-weight: bold;">${safeGateway}</td></tr>
+        </table>
+        <p style="color: #666; font-size: 13px; margin-top: 20px;">Open the admin dashboard to review fulfillment details.</p>
+      </div>
+    `,
+  });
+  return true;
+}
+
 async function sendPasswordChangeOTP(email, otp) {
   const safeOtp = escapeHtml(otp);
 
@@ -224,6 +263,7 @@ module.exports = {
   sendOrderConfirmation,
   sendFulfillmentEmail,
   sendContactAck,
+  sendInternalOrderNotification,
   sendPasswordChangeOTP,
   sendPasswordResetLink,
 };
