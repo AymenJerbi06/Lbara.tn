@@ -93,6 +93,23 @@
     });
   }
 
+  async function logout() {
+    try {
+      if (window.api?.logout) {
+        await window.api.logout();
+      } else {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+    } catch {
+      // The redirect still clears the user-facing session path even if the request fails.
+    }
+    window.location.href = '/login.html';
+  }
+
   function init() {
     initAccountSocials();
     document.querySelectorAll('[data-account-language]').forEach(buildLanguageMenu);
@@ -103,6 +120,13 @@
   document.addEventListener('lbara:i18nready', init);
   document.addEventListener('lbara:languagechange', syncLanguageMenus);
   document.addEventListener('click', closeMenus);
+  document.addEventListener('click', (event) => {
+    const logoutButton = event.target.closest('[data-account-logout]');
+    if (!logoutButton) return;
+    event.preventDefault();
+    event.stopPropagation();
+    logout();
+  });
 
-  window.lbaraAccountShell = { init, syncLanguageMenus, setLanguage, initAccountSocials };
+  window.lbaraAccountShell = { init, syncLanguageMenus, setLanguage, initAccountSocials, logout };
 })();

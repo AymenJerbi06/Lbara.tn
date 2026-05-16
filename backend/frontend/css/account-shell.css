@@ -213,6 +213,7 @@
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
+  border: 0;
   padding: 0.75rem 1rem;
   border-radius: 16px;
   background: #fdc34d;
@@ -220,6 +221,8 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 900;
   font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
   transition: transform .14s ease, box-shadow .14s ease;
 }
 
@@ -260,9 +263,13 @@
   position: relative;
   min-width: 46px;
   min-height: 54px;
+  border: 0;
   padding: 0.35rem 0.25rem;
   border-radius: 18px;
+  background: transparent;
   color: #6b7280;
+  font: inherit;
+  cursor: pointer;
   transition: color .14s ease, background .14s ease, transform .14s ease;
 }
 

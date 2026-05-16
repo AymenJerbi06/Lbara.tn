@@ -143,10 +143,10 @@
         <p class="text-xs text-on-surface-variant truncate" id="sidebar-email"></p>
       </div>
     </div>
-    <a href="/api/auth/logout" class="account-signout">
+    <button type="button" data-account-logout class="account-signout">
       <span class="material-symbols-outlined text-base">logout</span>
       <span>Sign Out</span>
-    </a>
+    </button>
   </div>
 </aside>
 
@@ -428,10 +428,10 @@
     <span class="material-symbols-outlined">lock</span>
     <span class="text-[10px] font-bold headline-font">Security</span>
   </a>
-  <a href="/api/auth/logout" class="account-mobile-nav-item flex flex-col items-center gap-1">
+  <button type="button" data-account-logout class="account-mobile-nav-item flex flex-col items-center gap-1">
     <span class="material-symbols-outlined">logout</span>
     <span class="text-[10px] font-bold headline-font">Sign Out</span>
-  </a>
+  </button>
 </nav>
 
 <script src="/js/api.js"></script>
@@ -550,13 +550,13 @@ function reviewAction(o) {
           <p class="text-xs headline-font font-black uppercase tracking-widest text-on-surface-variant mb-1">${escapeHtml(tr('Your review'))}</p>
           <div class="flex items-center gap-2">${reviewStars(o.review_rating)}<span class="text-xs font-bold text-on-surface-variant">${escapeHtml(o.review_comment || tr('No written comment'))}</span></div>
         </div>
-        <button onclick="openReview('${escapeHtml(o.id)}')" class="px-4 py-2 bg-primary-container text-on-primary rounded-full font-bold headline-font text-xs">${escapeHtml(tr('Edit review'))}</button>
+        <button type="button" data-review-order="${escapeHtml(o.id)}" class="px-4 py-2 bg-primary-container text-on-primary rounded-full font-bold headline-font text-xs">${escapeHtml(tr('Edit review'))}</button>
       </div>`;
   }
   return `
     <div class="mt-3 rounded-2xl bg-surface-container p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
       <p class="text-sm font-semibold text-on-surface-variant">${escapeHtml(tr('Bought this service? Share a quick review to help other users choose.'))}</p>
-      <button onclick="openReview('${escapeHtml(o.id)}')" class="px-4 py-2 bg-secondary-container text-on-secondary-container rounded-full font-bold headline-font text-xs">${escapeHtml(tr('Review purchase'))}</button>
+      <button type="button" data-review-order="${escapeHtml(o.id)}" class="px-4 py-2 bg-secondary-container text-on-secondary-container rounded-full font-bold headline-font text-xs">${escapeHtml(tr('Review purchase'))}</button>
     </div>`;
 }
 
@@ -769,7 +769,7 @@ function ensureReviewModal() {
           <p class="text-xs headline-font font-black uppercase tracking-widest text-secondary mb-2">${escapeHtml(tr('Verified purchase review'))}</p>
           <h2 id="review-modal-title" class="headline-font text-2xl font-black text-primary">${escapeHtml(tr('Review service'))}</h2>
         </div>
-        <button onclick="closeReview()" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center">
+        <button type="button" data-review-close class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -777,11 +777,30 @@ function ensureReviewModal() {
       <textarea id="review-comment-input" maxlength="800" rows="4" class="w-full rounded-2xl border-0 bg-surface-container p-4 font-medium focus:ring-2 focus:ring-primary-fixed" placeholder="${escapeHtml(tr('Tell other users what was clear, smooth, or useful...'))}"></textarea>
       <p id="review-modal-msg" class="hidden mt-3 text-sm font-semibold"></p>
       <div class="flex justify-end gap-3 mt-5">
-        <button onclick="closeReview()" class="px-5 py-3 rounded-full bg-surface-container text-on-surface-variant font-bold headline-font text-sm">${escapeHtml(tr('Cancel'))}</button>
-        <button onclick="submitReview()" id="review-submit-btn" class="px-5 py-3 rounded-full bg-primary-container text-on-primary font-bold headline-font text-sm">${escapeHtml(tr('Save review'))}</button>
+        <button type="button" data-review-close class="px-5 py-3 rounded-full bg-surface-container text-on-surface-variant font-bold headline-font text-sm">${escapeHtml(tr('Cancel'))}</button>
+        <button type="button" data-review-submit id="review-submit-btn" class="px-5 py-3 rounded-full bg-primary-container text-on-primary font-bold headline-font text-sm">${escapeHtml(tr('Save review'))}</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
+  modal.addEventListener('click', (event) => {
+    const closeButton = event.target.closest('[data-review-close]');
+    if (closeButton) {
+      event.preventDefault();
+      closeReview();
+      return;
+    }
+    const ratingButton = event.target.closest('[data-review-rating]');
+    if (ratingButton) {
+      event.preventDefault();
+      setReviewRating(Number(ratingButton.getAttribute('data-review-rating')));
+      return;
+    }
+    const submitButton = event.target.closest('[data-review-submit]');
+    if (submitButton) {
+      event.preventDefault();
+      submitReview();
+    }
+  });
   applyTranslations(modal);
   return modal;
 }
@@ -794,7 +813,7 @@ function renderReviewStarInput() {
   container.innerHTML = Array.from({ length: 5 }, (_, index) => {
     const rating = index + 1;
     const active = rating <= selectedReviewRating;
-    return `<button type="button" onclick="setReviewRating(${rating})" class="w-11 h-11 rounded-2xl bg-surface-container flex items-center justify-center">
+    return `<button type="button" data-review-rating="${rating}" class="w-11 h-11 rounded-2xl bg-surface-container flex items-center justify-center">
       <span class="material-symbols-outlined" style="font-variation-settings:'FILL' ${active ? 1 : 0},'wght' 800,'GRAD' 0,'opsz' 24;color:#7b5800;font-size:28px;">star</span>
     </button>`;
   }).join('');
@@ -856,6 +875,14 @@ async function submitReview() {
 }
 
 // ── Password change ───────────────────────────────────────
+document.addEventListener('click', (event) => {
+  const reviewButton = event.target.closest('[data-review-order]');
+  if (!reviewButton) return;
+  event.preventDefault();
+  event.stopPropagation();
+  openReview(reviewButton.getAttribute('data-review-order'));
+});
+
 function togglePwd(inputId, iconId) {
   const input = document.getElementById(inputId);
   const icon = document.getElementById(iconId);
