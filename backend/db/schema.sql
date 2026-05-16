@@ -216,6 +216,24 @@ CREATE TABLE IF NOT EXISTS product_reviews (
 CREATE INDEX IF NOT EXISTS idx_product_reviews_product_id ON product_reviews(product_id);
 CREATE INDEX IF NOT EXISTS idx_product_reviews_user_id ON product_reviews(user_id);
 
+CREATE TABLE IF NOT EXISTS product_events (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id        UUID REFERENCES products(id) ON DELETE CASCADE,
+  user_id           UUID REFERENCES users(id) ON DELETE SET NULL,
+  event_type        VARCHAR(30) NOT NULL,
+  visitor_key_hash  VARCHAR(96),
+  source            VARCHAR(50),
+  user_agent        TEXT,
+  created_at        TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_product_events_product_type_created
+  ON product_events(product_id, event_type, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_product_events_user_created
+  ON product_events(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_product_events_visitor_recent
+  ON product_events(product_id, event_type, visitor_key_hash, created_at DESC);
+
 -- ─── Password Reset Columns (safe to run on existing DB) ──
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token VARCHAR(128);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires TIMESTAMPTZ;

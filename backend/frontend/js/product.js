@@ -117,6 +117,31 @@ function refreshMotion(root) {
   document.dispatchEvent(new CustomEvent('lbara:contentupdated', { detail: { root: root || document } }));
 }
 
+function visitorKey() {
+  try {
+    var key = localStorage.getItem('lbara_visitor_key');
+    if (!key) {
+      key = (window.crypto && window.crypto.randomUUID)
+        ? window.crypto.randomUUID()
+        : 'visitor-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+      localStorage.setItem('lbara_visitor_key', key);
+    }
+    return key;
+  } catch {
+    return 'visitor-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+  }
+}
+
+function trackProductView(productId) {
+  if (!productId || !api.trackProductView) return;
+  api.trackProductView(productId, {
+    visitor_key: visitorKey(),
+    source: 'product_page',
+  }).catch(function () {
+    // Engagement stats are useful, but they should never block browsing.
+  });
+}
+
 function categoryLabel(value) {
   var key = String(value || 'service').toLowerCase();
   var labels = {
@@ -478,6 +503,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     await waitForI18n();
     var res = await api.getProduct(id);
     renderProduct(res.product);
+    trackProductView(res.product.id);
     loading.classList.add('hidden');
     content.classList.remove('hidden');
   } catch (err) {

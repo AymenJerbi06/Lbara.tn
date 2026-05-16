@@ -32,6 +32,7 @@ const api = {
   },
   getProduct: (id) => apiFetch(`/products/${id}`),
   getProductReviews: (id) => apiFetch(`/products/${encodeURIComponent(id)}/reviews`),
+  trackProductView: (id, body = {}) => apiFetch(`/products/${encodeURIComponent(id)}/view`, { method: 'POST', body }),
 
   // Account engagement
   getWishlist: () => apiFetch('/account/wishlist'),

@@ -295,6 +295,56 @@
   background: #B8860B;
 }
 
+.lbara-review-star-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+.lbara-review-star-btn {
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid #d9dee8;
+  border-radius: 1rem;
+  background: #f6f8fc;
+  color: #8a93a3;
+  box-shadow: 2px 2px 0 rgba(0, 48, 96, .12);
+  cursor: pointer;
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease, border-color .14s ease, color .14s ease;
+}
+
+.lbara-review-star-btn:hover,
+.lbara-review-star-btn:focus-visible {
+  transform: translateY(-2px);
+  border-color: #B8860B;
+  box-shadow: 3px 3px 0 rgba(184, 134, 11, .32);
+  outline: none;
+}
+
+.lbara-review-star-btn.is-active {
+  background: #B8860B;
+  border-color: #003060;
+  color: #fff;
+  box-shadow: 3px 3px 0 #003060;
+}
+
+.lbara-review-star-icon {
+  font-size: 1.95rem;
+  font-variation-settings: 'FILL' 0, 'wght' 850, 'GRAD' 0, 'opsz' 24;
+}
+
+.lbara-review-star-btn.is-active .lbara-review-star-icon {
+  font-variation-settings: 'FILL' 1, 'wght' 850, 'GRAD' 0, 'opsz' 24;
+}
+
+.lbara-review-star-label {
+  color: #003060;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
 @media (max-width: 640px) {
   .account-topbar {
     min-height: 68px;

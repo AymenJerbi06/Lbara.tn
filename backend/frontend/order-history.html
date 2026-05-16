@@ -391,7 +391,8 @@ function ensureReviewModal() {
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-      <div id="review-stars-input" class="flex gap-2 mb-5"></div>
+      <div id="review-stars-input" class="lbara-review-star-picker mb-2"></div>
+      <p id="review-rating-label" class="lbara-review-star-label mb-5"></p>
       <textarea id="review-comment-input" maxlength="800" rows="4" class="w-full rounded-2xl border-0 bg-surface-container p-4 font-medium focus:ring-2 focus:ring-primary-fixed" placeholder="${escapeHtml(tr('Tell other users what was clear, smooth, or useful...'))}"></textarea>
       <p id="review-modal-msg" class="hidden mt-3 text-sm font-semibold"></p>
       <div class="flex justify-end gap-3 mt-5">
@@ -425,13 +426,15 @@ function ensureReviewModal() {
 
 function renderReviewStarInput() {
   const container = document.getElementById('review-stars-input');
+  const label = document.getElementById('review-rating-label');
   container.innerHTML = Array.from({ length: 5 }, (_, index) => {
     const rating = index + 1;
     const active = rating <= selectedReviewRating;
-    return `<button type="button" data-review-rating="${rating}" class="w-11 h-11 rounded-2xl bg-surface-container flex items-center justify-center">
-      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' ${active ? 1 : 0},'wght' 800,'GRAD' 0,'opsz' 24;color:#7b5800;font-size:28px;">star</span>
+    return `<button type="button" data-review-rating="${rating}" aria-pressed="${active ? 'true' : 'false'}" aria-label="${rating} / 5" class="lbara-review-star-btn ${active ? 'is-active' : ''}">
+      <span class="material-symbols-outlined lbara-review-star-icon">star</span>
     </button>`;
   }).join('');
+  if (label) label.textContent = selectedReviewRating + ' / 5 ' + tr('stars selected');
 }
 
 function setReviewRating(rating) {
