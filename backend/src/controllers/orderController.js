@@ -18,7 +18,7 @@ const {
   handleValidationError,
 } = require('../utils/validation');
 
-const REVIEWABLE_STATUSES = ['paid', 'processing', 'fulfilled'];
+const REVIEWABLE_STATUSES = ['fulfilled'];
 
 async function create(req, res) {
   try {
@@ -259,7 +259,7 @@ async function reviewOrder(req, res) {
       return res.status(403).json({ success: false, message: 'You can only review your own purchases.' });
     }
     if (!REVIEWABLE_STATUSES.includes(order.status)) {
-      return res.status(409).json({ success: false, message: 'You can review this service after the order is paid.' });
+      return res.status(409).json({ success: false, message: 'You can review this service after the order is fulfilled.' });
     }
 
     const result = await pool.query(

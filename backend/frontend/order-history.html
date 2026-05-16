@@ -257,6 +257,8 @@ const STATUS_MAP = {
   cancelled:       { label: 'Cancelled',  bg: 'bg-error-container',     text: 'text-on-error-container' },
   refunded:        { label: 'Refunded',   bg: 'bg-surface-container',   text: 'text-on-surface-variant' },
 };
+const REVIEWABLE_STATUSES = ['fulfilled'];
+const ordersById = {};
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -302,6 +304,41 @@ function badge(status) {
   return `<span class="text-[10px] font-black headline-font uppercase px-3 py-1 rounded-full ${s.bg} ${s.text}">${escapeHtml(tr(s.label))}</span>`;
 }
 
+function reviewStars(rating) {
+  const value = Number(rating) || 0;
+  return Array.from({ length: 5 }, (_, i) => {
+    const active = i < value;
+    return `<span class="material-symbols-outlined" style="font-variation-settings:'FILL' ${active ? 1 : 0},'wght' 700,'GRAD' 0,'opsz' 24;color:#7b5800;opacity:${active ? 1 : .35};font-size:18px;">star</span>`;
+  }).join('');
+}
+
+function reviewAction(o) {
+  if (!REVIEWABLE_STATUSES.includes(o.status)) {
+    if (['paid', 'processing'].includes(o.status)) {
+      return `
+        <div class="rounded-2xl bg-surface-container p-3">
+          <p class="text-xs font-bold text-on-surface-variant">${escapeHtml(tr('Review available after fulfillment.'))}</p>
+        </div>`;
+    }
+    return '';
+  }
+  if (o.review_rating) {
+    return `
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-2xl bg-surface-container p-3">
+        <div>
+          <p class="text-xs headline-font font-black uppercase tracking-widest text-on-surface-variant mb-1">${escapeHtml(tr('Your review'))}</p>
+          <div class="flex items-center gap-2">${reviewStars(o.review_rating)}<span class="text-xs font-bold text-on-surface-variant">${escapeHtml(o.review_comment || tr('No written comment'))}</span></div>
+        </div>
+        <button onclick="openReview('${escapeHtml(o.id)}')" class="px-4 py-2 bg-primary-container text-on-primary rounded-full font-bold headline-font text-xs">${escapeHtml(tr('Edit review'))}</button>
+      </div>`;
+  }
+  return `
+    <div class="rounded-2xl bg-surface-container p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <p class="text-sm font-semibold text-on-surface-variant">${escapeHtml(tr('Bought this service? Share a quick review to help other users choose.'))}</p>
+      <button onclick="openReview('${escapeHtml(o.id)}')" class="px-4 py-2 bg-secondary-container text-on-secondary-container rounded-full font-bold headline-font text-xs">${escapeHtml(tr('Review purchase'))}</button>
+    </div>`;
+}
+
 function fmtDateTime(iso) {
   return new Date(iso).toLocaleString(activeLocale(), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
@@ -312,24 +349,126 @@ function monthLabel(iso) {
 
 function orderCard(o) {
   return `
-    <div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-[0_4px_20px_rgba(22,28,39,0.03)] border border-outline-variant/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:shadow-lg transition-all">
-      <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center text-primary">
-          <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+    <div class="bg-surface-container-lowest p-6 rounded-[2rem] shadow-[0_4px_20px_rgba(22,28,39,0.03)] border border-outline-variant/5 flex flex-col gap-4 hover:shadow-lg transition-all">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+          </div>
+          <div>
+            <h3 class="headline-font font-bold text-on-surface text-lg">${escapeHtml(tr(o.product_name || 'Order'))}${o.variant_name ? ' - ' + escapeHtml(tr(o.variant_name)) : ''}</h3>
+            <p class="text-sm text-on-surface-variant">${fmtDateTime(o.created_at)} &bull; <span class="font-medium">${escapeHtml(tr('Order #'))} ${escapeHtml(o.order_ref)}</span></p>
+          </div>
         </div>
-        <div>
-          <h3 class="headline-font font-bold text-on-surface text-lg">${escapeHtml(tr(o.product_name || 'Order'))}${o.variant_name ? ' - ' + escapeHtml(tr(o.variant_name)) : ''}</h3>
-          <p class="text-sm text-on-surface-variant">${fmtDateTime(o.created_at)} &bull; <span class="font-medium">${escapeHtml(tr('Order #'))} ${escapeHtml(o.order_ref)}</span></p>
+        <div class="flex items-center justify-between w-full md:w-auto md:text-right md:flex-col gap-2">
+          <span class="headline-font font-black text-xl text-on-surface">- ${formatTnd(o.amount_tnd)}</span>
+          ${badge(o.status)}
         </div>
       </div>
-      <div class="flex items-center justify-between w-full md:w-auto md:text-right md:flex-col gap-2">
-        <span class="headline-font font-black text-xl text-on-surface">- ${formatTnd(o.amount_tnd)}</span>
-        ${badge(o.status)}
-      </div>
+      ${reviewAction(o)}
     </div>`;
 }
 
 let allOrders = [];
+let activeReviewOrderId = null;
+let selectedReviewRating = 5;
+
+function ensureReviewModal() {
+  let modal = document.getElementById('review-modal');
+  if (modal) return modal;
+
+  modal = document.createElement('div');
+  modal.id = 'review-modal';
+  modal.className = 'fixed inset-0 z-[9999] hidden items-center justify-center bg-black/40 px-4';
+  modal.innerHTML = `
+    <div class="w-full max-w-lg rounded-[2rem] bg-surface-container-lowest p-6 shadow-[0_24px_60px_rgba(0,27,59,.24)]">
+      <div class="flex items-start justify-between gap-4 mb-5">
+        <div>
+          <p class="text-xs headline-font font-black uppercase tracking-widest text-secondary mb-2">${escapeHtml(tr('Verified purchase review'))}</p>
+          <h2 id="review-modal-title" class="headline-font text-2xl font-black text-primary">${escapeHtml(tr('Review service'))}</h2>
+        </div>
+        <button onclick="closeReview()" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div id="review-stars-input" class="flex gap-2 mb-5"></div>
+      <textarea id="review-comment-input" maxlength="800" rows="4" class="w-full rounded-2xl border-0 bg-surface-container p-4 font-medium focus:ring-2 focus:ring-primary-fixed" placeholder="${escapeHtml(tr('Tell other users what was clear, smooth, or useful...'))}"></textarea>
+      <p id="review-modal-msg" class="hidden mt-3 text-sm font-semibold"></p>
+      <div class="flex justify-end gap-3 mt-5">
+        <button onclick="closeReview()" class="px-5 py-3 rounded-full bg-surface-container text-on-surface-variant font-bold headline-font text-sm">${escapeHtml(tr('Cancel'))}</button>
+        <button onclick="submitReview()" id="review-submit-btn" class="px-5 py-3 rounded-full bg-primary-container text-on-primary font-bold headline-font text-sm">${escapeHtml(tr('Save review'))}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  applyTranslations(modal);
+  return modal;
+}
+
+function renderReviewStarInput() {
+  const container = document.getElementById('review-stars-input');
+  container.innerHTML = Array.from({ length: 5 }, (_, index) => {
+    const rating = index + 1;
+    const active = rating <= selectedReviewRating;
+    return `<button type="button" onclick="setReviewRating(${rating})" class="w-11 h-11 rounded-2xl bg-surface-container flex items-center justify-center">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' ${active ? 1 : 0},'wght' 800,'GRAD' 0,'opsz' 24;color:#7b5800;font-size:28px;">star</span>
+    </button>`;
+  }).join('');
+}
+
+function setReviewRating(rating) {
+  selectedReviewRating = rating;
+  renderReviewStarInput();
+}
+
+function openReview(orderId) {
+  const order = ordersById[orderId];
+  if (!order) return;
+  if (!REVIEWABLE_STATUSES.includes(order.status)) {
+    const message = tr('You can review this service after the order is fulfilled.');
+    if (window.showToast) window.showToast(message, 'error');
+    else alert(message);
+    return;
+  }
+  activeReviewOrderId = orderId;
+  selectedReviewRating = Number(order.review_rating) || 5;
+  const modal = ensureReviewModal();
+  document.getElementById('review-modal-title').textContent = tr(order.product_name || 'Review service');
+  document.getElementById('review-comment-input').value = order.review_comment || '';
+  document.getElementById('review-modal-msg').className = 'hidden';
+  renderReviewStarInput();
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeReview() {
+  const modal = document.getElementById('review-modal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+async function submitReview() {
+  if (!activeReviewOrderId) return;
+  const btn = document.getElementById('review-submit-btn');
+  const msg = document.getElementById('review-modal-msg');
+  btn.disabled = true;
+  btn.textContent = tr('Saving...');
+  try {
+    await api.reviewOrder(activeReviewOrderId, {
+      rating: selectedReviewRating,
+      comment: document.getElementById('review-comment-input').value.trim(),
+    });
+    msg.textContent = tr('Review saved. Thank you!');
+    msg.className = 'mt-3 text-sm font-semibold text-green-700';
+    closeReview();
+    await init();
+  } catch (err) {
+    msg.textContent = err.message || tr('Failed to save review.');
+    msg.className = 'mt-3 text-sm font-semibold text-red-600';
+  }
+  btn.disabled = false;
+  btn.textContent = tr('Save review');
+}
 
 function filterOrders() {
   const search = (document.getElementById('filter-search')?.value || document.getElementById('search-input')?.value || '').toLowerCase();
@@ -407,6 +546,8 @@ async function init() {
   try {
     const res = await api.myOrders();
     allOrders = res.orders || [];
+    Object.keys(ordersById).forEach(key => delete ordersById[key]);
+    allOrders.forEach(order => { ordersById[order.id] = order; });
     document.getElementById('orders-loading').style.display = 'none';
     renderOrders(allOrders);
   } catch {

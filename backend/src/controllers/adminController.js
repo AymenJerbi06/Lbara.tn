@@ -7,6 +7,7 @@ const {
   getFulfillmentTypeLabel,
   getFulfillmentMethodLabel,
 } = require('../utils/fulfillment');
+const { summarizeOrderFinancials, WEBSITE_FX_RATE } = require('../services/financeService');
 
 function decodeFulfillmentDetails(order) {
   const type = normalizeFulfillmentType(order.fulfillment_type || order.product_fulfillment_type);
@@ -384,22 +385,38 @@ async function listMessages(req, res) {
 
 async function stats(req, res) {
   try {
-    const [orders, revenue, pending, messages] = await Promise.all([
+    const [orders, financialOrders, pending, messages] = await Promise.all([
       pool.query(`SELECT COUNT(*) FROM orders WHERE status IN ('paid','processing','fulfilled','cancelled','refunded','flagged')`),
-      pool.query(`SELECT COALESCE(SUM(amount_tnd), 0) AS total FROM orders WHERE status IN ('paid','processing','fulfilled')`),
+      pool.query(
+        `SELECT o.amount_tnd, o.discount_tnd, o.ticket_quote_id,
+                p.slug AS product_slug, p.category,
+                v.slug AS variant_slug, v.checkout_mode AS variant_checkout_mode
+         FROM orders o
+         JOIN products p ON p.id = o.product_id
+         LEFT JOIN product_variants v ON v.id = o.variant_id
+         WHERE o.status IN ('paid','processing','fulfilled')`
+      ),
       pool.query(`SELECT COUNT(*) FROM orders WHERE status = 'paid'`),
       pool.query(`SELECT COUNT(*) FROM contact_messages WHERE status = 'open'`),
     ]);
+    const financials = summarizeOrderFinancials(financialOrders.rows);
     res.json({
       success: true,
       stats: {
         total_orders: parseInt(orders.rows[0].count),
-        total_revenue_tnd: parseFloat(revenue.rows[0].total),
+        gross_sales_tnd: financials.gross_sales_tnd,
+        gross_sales_cad: financials.gross_sales_cad,
+        money_spent_cad: financials.money_spent_cad,
+        revenue_cad: financials.revenue_cad,
+        revenue_tnd: financials.revenue_tnd,
+        total_revenue_tnd: financials.revenue_tnd,
+        fx_rate: WEBSITE_FX_RATE,
         pending_fulfillment: parseInt(pending.rows[0].count),
         open_messages: parseInt(messages.rows[0].count),
       },
     });
   } catch (err) {
+    console.error('[admin/stats]', err);
     res.status(500).json({ success: false, message: 'Failed to load stats.' });
   }
 }

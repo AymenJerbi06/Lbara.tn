@@ -71,7 +71,7 @@
   <!-- ─── Dashboard Tab ─────────────────────────────────── -->
   <div id="content-dashboard">
     <h1 class="font-headline text-3xl font-black text-primary mb-8">Dashboard Overview</h1>
-    <div id="stats-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <div id="stats-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-6 mb-10">
       <!-- Populated by JS -->
       <div class="cartoon-card p-6 animate-pulse"><div class="h-8 bg-primary/10 rounded-lg mb-2"></div><div class="h-12 bg-primary/5 rounded-lg"></div></div>
       <div class="cartoon-card p-6 animate-pulse"><div class="h-8 bg-primary/10 rounded-lg mb-2"></div><div class="h-12 bg-primary/5 rounded-lg"></div></div>
@@ -807,14 +807,30 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadDashboard() {
   try {
     const { stats } = await apiFetchAdmin('/admin/stats');
+    const moneySpentCad = Number(stats.money_spent_cad || 0).toFixed(2);
+    const revenueCad = Number(stats.revenue_cad || 0).toFixed(2);
+    const revenueTnd = Number(stats.revenue_tnd ?? stats.total_revenue_tnd ?? 0).toFixed(3);
+    const grossSalesTnd = Number(stats.gross_sales_tnd || 0).toFixed(3);
     document.getElementById('stats-grid').innerHTML = `
       <div class="cartoon-card p-6">
         <p class="text-xs font-black text-primary/50 uppercase tracking-widest mb-3">Total Orders</p>
         <p class="text-4xl font-black text-primary">${stats.total_orders}</p>
       </div>
       <div class="cartoon-card p-6">
-        <p class="text-xs font-black text-primary/50 uppercase tracking-widest mb-3">Revenue (TND)</p>
-        <p class="text-4xl font-black text-secondary">${parseFloat(stats.total_revenue_tnd).toFixed(3)}</p>
+        <p class="text-xs font-black text-primary/50 uppercase tracking-widest mb-3">Money Spent</p>
+        <p class="text-3xl font-black text-primary">${moneySpentCad}</p>
+        <p class="text-[10px] font-black text-primary/40 uppercase tracking-widest mt-2">CAD estimated cost</p>
+      </div>
+      <div class="cartoon-card p-6">
+        <p class="text-xs font-black text-primary/50 uppercase tracking-widest mb-3">Revenue</p>
+        <p class="text-3xl font-black text-secondary">${revenueCad}</p>
+        <p class="text-[10px] font-black text-primary/40 uppercase tracking-widest mt-2">CAD net profit</p>
+      </div>
+      <div class="cartoon-card p-6">
+        <p class="text-xs font-black text-primary/50 uppercase tracking-widest mb-3">Revenue</p>
+        <p class="text-3xl font-black text-secondary">${revenueTnd}</p>
+        <p class="text-[10px] font-black text-primary/40 uppercase tracking-widest mt-2">TND net profit</p>
+        <p class="text-[10px] font-black text-primary/35 uppercase tracking-widest mt-1">Gross: ${grossSalesTnd} TND</p>
       </div>
       <div class="cartoon-card p-6 border-accent/30">
         <p class="text-xs font-black text-primary/50 uppercase tracking-widest mb-3">Pending Fulfillment</p>
